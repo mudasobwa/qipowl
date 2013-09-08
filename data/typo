@@ -1,0 +1,64 @@
+// typographic keyboard
+// Sergei Stolyarov <sergei@regolit.com>
+//
+// Initial contribution by Alexey Ten <alexeyten+deb@gmail.com>
+//
+// Based on the layout proposed by Ilya Birman, 
+// http://ilyabirman.ru/typography-layout/
+//
+
+// default layout
+default partial
+xkb_symbols "base" {
+// 1st keyboard row
+    key <TLDE> { [NoSymbol, NoSymbol, U2261, approxeq] };
+    key <AE01> { [NoSymbol, NoSymbol, onesuperior, U2135] };
+    key <AE02> { [NoSymbol, NoSymbol, U2020, onehalf] };
+    key <AE03> { [NoSymbol, NoSymbol, U2021, U266B] };
+    key <AE04> { [NoSymbol, NoSymbol, U2713, U2717] };
+    key <AE05> { [NoSymbol, NoSymbol, U2030, U2205] };
+    key <AE07> { [NoSymbol, NoSymbol, U2220, U2228] };
+    key <AE08> { [NoSymbol, NoSymbol, U221E, U2219] };
+    key <AE09> { [NoSymbol, NoSymbol, U2208, U2209] };
+    key <AE10> { [NoSymbol, NoSymbol, U220B, U220C] };
+    key <AE11> { [NoSymbol, NoSymbol, emdash, U2013] };
+    key <AE12> { [NoSymbol, NoSymbol, notequal, plusminus] };
+
+// 2nd keyboard row
+    key <AD01> { [NoSymbol, NoSymbol, U231A, U231B] }; // "q"
+    key <AD02> { [NoSymbol, NoSymbol, U2200, U00AC] }; // "w"
+    key <AD03> { [NoSymbol, NoSymbol, U2203, U2204] }; // "e"
+    key <AD04> { [NoSymbol, NoSymbol, registered, U221A] }; // "r"
+    key <AD05> { [NoSymbol, NoSymbol, trademark, U2709] }; // "t"
+    key <AD06> { [NoSymbol, NoSymbol, yen, EuroSign] }; // "y"
+    key <AD07> { [NoSymbol, NoSymbol, U25B6, U25B7] }; // "u"
+    key <AD08> { [NoSymbol, NoSymbol, U2022, U25E6] }; // "i"
+    key <AD09> { [NoSymbol, NoSymbol, U2205, U2218] }; // "o"
+    key <AD10> { [NoSymbol, NoSymbol, acute, doubleacute] }; // "p"
+    key <AD11> { [NoSymbol, NoSymbol, U2329, U227A ] }; // [
+    key <AD12> { [NoSymbol, NoSymbol, U232A, U227B ] }; // ]
+
+// 3rd keyboard row
+    key <AC01> { [NoSymbol, NoSymbol, U0301, U2101] }; // "a"
+    key <AC02> { [NoSymbol, NoSymbol, section, U23CE]}; // "s"
+    key <AC03> { [NoSymbol, NoSymbol, degree, division] }; // "d"
+    key <AC04> { [NoSymbol, NoSymbol, U261B, U261E] }; // "f"
+    key <AC07> { [NoSymbol, NoSymbol, doublelowquotemark, singlelowquotemark] }; // "j"
+    key <AC08> { [NoSymbol, NoSymbol, leftdoublequotemark, leftsinglequotemark] }; // "k"
+    key <AC09> { [NoSymbol, NoSymbol, rightdoublequotemark, rightsinglequotemark] }; // "l"
+    key <AC10> { [NoSymbol, NoSymbol, leftsinglequotemark, minutes] }; // ";"
+    key <AC11> { [NoSymbol, NoSymbol, rightsinglequotemark, seconds] }; // "'"
+
+    key <BKSL> { [NoSymbol, NoSymbol, U03BB, U039B] }; // "'"
+
+// 4th keyboard row
+    key <AB02> { [NoSymbol, NoSymbol, multiply, U22C5] }; // "x"
+    key <AB03> { [NoSymbol, NoSymbol, copyright, cent] }; // "c"
+    key <AB04> { [NoSymbol, NoSymbol, U2606, U2605] }; // "v"
+    key <AB05> { [NoSymbol, NoSymbol, U260F, U260E] }; // "b"
+    key <AB06> { [NoSymbol, NoSymbol, U2622, U2623] }; // "n"
+    key <AB07> { [NoSymbol, NoSymbol, U270E, U270D] }; // "m"
+    key <AB08> { [NoSymbol, NoSymbol, guillemotleft, U2282] }; // ","
+    key <AB09> { [NoSymbol, NoSymbol, guillemotright, U2283] }; // "."
+    key <AB10> { [NoSymbol, NoSymbol, ellipsis, U203D] }; // "/"
+};
