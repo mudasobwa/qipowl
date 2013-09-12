@@ -62,7 +62,7 @@ module Typogrowl
      .merge(TAGS_COMPOSE_INLINE) { |k, f, s| f + s }
     
     TAGS_BLOCK = {
-      :hr           => ['———'],
+      :hr           => ['——'],
       :comment      => ['✎', '✍'],
       # block elements 
       :p            => ['❡'],
@@ -109,6 +109,11 @@ module Typogrowl
       :author       => ['Ⓐ', 'ⓐ']
     }.merge(TAGS_BLOCK)   { |k, f, s| f + s }
      .merge(TAGS_INLINE)  { |k, f, s| f + s }
+     
+    TAGS_BLOCKQUOTES = TAGS.select { |k, v|
+      k.to_s.start_with? 'blockquote'
+    }
+    TAGS_BLOCKQUOTES_RE = TAGS_BLOCKQUOTES.values.flatten.join '|'
 
     def stringify tags=:all
       case tags
@@ -146,9 +151,19 @@ module Typogrowl
       content.strip!
       "<#{html_tag}#{clazz}>" + (content.empty? ? '' : "#{content}</#{html_tag}>") 
     end
-    module_function :stringify, :regexpify, :inline?, :block?, :same_tag?, :tag, :html
+    
+    module_function :stringify, 
+                    :regexpify, 
+                    :inline?, 
+                    :block?, 
+                    :same_tag?, 
+                    :tag, 
+                    :html
     
     TAGS_STR = stringify
     TAGS_RE  = regexpify
+    
+    TAGS_RESTRICTED = "〈〉#{TAGS_STR}"
+    TAGS_NOT_ONE_OF = TAGS_RESTRICTED.split(//).join('|')
   end
 end

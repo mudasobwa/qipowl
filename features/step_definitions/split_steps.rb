@@ -2,6 +2,7 @@
 
 module Typogrowl  
   module Helpers
+    module_function :pre_wellform
     module_function :wellform
     module_function :inlines 
     module_function :split

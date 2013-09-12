@@ -1,5 +1,7 @@
 # encoding: utf-8
- 
+
+require_relative 'monkeypatches'
+
 module Typogrowl
   module DSL
     METHODS = Map::TAGS.values.flatten.map(&:to_sym)
@@ -10,20 +12,19 @@ module Typogrowl
       end
 
       def method_missing(method, *args, &block)
-        if METHODS.include?(method)
-          case method
-          when :⚓, :†
-            out_tag, in_tag = args[0].split /‖/
-            attr = (:⚓ == method) ? 'href' : 'title'
-            "<#{Map::tag(method)} #{attr}='#{in_tag}'>#{out_tag}</a>"
-          else
-            Map::html method, *args
-          end
-        else
-          super.method_missing(method, *args, &block)
-        end
+        METHODS.include?(method) ? 
+            Map::html(method, *args) :
+            super.method_missing(method, *args, &block)
       end
       
+      def ⚓ arg
+        out_tag, in_tag = arg.split /‖/
+        method, attr = in_tag.uri? ?
+          [:⚓, 'href'] : [:†, 'title']
+        "<#{Map::tag(method)} #{attr}='#{in_tag}'>#{out_tag}</#{Map::tag(method)}>"
+      end
+      alias_method :†, :⚓
+
       def ✉ arg
         " ✉ <a href='mailto:#{arg}'>#{arg}</a>"
       end

@@ -105,17 +105,17 @@ Feature: Tags to their Typogrowl representation should be handy and working
   Scenario: Abbrs are correctly replaced with HTML
     Given the input string is "Big brown fox†jumps over† herself"
     When we process the string
-    Then the result is "Big <abbr title='jumps over'>brown fox</a> herself"
+    Then the result is "Big <abbr title='jumps over'>brown fox</abbr> herself"
 
   Scenario: Implicit abbrs are correctly replaced with HTML
     Given the input string is "Big brown fox†jumps over herself"
     When we process the string
-    Then the result is "Big <abbr title='jumps over herself'>brown fox</a>"
+    Then the result is "Big <abbr title='jumps over herself'>brown fox</abbr>"
 
   Scenario: Full load of inlines should be processed
     Given the input string is "Big ≡brown fox¹jumps over ≈herself≈≡"
     When we process the string
-    Then the result is "Big <strong>brown <a href='jumps'>fox</a> over <em>herself</em></strong>"
+    Then the result is "Big <strong>brown <abbr title='jumps'>fox</abbr> over <em>herself</em></strong>"
 
   Scenario: Inplace ruby is _somehow_ supported
     Given the input string is "Big #{'='*10} brown fox jumps over herself"

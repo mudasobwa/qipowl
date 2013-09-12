@@ -56,8 +56,8 @@ Feature: Typogrowl input should be properly split into lines
     Then the result starts with "<blockquote>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante. <blockqu"
     And the result ends with "f='http://localhost'>anchor</a></blockquote>"
 
-  Scenario: Blockquote file should be parsed properly
-    Given the input is taken from file "blockquote.tg"
+  Scenario: Example file should be parsed properly
+    Given the input is taken from file "current.tg"
     When we process the input
     Then the result is printed out
 
