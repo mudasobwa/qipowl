@@ -17,6 +17,7 @@ module Typogrowl
             super.method_missing(method, *args, &block)
       end
       
+      # FIXME in-page tags like <a name="name" href="#">
       def ⚓ arg
         out_tag, in_tag = arg.split /‖/
         method, attr = in_tag.uri? ?

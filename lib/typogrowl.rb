@@ -1,11 +1,12 @@
-require "typogrowl/monkeypatches"
+# encoding: utf-8
 
 require "typogrowl/version"
-require "typogrowl/map"
-require "typogrowl/dsl"
-require "typogrowl/helper"
+require "typogrowl/tags"
+require "typogrowl/parser"
+#require "typogrowl/dsl"
+#require "typogrowl/helper"
 
+#require "typogrowl/io"
 
 module Typogrowl
-  
 end
