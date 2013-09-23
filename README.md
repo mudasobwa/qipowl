@@ -1,6 +1,6 @@
 # Typogrowl
 
-TODO: Write a gem description
+And God said “Foo” and there was Bar.
 
 ## Installation
 

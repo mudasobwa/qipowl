@@ -1,0 +1,103 @@
+:quotes :
+  :punctuation :
+    :re : '(?<quote>''|")\s*(?<punct>[.,!?]+)'  
+    :default :
+      - '\k<punct>\k<quote>'
+    :ru :
+      - '\k<quote>\k<punct>'
+  
+  # That's a 6.3" man, he sees sunsets at 10°20'30" E.
+  #             ⇑
+  :inch :
+    :pattern : '"'
+    :re : '(?:\p{Space}[\.,\p{Digit}]+)(")(?=\p{Space}|\Z)'
+    :default :
+      - '″'
+  # That's a 6.3" man, he sees sunsets at 10°20'30" E.
+  #                                               ⇑
+  :seconds :
+    :pattern : '"'
+    :re : '(?:\p{Space}[°''’′\p{Digit}]+)(")(?=\p{Space}|\p{Alpha}|\Z)'
+    :default :
+      - '″'
+
+  # That's a 6.3" man, he sees sunsets at 10°20'30" E.
+  #                                            ⇑
+  :minutes :
+    :pattern : ''''
+    :re : '(\p{Space}[°\p{Digit}]+)('')(?=\p{Space}|\p{Alnum}|\Z)'
+    :default :
+      - '′'
+
+  # That's a 6.3" man, he sees sunsets at 10°20'30" E.
+  #     ⇑
+  :apostrophe_pre :
+    :pattern : ''''
+    :re : '(?<=\p{Alpha})('')(?=\p{Alpha})'
+    :default : 
+      - '♻'
+  # And God said "∇×(∇×F) = ∇(∇·F) − ∇2F" and there was light.
+  #              ⇑
+  :left :
+    :original : '''"'
+    :re : '(?<=\p{Space}|\A)(?<m>"|'')(?=\p{Graph}|\Z)'
+    :compliant : 'right'
+    # Nested quotation marks are chosen if it’s an even occurence
+    :default :
+      - '“'
+      - '‘'
+#      - '〈'
+    :ru :
+      - '«'
+      - '„'
+    :us :
+      - '‘'
+      - '“'
+  # And God said "∇×(∇×F) = ∇(∇·F) − ∇2F" and there was light.
+  #                                     ⇑
+  :right :
+    :slave : true
+    :original : '''"'
+    :re : '(?<=\p{L}|\p{M}|\p{P})(?<m>"|'')(?=\p{Space}|\p{P}|\Z)'
+    :compliant : 'left'
+    # Nested quotation marks are chosen if it’s an odd occurence
+    :default :
+      - '”'
+      - '’'
+#      - '〉'
+    :ru :
+      - '»'
+      - '“'
+    :us :
+      - '’'
+      - '”'
+
+  # That's a 6.3" man, he sees sunsets at 10°20'30" E.
+  #     ⇑
+  :apostrophe_post :
+    :pattern : '♻'
+    :re : '(?<=\p{Alpha})(♻)(?=\p{Alpha})'
+    :default :
+      - '’'
+
+  :alone_single :
+    :re : '('')'
+    :alert: true
+    :default :
+      - '’'
+
+  :alone_double :
+    :re : '(")'
+    :alert: true
+    :default :
+      - '”'
+
+:dashes :
+  :mdash :
+    :re : '\s*(?<dash>—|–| - |--)\s*'
+    :default :
+      - '—'
+    :ru :
+      - ' — '
+    :us :
+      - ' – '
