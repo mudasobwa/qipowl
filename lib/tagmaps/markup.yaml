@@ -6,18 +6,20 @@
 # Regular expressions
 ###############################################
 :re_links : &re_links
-  - '—\s+(?<title>[^,]+),\s*(?<href>\S+)\s*$'
+  - '—\s+(?<title>.+),\s*(?<href>\S+)\s*$'
 :re_list : &re_list
   - '(?m-ix:(?<dsl>♻)(?<rest>[^♻]*?)(?=\n♻|\n\n|\Z))'
 :re_video : &re_video
-  - 'http://www.youtube.com/watch?v=(\S+)'
+  - 'http://www.youtube.com/watch\?v=(\S+)'
   - 'http://youtu.be/(\S+)'
 :re_nested : &re_nested
   - '(?m-ix:(?<dsl>(♻\p{Zs}*)+)(?<rest>.*?)(?=\n[^\p{Alnum}]*♻|\n\n|\Z))'
 :re_surroundings : &re_surroundings
   - '(?<dsl>♻)(?<rest>[^♻]+)(♻)'
-:re_sprawling : &re_sprawling
-  - '(?<pre>\S+)(?<dsl>¹|†)(?<post>\S+?)(?=†|\s|$)'
+:re_a : &re_a
+  - '(?<pre>\S+)(?<dsl>¹)(?<post>\S+)(?=\s|$)'
+:re_abbr : &re_abbr
+  - '(?<pre>\S+)(?<dsl>†)(?<post>[^†]+)(?:†|$)'
 :re_all_sufficient : &re_all_sufficient
   - '(?<dsl>♻)'
 :re_till_eol : &re_till_eol
@@ -217,7 +219,8 @@
 ###############################################
 :sprawling :
   :regexps :
-    :default : *re_sprawling
+    :a : *re_a
+    :abbr : *re_abbr
 
   :tags :
     :abbr : *abbr

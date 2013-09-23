@@ -74,7 +74,7 @@ module Typogrowl
         str.gsub!(re) { |m|
           title, href = $~.captures
           href.gsub(URI.regexp, '').strip.empty? ? 
-            "#{title.gsub(/ /, ' ')}¹#{href}\n\n" : m
+            "#{title.gsub(/ /, ' ')}¹#{href}" : m
         }
       end
       #################################################################
