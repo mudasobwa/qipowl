@@ -8,17 +8,21 @@ Given(/^the input string is taken from file "(.*?)"$/) do |f|
   @content = File.read(f)
 end
 
+################################################################################
 
 When(/^input string is processed with Typogrowl’s preliminary parser$/) do
-  @preliminary = Typogrowl::Parser::Preliminary.new @content
+  @preliminary = Typogrowl::Parser::Preliminary.new(@content)
+  @result = @preliminary.out
 end
 
+################################################################################
+
 Then(/^the result should equal to "(.*?)"$/) do |str|
-  @preliminary.out.should == str
+  @result.should == str
 end
 
 Then(/^the result should equal to content of file "(.*?)"$/) do |f|
-  @preliminary.out.should == File.read(f)
+  @result.should == File.read(f)
 end
 
 ################################################################################

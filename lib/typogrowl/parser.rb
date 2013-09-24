@@ -3,6 +3,8 @@
 require 'uri'
 require 'net/http'
 
+require_relative 'typograph/parser'
+
 module Typogrowl
   module Parser
     class Preliminary
@@ -62,6 +64,8 @@ module Typogrowl
       def parse_brackets str
         str.gsub!(/\(/, Tags.tag(:bracket_open, :control))
         str.gsub!(/\)/, Tags.tag(:bracket_close, :control))
+        str.gsub!(/"/, Tags.tag(:quote_double, :control))
+        str.gsub!(/'/, Tags.tag(:quote_single, :control))
         str.gsub!(/\n(?=\p{Alnum})/, ' ')
         str
       end

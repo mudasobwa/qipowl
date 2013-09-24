@@ -1,4 +1,4 @@
-§1 Heading 1
+⒈ Heading 1
 
 » Lorem ipsum ↓Bernard Show¹http://youtu.be/Sf9867dD↓ consectetur 
 ≡adipiscing elit≡. ≈Integer ≡posuere≡ erat a ante≈, (with a reference.)
@@ -6,13 +6,13 @@
 
 ——
 
-§2 Heading 2
+⒉ Heading 2
 
 » (Lorem ipsum) ↓dolor sit¹amet↓, consectetur adipiscing elit. Integer posuere
 erat a ante, with a reference.
 » » — Bernard Show, http://stackoverflow.com/content/img/5th-anniversary-banner.png
 
-§5 Heading 5
+⒌ Heading 5
 
 » Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere
 erat a ante, with a reference.
@@ -37,7 +37,7 @@ San Francisco, CA 94107
 ≡Full Name≡
 ✉ first.last@example.com
 
-§ § Heading 2
+⒋ Heading 4
 
 ▶ Description lists — A description list is perfect for defining terms.
 ▶ Euismod — Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.⏎
@@ -63,6 +63,7 @@ pretium nisl aliquet pretium nisl aliquet pretium nisl aliquet
 » Integer molestie lorem at massa
 » » Facilisis in ≡pretium nisl≡ aliquet
 » » Nulla volutpat aliquam velit
+» Text goes here
 » • Phasellus iaculis neque
 » • Phasellus2 iaculis neque
 » • Phasellus¹http://wikipedia.org

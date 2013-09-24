@@ -1,9 +1,10 @@
 # encoding: utf-8
 
 require 'yaml'
-require_relative 'exception'
 
 module Typogrowl
+  class InvalidTypogrowl < SyntaxError
+  end
   class Tags
     attr_accessor :yaml
 
@@ -23,8 +24,8 @@ module Typogrowl
             p "IGNORED: $!"
           end
           def #{w}_key(tag, subset = :all)
-            keys = #{w}s(subset).select { |k, v| v.include? tag }.keys
-            raise Tags::InvalidTypogrowl.new "Found two or more keys for tag \#{tag} in subset \#{subset}" if keys.size > 1
+            keys = #{w}s(subset).select { |k, v| v.include? tag.to_s }.keys
+            raise InvalidTypogrowl.new "Found two or more keys for tag \#{tag} in subset \#{subset}: \#{keys}" if keys.size > 1
             keys.first unless keys.empty?
           end
         end
@@ -37,9 +38,18 @@ module Typogrowl
       def ∀ with_controls = false
         res = tags.values
         res -= tags(:control).values unless with_controls
-        res.flatten.uniq.join
+        res.flatten.uniq - [' ']
       end
-      def ∃ tag
+      def ∀∀ 
+        ∀(true)
+      end
+      def ∃ with_controls = false
+        ∀(with_controls).join('|')
+      end
+      def ∃∃
+        ∃(true)
+      end
+      def ∃? tag
         tags.select { |k,v| v.include? tag }
       end
       def ← entity, match = true

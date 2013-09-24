@@ -68,18 +68,18 @@
 :br : &br
   - '⏎'
 :h1 : &h1
-  - '§1'
+  - '⒈'
 :h2 : &h2
-  - '§2'
-  - '§ §'
+  - '⒉'
+  - '§'
 :h3 : &h3
-  - '§3'
+  - '⒊'
 :h4 : &h4
-  - '§4'
+  - '⒋'
 :h5 : &h5
-  - '§5'
+  - '⒌'
 :h6 : &h6
-  - '§6'
+  - '⒍'
 :dd : &dd
   - '▶'
   - '▷'
@@ -118,6 +118,11 @@
   - '≺'
 :bracket_close : &bracket_close
   - '≻'
+:quote_single : &quote_single
+  - '╌'
+:quote_double : &quote_double
+  - '╍'
+
   
 :link : &link
   - '⚓'
@@ -142,11 +147,13 @@
 :op_li : &op_li
   - '∈'
 :op_li2 : &op_li2
-  - '∈'
+  - '⊂'
 :op_blockquote : &op_blockquote
   - '⌚'
 :op_blockquote2 : &op_blockquote2
   - '⌛'
+:op_dd : &op_dd
+  - '⊕'
 
 ################################################################################
 # <<<<<<<<<<<<<<<<<<<<<  END OF DECLARATION AREA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -161,12 +168,24 @@
     :links : *re_links
     
   :tags :
+    :placeholder : *placeholder
+
     :nbsp : *nbsp
     :unknown : *unknown
     :error : *error
-    :placeholder : *placeholder
+    
+    :ul : *op_li
+    :ol : *op_li2
+    :bq1 : *op_blockquote
+    :bq2 : *op_blockquote2
+    :dl : *op_dd
+    :broken : *error
+    
     :bracket_open : *bracket_open
     :bracket_close : *bracket_close
+    :quote_single : *quote_single
+    :quote_double : *quote_double
+    
       
 ###############################################
 # Default markup tag to use if not specified
@@ -260,7 +279,7 @@
     :info : *info
     :warning : *warning
     :danger : *danger
-
+    
 ###############################################
 # Tags, which apply till space (microformats)
 ###############################################
@@ -284,6 +303,7 @@
   :tags :
     :li : *li
     :li2 : *li2
+    :dd : *dd
     :blockquote : *blockquote
     :blockquote2 : *blockquote2
     :p : *p
@@ -293,5 +313,6 @@
 #      - '\n\n¶'
     :li : *op_li
     :li2 : *op_li2
+    :dd : *op_dd
     :blockquote : *op_blockquote
     :blockquote2 : *op_blockquote2

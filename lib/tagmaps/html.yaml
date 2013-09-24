@@ -3,10 +3,5 @@
 #     Typegrowl syntax fully ruby-compliant DSL
 ######################################################
 
-:links : 
-  :image : 
-    :params :
-      - 'proto'
-      - 'type'
-      - 'path'
-    :regexp : "(?:^|\s)+(?<proto>[hftps/:]*)(?<path>.+?)\.(?<type>png|jpg|jpeg|JPEG|JPG|gif))(?:\s|$)"
+:tags : 
+  :abbr : 'abbr'
