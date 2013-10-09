@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email = 'am@mudasobwa.ru'
   s.homepage = 'http://github.com/mudasobwa/typogrowl'
   s.summary = %Q{Modern markdown ancestor}
-  s.description = %Q{TODO: detailed description of your gem}
+  s.description = %Q{Multipurpose DSL-based pure text parser.}
   s.extra_rdoc_files = [
     'LICENSE',
     'README.rdoc',
@@ -29,5 +29,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'yard'
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'bueller'
+  
+  s.add_dependency 'psych'
+  s.add_dependency 'typogrowth'
 end
 

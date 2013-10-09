@@ -1,16 +1,3 @@
-:• : :li 
-:◦ : :li†active
-:≡ : :strong
-:≈ : :em
-:↓ : :small
-:λ : :code
-
-:inplace : 
-  - :≡
-  - :≈
-  - :↓
-  - :λ
-
 :nbsp : ' '
 :unknown : '‽'
 :error : '☠'
@@ -35,6 +22,9 @@
 :small : '↓'
 :code : 'λ'
     
+:li : 
+  - '•'
+  - :nested : '◦'
 :dt :
   - '▶'
   - :inline : '▷'

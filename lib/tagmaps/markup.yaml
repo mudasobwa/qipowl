@@ -1,318 +1,112 @@
-###############################################
+######################################################
 # Markup definition
-###############################################
+######################################################
 
-###############################################
-# Regular expressions
-###############################################
-:re_links : &re_links
-  - '—\s+(?<title>.+),\s*(?<href>\S+)\s*$'
-:re_list : &re_list
-  - '(?m-ix:(?<dsl>♻)(?<rest>[^♻]*?)(?=\n♻|\n\n|\Z))'
-:re_video : &re_video
-  - 'http://www.youtube.com/watch\?v=(\S+)'
-  - 'http://youtu.be/(\S+)'
-:re_nested : &re_nested
-  - '(?m-ix:(?<dsl>(♻\p{Zs}*)+)(?<rest>.*?)(?=\n[^\p{Alnum}]*♻|\n\n|\Z))'
-:re_surroundings : &re_surroundings
-  - '(?<dsl>♻)(?<rest>[^♻]+)(♻)'
-:re_a : &re_a
-  - '(?<pre>\S+)(?<dsl>¹)(?<post>\S+)(?=\s|$)'
-:re_abbr : &re_abbr
-  - '(?<pre>\S+)(?<dsl>†)(?<post>[^†]+)(?:†|$)'
-:re_all_sufficient : &re_all_sufficient
-  - '(?<dsl>♻)'
-:re_till_eol : &re_till_eol
-  - '(?<dsl>♻)(?<rest>.*)$'
-:re_till_space : &re_till_space
-  - '(?<dsl>♻)\p{Zs}+(?<rest>\S*)'
-:re_block : &re_block
-  - '(?m-ix:(?<dsl>♻)(?<rest>.*?)(?=\n(?!\p{Zs}*♻)|\Z))'
+######################################################
+# control modifiers
+######################################################
+:symbols :
+  # "\u{00A0}"
+  :nbsp : ' '
+  :unknown : '‽'
+  :error : '☠'
+  :video : '✇'
+  :empty : '␍'
 
-###############################################
-# Tags
-###############################################
+######################################################
+# preliminary parsing to avoid collisions
+######################################################
+:preliminary :
+  :extensions :
+    - :typograph
+  :symbols :
+    - '(' : '〈'
+    - ')' : '〉'
+    - '''' : '╍'
 
-# Placeholder tag MAY be modified, but don’t forget
-# modify it as well in regular expressions
-:placeholder : &placeholder
-  - '♻'
-
-# Markup tags
-:p : &p
-  - '❡'
-  - '¶'
-:li : &li
-  - '•'
-  - '◦'
-:pre : &pre
-  - 'Λ'
-:address : &address
-  - '℁'
-:blockquote : &blockquote
-  - '»'
-:em : &em
-  - '≈'
-:strong : &strong
-  - '≡'
-:small : &small
-  - '↓'
-:code : &code
-  - 'λ'
-:abbr : &abbr
-  - '†'
-:a : &a
-  - '¹'
-:hr : &hr
-  - '——'
-:br : &br
-  - '⏎'
-:h1 : &h1
-  - '⒈'
-:h2 : &h2
-  - '⒉'
-  - '§'
-:h3 : &h3
-  - '⒊'
-:h4 : &h4
-  - '⒋'
-:h5 : &h5
-  - '⒌'
-:h6 : &h6
-  - '⒍'
-:dd : &dd
-  - '▶'
-  - '▷'
-:comment : &comment
-  - '✎'
-:muted : &muted
-  - '☆'
-:primary : &primary
-  - '★'
-:success : &success
-  - '☛'
-:info : &info
-  - '☞'
-:warning : &warning
-  - '☣'
-:danger : &danger
-  - '☢'
-:phone : &phone
-  - '☎'
-:email : &email
-  - '✉'
-
-################################################################################
-# <<<<<<<<<<<<<<<<<<<<<  END OF ALLOWED MODIFICATION AREA <<<<<<<<<<<<<<<<<<<<<<
-################################################################################
-
-# Control tags. DO NOT MODIFY
-# "\u{00A0}"
-:nbsp : &nbsp
-  - ' '
-:unknown : &unknown
-  - '‽'
-:error : &error
-  - '☠'
-:bracket_open : &bracket_open
-  - '≺'
-:bracket_close : &bracket_close
-  - '≻'
-:quote_single : &quote_single
-  - '╌'
-:quote_double : &quote_double
-  - '╍'
-
+######################################################
+# dropping a curtseys to human habits
+######################################################
+:badlyformed :
+  - 
+    :name: :anchor
+    :re : 
+      - '—\s+(.+),\s*(\S+)\s*$'
+      - '(http://www.youtube.com/watch\?v=\S+)'
+      - '(http://youtu.be/\S+)'
+      - '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s)'
+    :tags : '⚓'
+  -
+    :name : :abbr
+    :re :
+      - '(?m-ix:(\S+)†(.+?)(?=†|\Z))'
+    :tags : '†'
+    
+:empty :
+  :re : '♻'
+  :tags :
+    :br : '⏎'
+    :hr : '——'
   
-:link : &link
-  - '⚓'
-:img : &img
-  - '⚐'
-:figure : &figure
-  - '⚑'
-:video : &video
-  - '✇'
-:empty : &empty
-  - '␍'
-
-:li2 : &li2
-  - '• •'
-  - '◦ ◦'
-:blockquote2 : &blockquote2
-  - '» »'
-
-###############################################
-# Operators
-###############################################
-:op_li : &op_li
-  - '∈'
-:op_li2 : &op_li2
-  - '⊂'
-:op_blockquote : &op_blockquote
-  - '⌚'
-:op_blockquote2 : &op_blockquote2
-  - '⌛'
-:op_dd : &op_dd
-  - '⊕'
-
-################################################################################
-# <<<<<<<<<<<<<<<<<<<<<  END OF DECLARATION AREA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-################################################################################
-
-
-###############################################
-# Control tags, not directly mapped to markup
-###############################################
-:control :
-  :regexps :
-    :links : *re_links
+:magnetic :
+  :re : '♻\p{Zs}*(\S+)'
+  :tags :
+    :phone : '☎'
+    :email : '✉'
     
+:bracketing :
+  :re : '♻(.*?)♻'
   :tags :
-    :placeholder : *placeholder
-
-    :nbsp : *nbsp
-    :unknown : *unknown
-    :error : *error
+    :strong : '≡'
+    :emphasis : '≈'
+    :small : '↓'
+    :code : 'λ'
     
-    :ul : *op_li
-    :ol : *op_li2
-    :bq1 : *op_blockquote
-    :bq2 : *op_blockquote2
-    :dl : *op_dd
-    :broken : *error
-    
-    :bracket_open : *bracket_open
-    :bracket_close : *bracket_close
-    :quote_single : *quote_single
-    :quote_double : *quote_double
-    
-      
-###############################################
-# Default markup tag to use if not specified
-###############################################
-:default :
-  :tags : 
-    :p : *p
-
-###############################################
-# Internal tags, not directly input by users
-###############################################
-:internal :
-  :regexps :
-    :video : *re_video
-      
+:linewide :
+  :shortcut : '☆'
+  :re : '(?m-ix:♻(.*?)(?=(♲)(?!\()|\R{2}|\Z))'
   :tags :
-    :link : *link
-    :img : *img
-    :figure : *figure
-    :video : *video
-    :empty : *empty
-      
-###############################################
-# Tags, which may be nested
-###############################################
-:nested :
-  :regexps :
-    :default : *re_nested
-#    :cleanup :
-#      - '\n(?=\p{Alnum})'
-  :tags :
-    :li : *li
-    :blockquote : *blockquote
-      
-###############################################
-# Tags, which surround text with  DSL symbols
-###############################################
-:surroundings :
-  :regexps :
-    :default : *re_surroundings
-    
-  :tags :
-    :em : *em
-    :strong : *strong
-    :small : *small
-    :code : *code
-      
-###############################################
-# Tags, which may preceed DSL symbols
-###############################################
-:sprawling :
-  :regexps :
-    :a : *re_a
-    :abbr : *re_abbr
-
-  :tags :
-    :abbr : *abbr
-    :a : *a
-
-###############################################
-# Tags, which are all-sufficient
-###############################################
-:all_sufficient :
-  :regexps:
-    :default : *re_all_sufficient
-
-  :tags :
-    :hr : *hr
-    :br : *br
-      
-###############################################
-# Tags, which are line-wide
-###############################################
-:till_eol :
-  :regexps:
-    :default : *re_till_eol
-    :dd : *re_list
-      
-  :tags :
-    :h1 : *h1
-    :h2 : *h2
-    :h3 : *h3
-    :h4 : *h4
-    :h5 : *h5
-    :h6 : *h6
-    :dd : *dd
-    :comment : *comment
-    :muted : *muted
-    :primary : *primary
-    :success : *success
-    :info : *info
-    :warning : *warning
-    :danger : *danger
-    
-###############################################
-# Tags, which apply till space (microformats)
-###############################################
-:till_space :
-  :regexps:
-    :default : *re_till_space
-
-  :tags :
-    :phone : *phone
-    :email : *email
-
-###############################################
-# Tags, which must be surrounded with block
-###############################################
+    :li : 
+      - '•'
+      - :nested : '◦'
+    :dt :
+      - '▶'
+      - :inline : '▷'
+    :h_1..6 :
+      - '§'
+      - :in_black_circle : '\u{2780}'
+      - :in_white_circle : '\u{278A}'
+      - :with_dot : '\u{2488}'
+    :muted : '☆'
+    :primary : '★'
+    :success : '☛'
+    :info : '☞'
+    :warning : '☣'
+    :danger : '☢'
+    :blockquote : '≻'
+    :address : '℁'
+    :comment : '✎'
+  
 :block :
-  :regexps :
-    :default : *re_block
-#    :p :
-#      - '(?m-ix:\n\n(.)\n\n)'
-      
-  :tags :
-    :li : *li
-    :li2 : *li2
-    :dd : *dd
-    :blockquote : *blockquote
-    :blockquote2 : *blockquote2
-    :p : *p
-      
-  :operators :
-#    :p :
-#      - '\n\n¶'
-    :li : *op_li
-    :li2 : *op_li2
-    :dd : *op_dd
-    :blockquote : *op_blockquote
-    :blockquote2 : *op_blockquote2
+  -
+    :shortcut : '★'
+    :re : '(?m-ix:♻(.*?)♻|\Z)'
+    :tags :
+      :comment : '✍'
+      :pre : 'Λ'
+      :cut : '✁'
+
+  -
+    :re : '(?m-ix:(?<=\R{2})\p{Zs}*(?!♲))'
+    :tags :
+      :paragraph : 
+        - '❡'
+        - :lead : '¶'
+        
+  -
+    :re : '(?m-ix:(♻)(.*?)(?=☆|★)'
+    :tags :
+      :ul : '∈'
+      :ol : '⊂'
+      :dl : '⊕'
+        
