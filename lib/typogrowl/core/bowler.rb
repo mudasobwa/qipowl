@@ -5,7 +5,7 @@ require 'uri'
 
 module Typogrowl
   class ::String
-    RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>&|^=`'
+    RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
     CODEPOINT_ORIGIN = 0x24D0
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
       [s, [(RUBY_SYMBOLS.index(s) + CODEPOINT_ORIGIN)].pack("U")]
@@ -80,17 +80,16 @@ module Typogrowl
     def orphan str
       str
     end
-
+    
     def harvest str
       @yielded << str
       nil
     end
-    
+
     def defreeze
       @courses = @in.bowl.split /\R{2}/
       @courses.map! { |dish| 
         dish.gsub! /\R/, ' '
-        puts "DISH: |#{dish}|"
         @mapping[:synsugar].each { |re, subst|
           dish.gsub! /#{re}/, subst
         } if @mapping[:synsugar]
@@ -102,14 +101,11 @@ module Typogrowl
       @courses.each {|dish|
         rest = eval(dish)
         rest = rest.flatten.join(SEPARATOR) if Array === rest
-        @yielded << orphan(rest) if rest 
+        harvest(nil, orphan(rest)) if rest 
       } unless @courses.nil?
       @out = @yielded.reverse.join("\n")
     end
     def serveup
-      puts '='*40
-      puts @yielded
-      puts '='*40
       @out.unbowl!
     end
   end

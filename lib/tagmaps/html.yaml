@@ -5,7 +5,11 @@
 
 :linewide :
   :• : :li 
+  : • : :li 
   :◦ : :li†active
+  :▶ : :dt
+  :▷ : :dt
+  :℁ : :address
   :» : :blockquote
 
 :inplace : 
@@ -15,6 +19,25 @@
   :λ : :code
   :⚓ : :a
   :† : :abbr
+
+:magnet :
+  :☎ : :span†phone
+  :✉ : :span†email
+  
+:flush :
+  :⏎ : :br
+  :—— : :hr
+
+:custom :
+  :ghgh : '<a class="tag">ghgh</a>'
+  
+:enclosures :
+  :• : :ul
+  : • : :ul
+  :◦ : :ol
+  :▶ : :dl
+  :▷ : :dl†dl_horizontal
+  
 
 :nbsp : ' '
 :unknown : '‽'
