@@ -1,15 +1,20 @@
-:• : :li 
-:◦ : :li†active
-:≡ : :strong
-:≈ : :em
-:↓ : :small
-:λ : :code
+:synsugar :
+  '—\s+(.+),\s*(\S+)\s*\Z' : '⚓\2 \1⚓'
+  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s)' : '⚓\2 \1⚓'
+  '(\S+)†(.+?)(†|\Z)' : '†\1 \2†'
+
+:linewide :
+  :• : :li 
+  :◦ : :li†active
+  :» : :blockquote
 
 :inplace : 
-  - :≡
-  - :≈
-  - :↓
-  - :λ
+  :≡ : :strong
+  :≈ : :em
+  :↓ : :small
+  :λ : :code
+  :⚓ : :a
+  :† : :abbr
 
 :nbsp : ' '
 :unknown : '‽'

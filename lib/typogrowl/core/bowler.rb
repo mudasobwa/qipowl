@@ -1,10 +1,11 @@
 # encoding: utf-8
 
 require 'yaml'
+require 'uri'
 
 module Typogrowl
   class ::String
-    RUBY_SYMBOLS = '\'"-(){}\[\].,!?~+*/%<>&|^=`'
+    RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>&|^=`'
     CODEPOINT_ORIGIN = 0x24D0
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
       [s, [(RUBY_SYMBOLS.index(s) + CODEPOINT_ORIGIN)].pack("U")]
@@ -60,6 +61,10 @@ module Typogrowl
       true
     end
 
+    def self.const_missing name
+      name
+    end
+    
     def method_missing method, *args, &block
       method, *args = special_handler(method, *args, &block) \
         if self.private_methods.include?(:special_handler)
@@ -70,7 +75,10 @@ module Typogrowl
     def initialize
       file = self.class.name.downcase.split('::').last
       @mapping = YAML.load_file "#{File.dirname(__FILE__)}/../../tagmaps/#{file}.yaml"
-      @yielded = []
+    end
+    
+    def orphan str
+      str
     end
 
     def harvest str
@@ -79,14 +87,29 @@ module Typogrowl
     end
     
     def defreeze
-      @in.bowl!
+      @courses = @in.bowl.split /\R{2}/
+      @courses.map! { |dish| 
+        dish.gsub! /\R/, ' '
+        puts "DISH: |#{dish}|"
+        @mapping[:synsugar].each { |re, subst|
+          dish.gsub! /#{re}/, subst
+        } if @mapping[:synsugar]
+        dish
+      }.reverse!
     end
     def roast
-      rest = eval(@in) unless @in.nil?
-      raise Exception.new "Processing input has trailings: [#{rest}]!" unless rest.nil?
-      @out = @yielded.join(SEPARATOR)
+      @yielded = []
+      @courses.each {|dish|
+        rest = eval(dish)
+        rest = rest.flatten.join(SEPARATOR) if Array === rest
+        @yielded << orphan(rest) if rest 
+      } unless @courses.nil?
+      @out = @yielded.reverse.join("\n")
     end
     def serveup
+      puts '='*40
+      puts @yielded
+      puts '='*40
       @out.unbowl!
     end
   end
