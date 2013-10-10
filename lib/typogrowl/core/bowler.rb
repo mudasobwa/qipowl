@@ -3,6 +3,9 @@
 require 'yaml'
 require 'uri'
 
+#require 'typogrowth/string'
+require_relative '../../../../typogrowth/lib/typogrowth/string'
+
 module Typogrowl
   class ::String
     RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
@@ -72,8 +75,8 @@ module Typogrowl
     end
 
   private
-    def initialize
-      file = self.class.name.downcase.split('::').last
+    def initialize file = nil
+      file ||= self.class.name.downcase.split('::').last
       @mapping = YAML.load_file "#{File.dirname(__FILE__)}/../../tagmaps/#{file}.yaml"
     end
     
@@ -81,13 +84,13 @@ module Typogrowl
       str
     end
     
-    def harvest str
+    def harvest callee, str
       @yielded << str
       nil
     end
 
     def defreeze
-      @courses = @in.bowl.split /\R{2}/
+      @courses = @in.typo.bowl.split /\R{2}/
       @courses.map! { |dish| 
         dish.gsub! /\R/, ' '
         @mapping[:synsugar].each { |re, subst|

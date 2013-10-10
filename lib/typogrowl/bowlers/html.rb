@@ -25,6 +25,7 @@ module Typogrowl
       dt, dd = args.join(SEPARATOR).split(/\s*—\s*/)
       harvest __callee__, "#{tagify :dt, {}, dt}#{tagify :dd, {}, dd}"
     end
+    alias :▷ :▶
     
     def ⚓ *args
       href, *title = args.flatten
@@ -35,11 +36,11 @@ module Typogrowl
       term, *title = args.flatten
       tagify @mapping[:inplace][__callee__], {:title => title.join(SEPARATOR)}, term
     end
+    
   private
     def initialize
       super
-      {
-        :linewide => :☀, :inplace => :☼, :flush => :⏎, :magnet => :☎
+      { :linewide => :☀, :inplace => :☼, :flush => :⏎, :magnet => :☎
       }.each { |section, meth|
         @mapping[section].each { |tag, htmltag|
           Html.class_eval %Q{
@@ -73,7 +74,7 @@ module Typogrowl
     end
 
     def orphan str
-      tagify :p, {:class => "lead"}, str.strip
+      tagify :p, {:class => "dropcap"}, str.strip
     end
 
     def level oper
@@ -91,7 +92,7 @@ module Typogrowl
           if nxt && (!@callee || level(callee) >= level(@callee))
         @callee = callee
       end
-      super str
+      super callee, str
     end
         
     def special_handler method, *args, &block
@@ -108,7 +109,7 @@ module Typogrowl
   end
 end
 
-tg =  Typogrowl::Html.new
+tg =  Typogrowl::Html.new 
 
 tg.in = 'welcome! 
 
@@ -121,7 +122,7 @@ tg.in = 'welcome!
 ▷ P — 2 I like Markdown¹http://daringfireball.net/projects/markdown/syntax
 • 3 Wiki†Best online 
 knowledge base ever†
- • 4
+ • "And God said "That\'s a 6.3" man, he sees sunsets at 10°20\'30" E." and there was light."
  • 4 instance_exec bye!
 • 5'
 
