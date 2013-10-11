@@ -10,6 +10,7 @@ module Typogrowl
   end
   class ::String
     CARRIAGE_RETURN = '␍'
+    NBSP = "\u{00A0}"
     RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
     CODEPOINT_ORIGIN = 0x24D0
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
@@ -72,6 +73,10 @@ module Typogrowl
     def entitify
       (out = self.dup).entitify!
       out
+    end
+    
+    def self.mapping
+      BOWLED_SYMBOLS
     end
   end
 end

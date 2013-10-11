@@ -52,6 +52,9 @@ module Typogrowl
     end
 
     def defreeze
+      # FIXME Make this configurable
+      raise Exception.new "Reserved symbols are used in input. Aborting…" \
+        if /[#{String::BOWL_SYMBOLS}]/ =~ @in
       @courses = @in.typo.bowl
     end
     def roast
@@ -73,6 +76,13 @@ module Typogrowl
     def serveup
       @out.carriage!
       @out.unbowl!
+    end
+    
+    def section tag
+      result = @mapping.each { |k, v| 
+        break k if Hash === v && v.keys.include?(tag) 
+      }
+      return Symbol === result ? result : nil
     end
   end
 end

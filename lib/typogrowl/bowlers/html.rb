@@ -4,11 +4,12 @@ require_relative '../core/bowler'
 
 module Typogrowl
   class Html < Bowler
-    def ☀ *args
+
+    def • *args
       harvest __callee__, tagify(@mapping[:linewide][__callee__], {}, args)
     end
     
-    def ☼ *args
+    def ≡ *args
       tagify(@mapping[:inplace][__callee__], {}, args)
     end
     
@@ -54,7 +55,12 @@ module Typogrowl
   private
     def initialize
       super
-      { :linewide => :☀, :inplace => :☼, :flush => :⏎, :magnet => :☎
+      { 
+        :flush => :⏎,
+        :block => :Λ,
+        :magnet => :☎,
+        :inplace => :≡,
+        :linewide => :•
       }.each { |section, meth|
         @mapping[section].each { |tag, htmltag|
           Html.class_eval %Q{
@@ -88,12 +94,12 @@ module Typogrowl
     end
 
     def orphan str
-      tagify :p, {:class => "dropcap"}, str.strip
+      tagify :p, {:class => 'dropcap'}, str.strip
     end
 
     def level oper
       oper = oper.to_s
-      (0..oper.length-1).each { |i| break i if oper[i] != "\u{00A0}" }
+      (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
 
     def harvest callee, str
@@ -119,6 +125,15 @@ module Typogrowl
     end
         
     def special_handler method, *args, &block
+      # Sublevel markers, e.g. “ •” is level 2 line-item
+      if level(method) > 0
+        orig = method.to_s[level(method), method.length].to_sym
+        @mapping[section orig][method] = @mapping[section orig][orig]
+        Html.class_eval %Q{
+          alias :#{method} :#{orig}
+        }
+        return send(method, args)
+      end
       # Inplace tags, like “≡” for ≡bold decoration≡ 
       @mapping[:inplace].each { |tag, htmltag|
         if method.to_s.start_with? tag.to_s
@@ -134,7 +149,7 @@ end
 
 tg =  Typogrowl::Html.new 
 
-tg.in = 'welcome! 
+tg.in = '§2 welcome! 
 
 ℁
 ≡Twitter≡ ⏎
@@ -149,6 +164,7 @@ knowledge base ever†
  • 4 instance_exec bye!
 • 5
 
+——
 Λ ruby
       @mapping[:inplace].each { |tag, htmltag|
         if method < 5 && method > 2

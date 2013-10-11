@@ -1,5 +1,7 @@
 # Typogrowl
 
+![Typogrowl](/images/owl.png)
+
 And God said “Foo” and there was Bar.
 
 ## Installation
