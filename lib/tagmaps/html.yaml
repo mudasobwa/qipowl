@@ -10,7 +10,8 @@
   :▶ : :dt
   :▷ : :dt
   :℁ : :address
-  :» : :blockquote
+  :» : :p
+  : » : :p
 
 :inplace : 
   :≡ : :strong
@@ -19,6 +20,10 @@
   :λ : :code
   :⚓ : :a
   :† : :abbr
+  
+:block : 
+  :Λ : :pre
+  :✎ : :comment
 
 :magnet :
   :☎ : :span†phone
@@ -37,6 +42,8 @@
   :◦ : :ol
   :▶ : :dl
   :▷ : :dl†dl_horizontal
+  :» : :blockquote
+  : » : :blockquote
   
 
 :nbsp : ' '

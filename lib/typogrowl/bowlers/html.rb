@@ -15,6 +15,20 @@ module Typogrowl
     def ⏎ *args
       [opening(@mapping[:flush][__callee__]), args]
     end
+    
+    def Λ param, *args
+      harvest __callee__, 
+              tagify(
+                      @mapping[:block][__callee__], 
+                      {:class=>param.strip}, 
+                      args.join(SEPARATOR).entitify
+                    )
+    end
+
+    def ✎ param, *args
+      harvest __callee__, 
+        "<!-- [#{param.strip}]#{args.join(SEPARATOR)}-->"      
+    end
 
     def ☎ *args
       param, *rest = args.flatten
@@ -36,7 +50,7 @@ module Typogrowl
       term, *title = args.flatten
       tagify @mapping[:inplace][__callee__], {:title => title.join(SEPARATOR)}, term
     end
-    
+        
   private
     def initialize
       super
@@ -94,6 +108,15 @@ module Typogrowl
       end
       super callee, str
     end
+    
+    def defreeze
+      super
+      @mapping[:block].each { |tag, htmltag| 
+        @courses.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
+          "#{$1}('#{$2}', '#{$3.uncarriage false}')"
+        }
+      }
+    end
         
     def special_handler method, *args, &block
       # Inplace tags, like “≡” for ≡bold decoration≡ 
@@ -124,11 +147,27 @@ tg.in = 'welcome!
 knowledge base ever†
  • "And God said "That\'s a 6.3" man, he sees sunsets at 10°20\'30" E." and there was light."
  • 4 instance_exec bye!
-• 5'
+• 5
 
-#» Blockquote 1 asd
-#» • Nested 1
-#» • Nested 2
-#» Blockquote 2'
+Λ ruby
+      @mapping[:inplace].each { |tag, htmltag|
+        if method < 5 && method > 2
+          return 2
+        end
+      }
+Λ
+
+✎ FIXME
+Comment is the most outrageneous feature!
+✎ 
+
+» Blockquote 1 asd
+ » Nested 1
+ » Nested 2
+» Blockquote 2
+ • Nested 1
+ • Nested 2
+» Blockquote 2
+'
 
 puts tg.out
