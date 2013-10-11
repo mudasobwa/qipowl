@@ -17,6 +17,11 @@ module Typogrowl
       [opening(@mapping[:flush][__callee__]), args]
     end
     
+    def —— *args
+      harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
+      harvest __callee__, [opening(@mapping[:flush][__callee__])]
+    end
+    
     def Λ param, *args
       harvest __callee__, 
               tagify(
@@ -33,7 +38,7 @@ module Typogrowl
 
     def ☎ *args
       param, *rest = args.flatten
-      [tagify(@mapping[:magnet][__callee__], {}, param), rest]
+      [tagify(@mapping[:magnet][__callee__], {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
     end
     
     def ▶ *args
@@ -103,7 +108,7 @@ module Typogrowl
     end
 
     def harvest callee, str
-      if @callee != callee
+      if callee != @callee
         prv = @mapping[:enclosures][@callee]
         nxt = @mapping[:enclosures][callee]
         @yielded.last.sub! /\A/, opening(prv) \
@@ -127,11 +132,20 @@ module Typogrowl
     def special_handler method, *args, &block
       # Sublevel markers, e.g. “ •” is level 2 line-item
       if level(method) > 0
+        # original (not nested) method. e.g. “•” for “  •”
         orig = method.to_s[level(method), method.length].to_sym
-        @mapping[section orig][method] = @mapping[section orig][orig]
+        
+        # section, the original method belongs to
+        sect = section orig
+        @mapping[sect][method] = @mapping[sect][orig] if @mapping[sect]
+        @mapping[:enclosures][method] = @mapping[:enclosures][orig] \
+          if @mapping[:enclosures][orig]
+        
+        # create alias for nested
         Html.class_eval %Q{
           alias :#{method} :#{orig}
         }
+        # after all, we need to process this nested operator
         return send(method, args)
       end
       # Inplace tags, like “≡” for ≡bold decoration≡ 
@@ -153,7 +167,7 @@ tg.in = '§2 welcome!
 
 ℁
 ≡Twitter≡ ⏎
-☎ +7(111)5554433 ⏎
+☎ +1(987)5554321 ⏎
 ✉ info@twitter.com
 
 ▷ Q — 1 trtr ≈eval instance_exec≈  ≡λghgh ghghλ≡ ghgh
@@ -165,6 +179,9 @@ knowledge base ever†
 • 5
 
 ——
+
+Lorem ipsum —— lorem pupsum.
+
 Λ ruby
       @mapping[:inplace].each { |tag, htmltag|
         if method < 5 && method > 2
@@ -177,13 +194,23 @@ knowledge base ever†
 Comment is the most outrageneous feature!
 ✎ 
 
-» Blockquote 1 asd
- » Nested 1
- » Nested 2
+• Line item 1
+ • Nested li 1
+ • Nested li 2
+• Line item 2
+
+» Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
+Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
+Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
+ » Nested BQ 1
+ » Nested BQ 2
 » Blockquote 2
- • Nested 1
- • Nested 2
-» Blockquote 2
+ • line item 1
+  • nested li1
+  • nested li 2
+ • line item 2
+» Blockquote 3
+
 '
 
 puts tg.out
