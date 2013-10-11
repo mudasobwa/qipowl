@@ -12,7 +12,7 @@ That gives the user an ability to make virtually every term in input text
 the _operating entity_.
 
 _Typogrowl_ utilizes UTF-8 heavily. The standard markup (here and further:
-**Typogrowl markup**, or **TGM**) lays on unicode characters instead of
+_Typogrowl markup_, or _TGM_) lays on unicode characters instead of
 legacy asterisks and underscores in markdown. It brings the better 
 readability to plain text before it’s processed with _Typogrowl_ and
 allows more readable `DSL` for processing. For instance, the input:
@@ -80,7 +80,7 @@ their representation.
     :flush
       :⏎ : :br
 
-means that “⏎” anywhere in text will be substituted with “<br>”
+means that “⏎” anywhere in text will be substituted with “&lt;br&gt;”
 
 #### :block
 
@@ -145,7 +145,7 @@ into
 #### :linewide
 
 Those are not require closings, since they are operated on the _rest_ of
-the text. Support nesting by prepending tags with non-breakable space:
+the text. Support nesting by prepending tags with _non-breakable space_:
 
     :linewide
       :• : li
