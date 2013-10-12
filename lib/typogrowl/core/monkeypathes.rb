@@ -8,9 +8,27 @@ module Typogrowl
       (self.flatten - [nil]).empty?
     end
   end
+  class ::Hash
+    %w{bowl unbowl}.each { |m|
+      Hash.class_eval %Q{
+        def #{m}
+          Hash[self.map { |k, v|
+            [ 
+              Symbol === k ? k.to_s.#{m}.to_sym : k, 
+              Hash === v ? v.#{m} : v 
+            ]
+          }]
+        end
+        def #{m}!
+          self.replace self.#{m}
+        end
+      }
+    }
+  end
   class ::String
-    CARRIAGE_RETURN = '␍'
     NBSP = "\u{00A0}"
+    CARRIAGE_RETURN = '␍'
+    NULL = '␀'
     RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
     CODEPOINT_ORIGIN = 0x24D0
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
@@ -26,14 +44,12 @@ module Typogrowl
     def bowl!
       r = []
       r << self.gsub!(/[#{RUBY_SYMBOLS}]/, BOWLED_SYMBOLS)
-      r << self.gsub!(/(\s)(\d)/, '\1☠\2')
+      r << self.gsub!(/(\s)(\d)/, "\\1#{NULL}\\2")
       (
         RUBY_KEYWORDS + Kernel.public_methods +
-        Bowler.public_instance_methods - 
-        Bowler.public_instance_methods(false) +
-        [:respond_to, :method_missing, :in=]
+        Bowler.public_instance_methods
       ).uniq.each { |m|
-        r << self.gsub!(/(\p{^L})#{m}/, "\\1☠#{m}")
+        r << self.gsub!(/(\p{^L})#{m}/, "\\1#{NULL}#{m}")
       }
       r.vacant? ? nil : self
     end
@@ -44,7 +60,7 @@ module Typogrowl
     def unbowl!
       r = []
       r << self.gsub!(/[#{BOWL_SYMBOLS}]/, UNBOWLED_SYMBOLS)
-      r << self.gsub!(/☠/, '')
+      r << self.gsub!(/#{NULL}/, '')
       r.vacant? ? nil : self
     end
     def unbowl
@@ -73,10 +89,6 @@ module Typogrowl
     def entitify
       (out = self.dup).entitify!
       out
-    end
-    
-    def self.mapping
-      BOWLED_SYMBOLS
     end
   end
 end

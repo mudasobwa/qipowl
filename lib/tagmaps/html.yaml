@@ -18,6 +18,7 @@
 :inplace : 
   :≡ : :strong
   :≈ : :em
+  :'*' : :em
   :↓ : :small
   :λ : :code
   :⚓ : :a
@@ -39,6 +40,7 @@
 
 :custom :
   :ghgh : '<a class="tag">ghgh</a>'
+  :ipsum : '!!!ipsum!!!'
   
 :enclosures :
   :• : :ul

@@ -57,9 +57,9 @@ module Typogrowl
       tagify @mapping[:inplace][__callee__], {:title => title.join(SEPARATOR)}, term
     end
         
-  private
-    def initialize
+    def initialize file = nil
       super
+      merge_rules file if file
       { 
         :flush => :⏎,
         :block => :Λ,
@@ -82,6 +82,7 @@ module Typogrowl
       }
     end
     
+  private
     def opening tag, params={}
       tag, *clazz = tag.to_s.split('†')
       clazz = clazz.empty? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
@@ -120,13 +121,14 @@ module Typogrowl
       super callee, str
     end
     
-    def defreeze
-      super
+    def defreeze str
+      str = super str
       @mapping[:block].each { |tag, htmltag| 
-        @courses.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
+        str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
           "#{$1}('#{$2}', '#{$3.uncarriage false}')"
         }
       }
+      str
     end
         
     def special_handler method, *args, &block
@@ -160,57 +162,3 @@ module Typogrowl
     end
   end
 end
-
-tg =  Typogrowl::Html.new 
-
-tg.in = '§2 welcome! 
-
-℁
-≡Twitter≡ ⏎
-☎ +1(987)5554321 ⏎
-✉ info@twitter.com
-
-▷ Q — 1 trtr ≈eval instance_exec≈  ≡λghgh ghghλ≡ ghgh
-▷ P — 2 I like Markdown¹http://daringfireball.net/projects/markdown/syntax
-• 3 Wiki†Best online 
-knowledge base ever†
- • "And God said "That\'s a 6.3" man, he sees sunsets at 10°20\'30" E." and there was light."
- • 4 instance_exec bye!
-• 5
-
-——
-
-Lorem ipsum —— lorem pupsum.
-
-Λ ruby
-      @mapping[:inplace].each { |tag, htmltag|
-        if method < 5 && method > 2
-          return 2
-        end
-      }
-Λ
-
-✎ FIXME
-Comment is the most outrageneous feature!
-✎ 
-
-• Line item 1
- • Nested li 1
- • Nested li 2
-• Line item 2
-
-» Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
-Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
-Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
- » Nested BQ 1
- » Nested BQ 2
-» Blockquote 2
- • line item 1
-  • nested li1
-  • nested li 2
- • line item 2
-» Blockquote 3
-
-'
-
-puts tg.out
