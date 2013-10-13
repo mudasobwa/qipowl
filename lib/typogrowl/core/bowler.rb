@@ -7,7 +7,7 @@ require 'uri'
 require_relative '../../../../typogrowth/lib/typogrowth/string'
 
 require_relative 'monkeypathes'
-require_relative '../utils/logger'
+require_relative '../utils/logging'
 
 # @author Alexei Matyushkin
 module Typogrowl
