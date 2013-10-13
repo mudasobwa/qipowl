@@ -16,4 +16,6 @@ task :default => :features
 
 require 'yard'
 desc 'YARD'
-YARD::Rake::YardocTask.new(:yard)
+YARD::Rake::YardocTask.new(:yard) do |t|
+  t.files   = ['**/*.rb', 'features/**/*.feature', 'features/**/*.rb']
+end

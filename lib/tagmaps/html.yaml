@@ -1,6 +1,7 @@
+# FIXME keys are to written in non-bowl version and translated later
 :synsugar :
-  '—\s+(.+),\s*(\S+)\s*\Z' : '⚓\2 \1⚓'
-  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s)' : '⚓\2 \1⚓'
+  '—\p{Blank}+(.+)ဌ\s*(\S+)' : '⚓\2 \1⚓'
+  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s|␍|\Z)' : '⚓\2 \1⚓'
   '(\S+)†(.+?)(†|\Z)' : '†\1 \2†'
 
 :flush :
@@ -39,7 +40,7 @@
   :§6 : h6
 
 :custom :
-  :ghgh : '<a class="tag">ghgh</a>'
+  :ghgh : "<a class='tag'>ghgh</a>"
   :ipsum : '!!!ipsum!!!'
   
 :enclosures :

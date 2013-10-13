@@ -30,7 +30,7 @@ module Typogrowl
     CARRIAGE_RETURN = '␍'
     NULL = '␀'
     RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
-    CODEPOINT_ORIGIN = 0x24D0
+    CODEPOINT_ORIGIN = 0x1000
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
       [s, [(RUBY_SYMBOLS.index(s) + CODEPOINT_ORIGIN)].pack("U")]
     }.flatten]

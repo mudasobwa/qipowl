@@ -12,7 +12,7 @@ describe Typogrowl::Bowler do
     context 'text is provided' do
       it 'is modified in whitespace only' do
         @result = @parser.parse_and_roll @string
-        expect(@result.gsub(/[\n\s]/, '')).to eql @result.gsub(/[\n\s]/, '')
+        expect(@result.gsub(/[\n\s]/, '')).to eql @string.gsub(/[\n\s]/, '')
       end
     end
   end
