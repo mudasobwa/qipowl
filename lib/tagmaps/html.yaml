@@ -32,12 +32,19 @@
   :▷ : :dt
   :℁ : :address
   :» : :p
-  :§1 : h1
-  :§2 : h2
-  :§3 : h3
-  :§4 : h4
-  :§5 : h5
-  :§6 : h6
+  :§1 : :h1
+  :§2 : :h2
+  :§3 : :h3
+  :§4 : :h4
+  :§5 : :h5
+  :§6 : :h6
+  :☆ : :p†muted
+  :★ : p†primary
+  :☛ : :p†success
+  :☞ : :p†info
+  :☣ : p†warning
+  :☢ : p†danger
+  :¶ : p†lead
 
 :custom :
   :ghgh : "<a class='tag'>ghgh</a>"
@@ -51,55 +58,4 @@
   :▷ : :dl†dl_horizontal
   :» : :blockquote
   : » : :blockquote
-  
-
-:nbsp : ' '
-:unknown : '‽'
-:error : '☠'
-:video : '✇'
-:empty : '␍'
-:ul : '∈'
-:ol : '⊂'
-:dl : '⊕'
-
-:anchor : '⚓'
-
-:abbr : '†'
-
-:br : '⏎'
-:hr : '——'
-  
-:phone : '☎'
-:email : '✉'
-    
-:strong : '≡'
-:emphasis : '≈'
-:small : '↓'
-:code : 'λ'
-    
-:dt :
-  - '▶'
-  - :inline : '▷'
-:h_1..6 :
-  - '§'
-  - :in_black_circle : '\u{2780}'
-  - :in_white_circle : '\u{278A}'
-  - :with_dot : '\u{2488}'
-:muted : '☆'
-:primary : '★'
-:success : '☛'
-:info : '☞'
-:warning : '☣'
-:danger : '☢'
-:blockquote : '≻'
-:address : '℁'
-:comment : '✎'
-  
-:comment : '✍'
-:pre : 'Λ'
-:cut : '✁'
-
-:paragraph : 
-  - '❡'
-  - :lead : '¶'
 

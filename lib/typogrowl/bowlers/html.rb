@@ -52,8 +52,7 @@ module Typogrowl
 
     # `:block` handler for comment (required because comments are
     # formatted in HTML in some specific way.)
-    # @param [String] param the text to be places on the same string as
-    # opening tag
+    # @param [String] param the text to be places on the same string as opening tag
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return nil
     def ✎ param, *args
@@ -86,6 +85,20 @@ module Typogrowl
     # @return [Array] the array of words with trimmed `a` tag
     def ⚓ *args
       href, *title = args.flatten
+#        uri = URI(link)
+#        Net::HTTP.start(uri.host, uri.port) do |http|
+#          http.open_timeout = 3
+#
+#          request = Net::HTTP::Head.new uri
+#          response = http.request request
+#          Tags.tag(
+#            case response.to_hash["content-type"].first
+#            when /image/ then 'img'
+#            when /text/  then 'link'
+#            else 'unknown'
+#            end
+#          )
+#        end
       tagify @mapping[:inplace][__callee__], {:href => href}, title
     end
     
