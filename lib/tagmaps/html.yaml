@@ -1,0 +1,65 @@
+# FIXME keys are to written in non-bowl version and translated later
+:synsugar :
+  '—\p{Blank}+(.+),\s*(\S+)' : '⚓\2 \1⚓'
+  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s|␍|\Z)' : '⚓\2 \1⚓'
+  '(\S+)†(.+?)(†|\Z)' : '†\1 \2†'
+# http://youtu.be/SAJ_TzLqy1U?t=6s
+  'http://youtu\.be/([A-Za-z0-9_]+)(?:\?t=(\d+)s)?' : '✇ \1'
+# http://www.youtube.com/watch?v=SAJ_TzLqy1U
+  'http://www\.youtube\.com/watch\?v=([A-Za-z0-9_]+)' : '✇ \1'
+# Standalone images and quotes
+  '^(http://\S+)\s+(.*)$' : '⚘ \1 \2'
+
+:flush :
+  :⏎ : :br
+  :—— : :hr
+
+:block : 
+  :Λ : :pre
+  :✎ : :comment
+
+:magnet :
+  :☎ : :span†phone
+  :✉ : :span†email
+  
+:inplace : 
+  :≡ : :strong
+  :≈ : :em
+  :↓ : :small
+  :λ : :code
+  :⚓ : :a
+  :† : :abbr
+  
+:linewide :
+  :• : :li 
+  :◦ : :li†active
+  :▶ : :dt
+  :▷ : :dt
+  :℁ : :address
+  :〉 : :p
+  :§1 : :h1
+  :§2 : :h2
+  :§3 : :h3
+  :§4 : :h4
+  :§5 : :h5
+  :§6 : :h6
+  :☆ : :p†muted
+  :★ : p†primary
+  :☛ : :p†success
+  :☞ : :p†info
+  :☣ : p†warning
+  :☢ : p†danger
+  :¶ : p†lead
+  :✇ : :video
+  :⚘ : :figure
+
+:custom :
+  :ghgh : "<a class='tag'>ghgh</a>"
+  
+:enclosures :
+  :• : :ul
+  :◦ : :ol
+  :▶ : :dl
+  :▷ : :dl†dl_horizontal
+  :〉 : :blockquote
+

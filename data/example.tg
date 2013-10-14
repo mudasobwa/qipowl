@@ -1,20 +1,16 @@
----
-    Typography as by bootstrap, written in TypogrOwl
----
-
 ✎ Headings
 
-§ h1. Bootstrap heading
+§1 h1. Bootstrap heading
 
-§§ h2. Bootstrap heading
+§ § h2. Bootstrap heading
 
-§§§ h3. Bootstrap heading
+§3 h3. Bootstrap heading
 
-§§§§ h4. Bootstrap heading
+§4 h4. Bootstrap heading
 
-§§§§§ h5. Bootstrap heading
+§5 h5. Bootstrap heading
 
-§§§§§§ h6. Bootstrap heading
+§6 h6. Bootstrap heading
 
 ✎ Normal text, 3 paragraphs
 

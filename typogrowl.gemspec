@@ -10,10 +10,10 @@ Gem::Specification.new do |s|
   s.email = 'am@mudasobwa.ru'
   s.homepage = 'http://github.com/mudasobwa/typogrowl'
   s.summary = %Q{Modern markdown ancestor}
-  s.description = %Q{TODO: detailed description of your gem}
+  s.description = %Q{Multipurpose DSL-based pure text parser.}
   s.extra_rdoc_files = [
     'LICENSE',
-    'README.rdoc',
+    'README.md',
   ]
 
   s.required_rubygems_version = Gem::Requirement.new('>= 1.3.7')
@@ -26,8 +26,13 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'fuubar'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'cucumber'
+  s.add_development_dependency 'yard-cucumber'
   s.add_development_dependency 'bueller'
+  
+  s.add_dependency 'psych'
+  s.add_dependency 'typogrowth'
 end
 
