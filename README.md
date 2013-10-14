@@ -34,18 +34,20 @@ allows more readable `DSL` for processing. For instance, the input:
 
 will be processed as:
 
-    <h3>Emphasized text</h3>
-    <p class='dropcap'>There are four standard modifiers for emphasizing text:</p>
-    <dl><dt>“≡”</dt><dd>bold</dd>
-    <dt>“≈”</dt><dd>italic</dd>
-    <dt>“↓”</dt><dd>small</dd>
-    <dt>“λ”</dt><dd>code</dd></dl>
-    <p class='dropcap'>The formers are to surround the target text piece.
-    This text contains:</p>
-    <ul><li><strong>bold</strong>,</li>
-    <li><em>italics</em>,</li>
-    <li><small>small</small></li>
-    <li>and even some <code>code</code>.</li></ul>
+```html
+<h3>Emphasized text</h3>
+<p class='dropcap'>There are four standard modifiers for emphasizing text:</p>
+<dl><dt>“≡”</dt><dd>bold</dd>
+<dt>“≈”</dt><dd>italic</dd>
+<dt>“↓”</dt><dd>small</dd>
+<dt>“λ”</dt><dd>code</dd></dl>
+<p class='dropcap'>The formers are to surround the target text piece.
+This text contains:</p>
+<ul><li><strong>bold</strong>,</li>
+<li><em>italics</em>,</li>
+<li><small>small</small></li>
+<li>and even some <code>code</code>.</li></ul>
+```
 
 The valuable subset of HTML5 is implemented directly, plus the user may
 eventually extend the list of understandable tags.
@@ -174,26 +176,28 @@ for generic words. Please use on your own risk.
 Extending _Typogrowl_ is as easy as writing a couple of strings in YAML format.
 Let’s take a look at additional rules file for markdown support:
 
-    :synsugar :
-      # Code blocks, 4+ spaces indent
-      '(?x-mi:(\R)((?:(?:\R)+(?:\s{4,}|\t).*)+\R)(?=\R))' : "\\1\nΛ auto\\2Λ\n"
-      # Pictures
-      '!\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
-      # Links
-      '\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
-      # Blockquotes
-      '^\s*>' : '〉'
-      '^\s*>\s*>' : '〉 〉'
-      '^\s*\*\s*\*' : '〉 •'
-      '^\s+\*' : '• •'
+```yaml
+:synsugar :
+  # Code blocks, 4+ spaces indent
+  '(?x-mi:(\R)((?:(?:\R)+(?:\s{4,}|\t).*)+\R)(?=\R))' : "\\1\nΛ auto\\2Λ\n"
+  # Pictures
+  '!\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
+  # Links
+  '\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
+  # Blockquotes
+  '^\s*>' : '〉'
+  '^\s*>\s*>' : '〉 〉'
+  '^\s*\*\s*\*' : '〉 •'
+  '^\s+\*' : '• •'
 
 
-    :inplace : 
-      :'__' : :strong
-      :'**' : :strong
-      :'_' : :em
-      :'*' : :em
-      :'`' : :code
+:inplace : 
+  :'__' : :strong
+  :'**' : :strong
+  :'_' : :em
+  :'*' : :em
+  :'`' : :code
+```
 
 Bold, italic, code, images, links, blockquotes (including nesteds) are now 
 supported by _Typogrowl_. Let any one of you who is not delighted with, 
@@ -202,7 +206,9 @@ be the first to throw a stone at me.
 Need custom support for `github`-flavored markdown _strikethrough_? Oneliner
 inside an `:inplace` section of custom rules came on scene:
 
-      :'~~' :strike
+```yaml
+  :'~~' :strike
+```
 
 #### Sophisticated extending
 
@@ -210,16 +216,18 @@ Whether one needs more sophisticated rules, she is to write her own
 descendant of `Bowler` class, implementing DSL herself. E.g. `Html`
 markup uses the following DSL for handling video links to YouTube:
 
-    # Handler for Youtube video
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def ✇ *args
-      id, *rest = args.flatten
-      harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
-      harvest __callee__, "<iframe width='560' height='315' 
-               src='http://www.youtube.com/embed/#{id}' 
-               frameborder='0' allowfullscreen></iframe>"
-    end
+```ruby
+ # Handler for Youtube video
+ # @param [Array] args the words, gained since last call to {#harvest}
+ # @return [Nil] nil
+ def ✇ *args
+   id, *rest = args.flatten
+   harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
+   harvest __callee__, "<iframe width='560' height='315' 
+           src='http://www.youtube.com/embed/#{id}' 
+           frameborder='0' allowfullscreen></iframe>"
+ end
+```
 
 Here we harvest the previously gained words (`rest`) and transform copy-pasted
 link to video into embedded frame with video content as by YouTube.
@@ -240,19 +248,22 @@ Or install it yourself as:
 
 ## Usage
 
-    require 'typogrowl'
-    …
-    tg =  Typogrowl::Html.new 
-    puts tg.parse_and_roll(text)
+```ruby
+require 'typogrowl'
+…
+tg =  Typogrowl::Html.new 
+puts tg.parse_and_roll(text)
+```
 
 or even simplier
 
-    require 'typogrowl'
-    …
-    tg =  Typogrowl.tg_md__html
-    # Will parse typogrowl markup _and_ markdown as well
-    puts tg.parse_and_roll(text)
+```ruby
+require 'typogrowl'
+…
+tg =  Typogrowl.tg_md__html # typogrowl markup _and_ markdown
 
+puts tg.parse_and_roll(text)
+```
 
 ## Contributing
 
