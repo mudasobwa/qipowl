@@ -5,6 +5,7 @@ require_relative 'spec_helper'
 describe Typogrowl::Html do
   before(:each) do
     @parser = Typogrowl::Html.new
+    @parser.merge_rules "#{File.dirname(__FILE__)}/../lib/tagmaps/markdown2html.yaml"
     @string = File.read("#{File.dirname(__FILE__)}/input.tgm")
   end
 
