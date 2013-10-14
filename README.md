@@ -169,7 +169,60 @@ will produce:
 Custom is not yet fully powerful mechanism to make substitutions inplace
 for generic words. Please use on your own risk.
 
+### Extending
 
+Extending _Typogrowl_ is as easy as writing a couple of strings in YAML format.
+Let’s take a look at additional rules file for markdown support:
+
+    :synsugar :
+      # Code blocks, 4+ spaces indent
+      '(?x-mi:(\R)((?:(?:\R)+(?:\s{4,}|\t).*)+\R)(?=\R))' : "\\1\nΛ auto\\2Λ\n"
+      # Pictures
+      '!\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
+      # Links
+      '\[(.*?)\]\((.*?)\)' :  '⚓\2 \1⚓'
+      # Blockquotes
+      '^\s*>' : '〉'
+      '^\s*>\s*>' : '〉 〉'
+      '^\s*\*\s*\*' : '〉 •'
+      '^\s+\*' : '• •'
+
+
+    :inplace : 
+      :'__' : :strong
+      :'**' : :strong
+      :'_' : :em
+      :'*' : :em
+      :'`' : :code
+
+Bold, italic, code, images, links, blockquotes (including nesteds) are now 
+supported by _Typogrowl_. Let any one of you who is not delighted with, 
+be the first to throw a stone at me.
+
+Need custom support for `github`-flavored markdown _strikethrough_? Oneliner
+inside an `:inplace` section of custom rules came on scene:
+
+      :'~~' :strike
+
+#### Sophisticated extending
+
+Whether one needs more sophisticated rules, she is to write her own 
+descendant of `Bowler` class, implementing DSL herself. E.g. `Html`
+markup uses the following DSL for handling video links to YouTube:
+
+    # Handler for Youtube video
+    # @param [Array] args the words, gained since last call to {#harvest}
+    # @return [Nil] nil
+    def ✇ *args
+      id, *rest = args.flatten
+      harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
+      harvest __callee__, "<iframe width='560' height='315' 
+               src='http://www.youtube.com/embed/#{id}' 
+               frameborder='0' allowfullscreen></iframe>"
+    end
+
+Here we harvest the previously gained words (`rest`) and transform copy-pasted
+link to video into embedded frame with video content as by YouTube.
 
 ## Installation
 
@@ -188,13 +241,18 @@ Or install it yourself as:
 ## Usage
 
     require 'typogrowl'
-    
     …
-
     tg =  Typogrowl::Html.new 
-    tg.in = "#{text}"
+    puts tg.parse_and_roll(text)
 
-    puts tg.out
+or even simplier
+
+    require 'typogrowl'
+    …
+    tg =  Typogrowl.tg_md__html
+    # Will parse typogrowl markup _and_ markdown as well
+    puts tg.parse_and_roll(text)
+
 
 ## Contributing
 

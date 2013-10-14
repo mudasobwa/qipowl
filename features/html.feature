@@ -29,6 +29,20 @@ Feature: Composer for HTML produces HTML
         | "— Wikipedia, http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia¹http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†" | "<p class='dropcap'><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
+        | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p class='dropcap'><img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'> goes here.</p>" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'><figcaption><p>Standalone picture</p></figcaption></figure>" |
+
+  Scenario Outline: Syntactic sugar with carriage returns
+    Given the input string is <input>
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should start with to <output>
+
+    Examples:
+        | input                  | output                             |
+        | "http://www.youtube.com/watch?v=gokeLEC8dZc" | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
+        | "http://youtu.be/gokeLEC8dZc" | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
+        | "YouTube http://youtu.be/gokeLEC8dZc inline test." | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
 
   Scenario Outline: Magnets
     Given the input string is <input>
@@ -91,7 +105,8 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input               | output                             |
-        | "Here ![Image](http://wikipedia.org/a.png) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/a.png'>Image</a> goes</p>" |
+        | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p class='dropcap'>Here <img alt='Image' src='http://mudasobwa.ru/images/am.jpg'> goes</p>" |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'><figcaption><p>Figure</p></figcaption></figure>" |
         | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
 
   Scenario: Full processing
