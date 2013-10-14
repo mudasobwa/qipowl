@@ -153,7 +153,7 @@ module Typogrowl
     # @return [String] opening tag for the input given.
     def opening tag, params={}
       tag, *clazz = tag.to_s.split('†')
-      clazz = clazz.empty? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
+      clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
       attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
       "<#{tag}#{clazz}#{attrs}>"
     end
@@ -197,6 +197,7 @@ module Typogrowl
     # @return [Integer] the level requested. 
     #
     def level oper
+      return -1 if oper.nil?
       oper = oper.to_s
       (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
@@ -282,7 +283,7 @@ module Typogrowl
       # FIXME Not efficient!
       @mapping[:inplace].each { |tag, htmltag|
         if method.to_s.start_with? tag.to_s
-          return [method, args].flatten.join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
+          return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
             send(tag, eval($1)).bowl
           }.split(SEPARATOR)
         end

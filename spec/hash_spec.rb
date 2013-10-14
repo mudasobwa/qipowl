@@ -5,7 +5,8 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe Hash do
   before(:each) do
     @hash = {:'*'=>{'*'=>1, 'b'=>2},:w=>{:'*'=>:*, :b=>'b'}}
-    @res = {:ဓ=>{'*'=>1, 'b'=>2},:w=>{:ဓ=>:*, :b=>'b'}}
+    bwld = String::BOWLED_SYMBOLS['*'].to_sym
+    @res = {bwld=>{'*'=>1, 'b'=>2},:w=>{bwld=>:*, :b=>'b'}}
   end
 
   describe "#bowl" do

@@ -40,7 +40,7 @@ module Typogrowl
     include TypoLogging
     # The last interpreted input string and it′s result of evaluation
     # respectively.
-    attr_reader :in, :out
+    attr_reader :in, :out, :mapping
     
     # Internal constant for joining/splitting the strings during processing.
     # Override on your own risk. I can′t imaging why you would need to do so.
@@ -223,7 +223,7 @@ module Typogrowl
       courses = str.split(/\R{2,}/).reverse
       courses.each {|dish|
         rest = eval(dish.uncarriage)
-        rest = rest.flatten.join(SEPARATOR) if Array === rest
+        rest = rest.join(SEPARATOR) if Array === rest
         harvest(nil, orphan(rest)) if rest 
       } unless courses.nil?
       @yielded.reverse.join("\n")

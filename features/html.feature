@@ -116,5 +116,12 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to content of file "spec/output.html"
 
+  Scenario: Weird behaviour with words starting with “ni”
+    Given the input string is "Very define and defined and even defined? words"
+    And parser is "html"
+    And rules from "lib/tagmaps/markdown2html.yaml" are merged in
+    When input string is processed with parser
+    Then the result should equal to "<p class='dropcap'>Very define and defined and even defined? words</p>"
+
     
 

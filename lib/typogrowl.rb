@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-require "typogrowl/version"
+require_relative "typogrowl/version"
 
 #require "typogrowl/utils/io"
-require "typogrowl/core/bowler"
-require "typogrowl/bowlers/html"
+require_relative "typogrowl/core/bowler"
+require_relative "typogrowl/bowlers/html"
 
 module Typogrowl
   def self.tg__html

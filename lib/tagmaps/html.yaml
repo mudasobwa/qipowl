@@ -43,12 +43,12 @@
   :§4 : :h4
   :§5 : :h5
   :§6 : :h6
-  :☆ : :p†muted
-  :★ : p†primary
-  :☛ : :p†success
-  :☞ : :p†info
-  :☣ : p†warning
-  :☢ : p†danger
+  :☆ : :p†text_muted
+  :★ : p†text_primary
+  :☛ : :p†text_success
+  :☞ : :p†text_info
+  :☣ : p†text_warning
+  :☢ : p†text_danger
   :¶ : p†lead
   :✇ : :video
   :⚘ : :figure

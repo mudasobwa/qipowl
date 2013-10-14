@@ -29,7 +29,7 @@ module Typogrowl
     NBSP = "\u{00A0}"
     CARRIAGE_RETURN = '␍'
     NULL = '␀'
-    RUBY_SYMBOLS = '\'"-(){}\[\].,:;!?~+*/%<>@&|^=`'
+    RUBY_SYMBOLS = '\'"\-(){}\[\].,:;!?~+*/%<>@&|^=`'
     CODEPOINT_ORIGIN = 0x1000
     BOWLED_SYMBOLS = Hash[* RUBY_SYMBOLS.split(//).map { |s|
       [s, [(RUBY_SYMBOLS.index(s) + CODEPOINT_ORIGIN)].pack("U")]
@@ -49,7 +49,8 @@ module Typogrowl
         RUBY_KEYWORDS + Kernel.public_methods +
         Bowler.public_instance_methods
       ).uniq.each { |m|
-        r << self.gsub!(/(\p{^L})#{m}/, "\\1#{NULL}#{m}")
+        # FIXME Do something with methods ending with “?”
+        r << self.gsub!(/(?<=\p{^L})#{m.to_s.gsub '?', '\?'}(?=\p{^L})/, "#{NULL}#{m}")
       }
       r.vacant? ? nil : self
     end
