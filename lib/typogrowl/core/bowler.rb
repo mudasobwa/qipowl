@@ -199,7 +199,11 @@ module Typogrowl
     def defreeze str
       raise Exception.new "Reserved symbols are used in input. Aborting…" \
         if /[#{String::BOWL_SYMBOLS}]/ =~ str
-      str.bowl
+      out = str.dup
+      @mapping[:synsugar].each { |re, subst|
+        out.gsub! /#{re}/, subst
+      } if @mapping[:synsugar]
+      out.bowl
     end
 
     # …Drum-roll… Main handler.
@@ -215,15 +219,10 @@ module Typogrowl
     # @return [String] roasted input. It still requires to be {String#unbowl}ed.
     def roast str
       @yielded = []
-      courses = str.split /\R{2}/
-      courses.map! { |dish| 
-        @mapping[:synsugar].each { |re, subst|
-          dish.gsub! /#{re}/, subst
-        } if @mapping[:synsugar]
-        dish.uncarriage
-      }.reverse!
+      # FIXME Understand, why reverse here    ⇓⇓⇓⇓⇓⇓⇓ is needed and (!) works
+      courses = str.split(/\R{2,}/).reverse
       courses.each {|dish|
-        rest = eval(dish)
+        rest = eval(dish.uncarriage)
         rest = rest.flatten.join(SEPARATOR) if Array === rest
         harvest(nil, orphan(rest)) if rest 
       } unless courses.nil?

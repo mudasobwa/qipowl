@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'net/http'
+
 require_relative '../core/bowler'
 
 module Typogrowl
@@ -30,7 +32,7 @@ module Typogrowl
     # `:flash` handler for horizontal rule; it differs from default
     # handler since orphans around must be handled as well.
     # @param [Array] args the words, gained since last call to {#harvest}
-    # @return nil
+    # @return [Nil] nil
     def —— *args
       harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
       harvest __callee__, [opening(@mapping[:flush][__callee__])]
@@ -40,7 +42,7 @@ module Typogrowl
     # @param [Array] args the words, gained since last call to {#harvest}
     # @param [String] param the text to be places on the same string as
     # opening tag
-    # @return nil
+    # @return [Nil] nil
     def Λ param, *args
       harvest __callee__, 
               tagify(
@@ -54,7 +56,7 @@ module Typogrowl
     # formatted in HTML in some specific way.)
     # @param [String] param the text to be places on the same string as opening tag
     # @param [Array] args the words, gained since last call to {#harvest}
-    # @return nil
+    # @return [Nil] nil
     def ✎ param, *args
       harvest __callee__, 
         "<!-- [#{param.strip}]#{args.join(SEPARATOR)}-->"      
@@ -71,7 +73,7 @@ module Typogrowl
     # `:linewide` handler for data lists (required since data list items
     # consist of two tags: `dt` and `dd`.)
     # @param [Array] args the words, gained since last call to {#harvest}
-    # @return nil
+    # @return [Nil] nil
     def ▶ *args
       dt, dd = args.join(SEPARATOR).split(/\s*—\s*/)
       harvest __callee__, "#{tagify :dt, {}, dt}#{tagify :dd, {}, dd}"
@@ -85,21 +87,32 @@ module Typogrowl
     # @return [Array] the array of words with trimmed `a` tag
     def ⚓ *args
       href, *title = args.flatten
-#        uri = URI(link)
-#        Net::HTTP.start(uri.host, uri.port) do |http|
-#          http.open_timeout = 3
-#
-#          request = Net::HTTP::Head.new uri
-#          response = http.request request
-#          Tags.tag(
-#            case response.to_hash["content-type"].first
-#            when /image/ then 'img'
-#            when /text/  then 'link'
-#            else 'unknown'
-#            end
-#          )
-#        end
-      tagify @mapping[:inplace][__callee__], {:href => href}, title
+      case get_href_content(href)
+      when :img 
+        opening :img, { :src => href, :alt => title.join(SEPARATOR) }
+      else 
+        tagify @mapping[:inplace][__callee__], {:href => href}, title
+      end
+    end
+
+    # Handler for Youtube video
+    # @param [Array] args the words, gained since last call to {#harvest}
+    # @return [Nil] nil
+    def ✇ *args
+      id, *rest = args.flatten
+      harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
+      harvest __callee__, "<iframe width='560' height='315' src='http://www.youtube.com/embed/#{id}' 
+               frameborder='0' allowfullscreen></iframe>"
+    end
+    
+    # Handler for standalone pictures and
+    # @todo Make it to understand quotes when there is a plain HTML on the other side
+    # 
+    # @param 
+    # @return [Nil] nil
+    def ⚘ *args
+      href, *title = args.flatten
+      harvest __callee__, "<figure><img src='#{href}'><figcaption><p>#{title.join(SEPARATOR)}</p></figcaption></figure>"
     end
     
     # Handler for abbrs.
@@ -303,6 +316,27 @@ module Typogrowl
         } unless self.class.instance_methods(false).include?(tag)
       }
       @mapping
+    end
+    
+    # Determines content of remote link by href.
+    # @param [String] href link to remote resource
+    # @return [Symbol] content type (`:img` or `:text` currently)
+    def get_href_content href
+      uri = URI(href.to_s.unbowl)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        http.open_timeout = 3
+
+        request = Net::HTTP::Head.new uri
+        response = http.request request
+        case response.to_hash["content-type"].first
+        when /image/ then return :img
+        when /text/ then return :text
+        end
+      end
+      :unknown
+    rescue
+      logger.warn "Unable to determine link type: no internet connection. Reverting to default."
+      :unknown
     end
   end
 end

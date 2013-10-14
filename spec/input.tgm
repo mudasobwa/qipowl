@@ -10,7 +10,7 @@
 • 3 Wiki†Best online 
 knowledge base ever†
  • "And God said "That's a 6.3" man, he sees sunsets at 10°20'30" E." and there was light."
- • 4 instance_exec bye!
+ • 4 instance_exec  bye!
 • 5
 
 ——
@@ -18,6 +18,26 @@ knowledge base ever†
 Lorem __ipsum__ —— *`lorem`* pupsum.
 
 > Markdown blockquotes test.
+
+Markdown code test.
+
+     @mapping[:inplace].each { |tag, htmltag|
+       if method < 5 && method > 2
+         return 2
+       end
+     }
+
+YouTube test.
+
+http://www.youtube.com/watch?v=gokeLEC8dZc
+
+http://youtu.be/gokeLEC8dZc
+
+YouTube http://youtu.be/gokeLEC8dZc inline test.
+
+Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here.
+
+http://mudasobwa.ru/images/am.jpg Standalone picture
 
 Λ ruby
       @mapping[:inplace].each { |tag, htmltag|
