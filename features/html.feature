@@ -4,7 +4,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Inline tags
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
@@ -19,7 +20,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Syntactic sugar
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
@@ -30,7 +32,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Magnets
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
@@ -40,7 +43,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Flushes (oneliners)
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
@@ -49,7 +53,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Flushes (multiliners)
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should be multiline and almost equal to <output>
 
     Examples:
@@ -58,7 +63,8 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Linewides
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should be multiline and almost equal to <output>
 
     Examples:
@@ -68,15 +74,32 @@ Feature: Composer for HTML produces HTML
 
   Scenario Outline: Customs
     Given the input string is <input>
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
         | input               | output                             |
         | "Here ghgh goes" | "<p class='dropcap'>Here <a class='tag'>ghgh</a> goes</p>" |
 
+  Scenario Outline: Markdown atavisms ⇒ links
+    Given the input string is <input>
+    And parser is "html"
+    And rules from "lib/tagmaps/markdown2html.yaml" are merged in
+    When input string is processed with parser
+    Then the result should equal to <output>
+
+    Examples:
+        | input               | output                             |
+        | "Here ![Image](http://wikipedia.org/a.png) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/a.png'>Image</a> goes</p>" |
+        | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
+
   Scenario: Full processing
     Given the input string is taken from file "spec/input.tgm"
-    When input string is processed with Typogrowl::Html parser
+    And parser is "html"
+    And rules from "lib/tagmaps/markdown2html.yaml" are merged in
+    When input string is processed with parser
     Then the result should equal to content of file "spec/output.html"
+
+    
 

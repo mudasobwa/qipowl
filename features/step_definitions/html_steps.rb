@@ -1,5 +1,9 @@
 # encoding: utf-8
 
+Given(/^parser is "(.*?)"$/) do |clazz|
+  @parser = eval("Typogrowl::#{clazz.capitalize}.new")
+end
+
 Given(/^the input string is "(.*?)"$/) do |str|
   @content = str
 end
@@ -8,10 +12,14 @@ Given(/^the input string is taken from file "(.*?)"$/) do |f|
   @content = File.read(f)
 end
 
+Given(/^rules from "(.*?)" are merged in$/) do |f|
+  @parser.merge_rules f
+end
+
 ################################################################################
 
-When(/^input string is processed with Typogrowl::Html parser$/) do
-  @result = Typogrowl::Html.new.parse_and_roll @content
+When(/^input string is processed with parser$/) do
+  @result = @parser.parse_and_roll @content
 end
 
 ################################################################################

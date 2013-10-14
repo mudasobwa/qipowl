@@ -1,0 +1,17 @@
+# FIXME keys are to written in non-bowl version and translated later
+# Markdown atavisms
+#  "["=>"ဈ", "]"=>"ည", "!"=>"ဏ", "("=>"ဃ", ")"=>"င", ">"=>"ဗ", "*"=>"ဓ"
+:synsugar :
+  'ဏဈ(.*?)ညဃ(.*?)င' :  '⚓\2 \1⚓'
+  'ဈ(.*?)ညဃ(.*?)င' :  '⚓\2 \1⚓'
+  '^\s*ဗ' : '〉'
+  '^\s*ဗ\s*ဗ' : '〉 〉'
+  '^\s*ဗ\s*ဓ' : '〉 •'
+  '^\s+ဓ' : '• •'
+
+:inplace : 
+  :'__' : :strong
+  :'**' : :strong
+  :'_' : :em
+  :'*' : :em
+  :'`' : :code

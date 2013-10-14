@@ -19,7 +19,6 @@
 :inplace : 
   :≡ : :strong
   :≈ : :em
-  :'*' : :em
   :↓ : :small
   :λ : :code
   :⚓ : :a
@@ -31,7 +30,7 @@
   :▶ : :dt
   :▷ : :dt
   :℁ : :address
-  :» : :p
+  :〉 : :p
   :§1 : :h1
   :§2 : :h2
   :§3 : :h3
@@ -48,14 +47,11 @@
 
 :custom :
   :ghgh : "<a class='tag'>ghgh</a>"
-  :ipsum : '!!!ipsum!!!'
   
 :enclosures :
   :• : :ul
-  : • : :ul
   :◦ : :ol
   :▶ : :dl
   :▷ : :dl†dl_horizontal
-  :» : :blockquote
-  : » : :blockquote
+  :〉 : :blockquote
 

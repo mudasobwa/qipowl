@@ -15,7 +15,9 @@ knowledge base ever†
 
 ——
 
-Lorem ipsum —— *lorem* pupsum.
+Lorem __ipsum__ —— *`lorem`* pupsum.
+
+> Markdown blockquotes test.
 
 Λ ruby
       @mapping[:inplace].each { |tag, htmltag|
@@ -34,14 +36,14 @@ Comment is the most outrageneous feature!
  ◦ Nested li 2
 • Line item 2
 
-» Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
+〉 Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
 Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
 Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
- » Nested BQ 1
- » Nested BQ 2
-» Blockquote 2
+ 〉 Nested BQ 1
+ 〉 Nested BQ 2
+〉 Blockquote 2
  • line item 1
   • nested li1
   • nested li 2
  • line item 2
-» Blockquote 3
+〉 Blockquote 3

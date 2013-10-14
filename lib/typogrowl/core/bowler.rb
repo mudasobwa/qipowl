@@ -37,6 +37,7 @@ module Typogrowl
   # respectively.
   #
   class Bowler
+    include TypoLogging
     # The last interpreted input string and it′s result of evaluation
     # respectively.
     attr_reader :in, :out
@@ -79,11 +80,13 @@ module Typogrowl
     def merge_rules file_or_hash
       rules = case file_or_hash
       when Hash then file_or_hash
-      when String then YAML.load_file(file_or_hash)\
-        rescue logger.warn "Try to merge rules failed. File: #{file_or_hash}."
-      else logger.info "Inconsistent `merge_rules` call. Param: #{file_or_hash}."
+      when String then YAML.load_file(file_or_hash)
+      else
       end.bowl
       @mapping.rmerge!(rules)
+      fix_mapping if respond_to?(fix_mapping)
+    rescue
+      logger.info "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
     end
     
     # Everything is a DSL, remember?
@@ -116,6 +119,7 @@ module Typogrowl
       file ||= self.class.name.downcase.split('::').last
       file = "#{File.dirname(__FILE__)}/../../tagmaps/#{file}.yaml"
       @mapping = File.exist?(file) ? YAML.load_file(file).bowl : {} 
+      fix_mapping if respond_to?(fix_mapping)
     end
     
   private
@@ -250,4 +254,3 @@ module Typogrowl
     end
   end
 end
-

@@ -126,26 +126,6 @@ module Typogrowl
     def initialize file = nil
       super
       merge_rules file if file
-      { 
-        :flush => :⏎,
-        :block => :Λ,
-        :magnet => :☎,
-        :inplace => :≡,
-        :linewide => :•
-      }.each { |section, meth|
-        @mapping[section].each { |tag, htmltag|
-          Html.class_eval %Q{
-            alias :#{tag} :#{meth}
-          } unless self.class.instance_methods(false).include?(tag)
-        }
-      }
-      @mapping[:custom].each { |tag, re|
-        Html.class_eval %Q{
-          def #{tag} *args
-            ["#{re.bowl}", args]
-          end
-        } unless self.class.instance_methods(false).include?(tag)
-      }
     end
     
   private
@@ -295,6 +275,34 @@ module Typogrowl
         end
       }
       [method, args].flatten
+    end
+
+    # Fixes mapping after initialization and merging rules by dynamically
+    # appending aliases and custom methods to class for rules.
+    #
+    # @return [Hash] rules
+    def fix_mapping
+      { 
+        :flush => :⏎,
+        :block => :Λ,
+        :magnet => :☎,
+        :inplace => :≡,
+        :linewide => :•
+      }.each { |section, meth|
+        @mapping[section].each { |tag, htmltag|
+          Html.class_eval %Q{
+            alias :#{tag} :#{meth}
+          } unless self.class.instance_methods(false).include?(tag)
+        }
+      }
+      @mapping[:custom].each { |tag, re|
+        Html.class_eval %Q{
+          def #{tag} *args
+            ["#{re.bowl}", args]
+          end
+        } unless self.class.instance_methods(false).include?(tag)
+      }
+      @mapping
     end
   end
 end
