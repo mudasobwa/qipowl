@@ -35,7 +35,7 @@ module Typogrowl
     # @return [Nil] nil
     def —— *args
       harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-      harvest __callee__, [opening(@mapping[:flush][__callee__])]
+      harvest __callee__, opening(@mapping[:flush][__callee__])
     end
     
     # `:block` default handler
@@ -197,7 +197,7 @@ module Typogrowl
     # @return [Integer] the level requested. 
     #
     def level oper
-      return -1 if oper.nil?
+      return 0 if oper.nil?
       oper = oper.to_s
       (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
@@ -210,7 +210,7 @@ module Typogrowl
     # @param [Symbol] callee of method
     # @param [String] str to be harvested
     def harvest callee, str
-      if callee != @callee
+      unless callee == @callee && level(callee) == level(@callee)
         prv = @mapping[:enclosures][@callee]
         nxt = @mapping[:enclosures][callee]
         @yielded.last.sub! /\A/, opening(prv) \

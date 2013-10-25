@@ -40,7 +40,12 @@ module Typogrowl
       class def defined? do else elsif end END ensure false for if in module 
       next nil not or redo rescue retry return self super then true undef 
       unless until when while yield}.map &:to_sym
-    
+    DIGITS_ORIGIN = 0x0D66
+    DIGITS_WITH_POINT = (0..8).inject({}) { |m, i|
+      m[i] = [i + DIGITS_ORIGIN].pack("U")
+      m
+    }
+      
     def bowl!
       r = []
       r << self.gsub!(/[#{RUBY_SYMBOLS}]/, BOWLED_SYMBOLS)
@@ -90,6 +95,17 @@ module Typogrowl
     def entitify
       (out = self.dup).entitify!
       out
+    end
+    def self.bracketify i
+      raise Exception.new "Bracketifying is working for integers in range #{(0..8)} only." \
+        unless Fixnum === i && i >= 0 && i <= 8 
+      "❲#{DIGITS_WITH_POINT[i]}❳"
+    end
+  end
+  
+  class ::Fixnum
+    def bracketify
+      String.bracketify self
     end
   end
 end

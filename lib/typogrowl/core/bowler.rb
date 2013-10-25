@@ -51,6 +51,7 @@ module Typogrowl
     # @param [String] str the string to be processed
     # @return [String] the result of string evaluation
     def parse_and_roll str
+      @callee = nil
       serveup roast defreeze @in = str
     end
 

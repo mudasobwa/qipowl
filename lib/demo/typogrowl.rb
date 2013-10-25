@@ -22,6 +22,5 @@ get '/bowler/:type' do |type|
     unless type == 'html'
   str = CGI::parse(request.query_string)['text'].first
   content_type :html
-  puts "TYPO: #{session[:typo]}"
   session[:typo].parse_and_roll str
 end
