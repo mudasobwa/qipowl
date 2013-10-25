@@ -210,13 +210,27 @@ module Typogrowl
     # @param [Symbol] callee of method
     # @param [String] str to be harvested
     def harvest callee, str
-      unless callee == @callee && level(callee) == level(@callee)
+      unless callee == @callee
         prv = @mapping[:enclosures][@callee]
         nxt = @mapping[:enclosures][callee]
-        @yielded.last.sub! /\A/, opening(prv) \
-          if prv && (!callee || level(callee) <= level(@callee))
+        if prv && (!callee || level(callee) <= level(@callee))
+          @yielded.each { |str| str.gsub! /#{level(@callee).bracketify}/, closing(prv) }
+          @yielded.last.sub! /\A/, opening(prv)
+        end
         str += closing(nxt) \
           if nxt && (!@callee || level(callee) >= level(@callee))
+        # if there was a jump down layers, e.g. we encountered second
+        #    level while being on zeroth
+        (level(callee) - 1).downto(level(@callee)) { |i|
+          logger.debug "Jump down levels #{level(@callee)} ⇒ #{level(callee)} Context: #{str}"
+          str += i.bracketify
+        } unless nested_base(callee) == nested_base(@callee)
+        # if there was a jump up layers, e.g. we encountered second
+        #    level while being on fifth
+        (level(@callee) - 1).downto(level(callee)) { |i|
+          logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str}"
+          @yielded.each { |str| str.gsub! /#{i.bracketify}/, '' }
+        } unless nested_base(callee) == nested_base(@callee)
         @callee = callee
       end
       super callee, str
@@ -264,7 +278,7 @@ module Typogrowl
       # Sublevel markers, e.g. “ •” is level 2 line-item
       if level(method) > 0
         # original (not nested) method. e.g. “•” for “  •”
-        orig = method.to_s[level(method), method.length].to_sym
+        orig = nested_base method
         
         # section, the original method belongs to
         sect = section orig
@@ -338,6 +352,13 @@ module Typogrowl
     rescue
       logger.warn "Unable to determine link type: no internet connection. Reverting to default."
       :unknown
+    end
+
+    # Determines nested method’s base (e.g. “•” for [second level] “  •”)
+    # @param [Symbol] nested the name of the nested method
+    # @return [Symbol] the base (original) method name
+    def nested_base nested
+      nested ? nested.to_s[level(nested), nested.length].to_sym : nil
     end
   end
 end
