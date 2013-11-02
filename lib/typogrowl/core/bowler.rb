@@ -3,9 +3,6 @@
 require 'yaml'
 require 'uri'
 
-#require 'typogrowth/string'
-require_relative '../../../../typogrowth/lib/typogrowth/string'
-
 require_relative 'monkeypathes'
 require_relative '../utils/logging'
 
@@ -43,7 +40,7 @@ module Typogrowl
     attr_reader :in, :out, :mapping
     
     # Internal constant for joining/splitting the strings during processing.
-    # Override on your own risk. I can′t imaging why you would need to do so.
+    # Override on your own risk. I can′t imagine why you would need to do so.
     SEPARATOR = $, || ' '
 
     # Main execution method.
@@ -80,14 +77,13 @@ module Typogrowl
     #
     def merge_rules file_or_hash
       rules = case file_or_hash
-      when Hash then file_or_hash
-      when String then YAML.load_file(file_or_hash)
-      else
-      end.bowl
+              when Hash then file_or_hash
+              when String then YAML.load_file(file_or_hash)
+              end.bowl
       @mapping.rmerge!(rules)
-      fix_mapping if respond_to?(fix_mapping)
+      fix_mapping if respond_to?(:fix_mapping)
     rescue
-      logger.info "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
+      logger.warn "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
     end
     
     # Everything is a DSL, remember?
@@ -117,10 +113,8 @@ module Typogrowl
 
     # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
     def initialize file = nil
-      file ||= self.class.name.downcase.split('::').last
-      file = "#{File.dirname(__FILE__)}/../../tagmaps/#{file}.yaml"
-      @mapping = File.exist?(file) ? YAML.load_file(file).bowl : {} 
-      fix_mapping if respond_to?(fix_mapping)
+      @mapping = {}
+      merge_rules file || "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
     end
     
   private
@@ -224,8 +218,7 @@ module Typogrowl
       courses = str.split(/\R{2,}/).reverse
       courses.each {|dish|
         rest = eval(dish.uncarriage)
-        rest = rest.join(SEPARATOR) if Array === rest
-        harvest(nil, orphan(rest)) if rest 
+        harvest(nil, orphan([*rest].join(SEPARATOR))) if rest 
       } unless courses.nil?
       @yielded.reverse.join("\n")
     end

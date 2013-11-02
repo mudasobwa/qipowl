@@ -22,6 +22,10 @@ When(/^input string is processed with parser$/) do
   @result = @parser.parse_and_roll @content
 end
 
+When(/^input string is reversed with unparse_and_roll$/) do
+  @result = @parser.unparse_and_roll @content
+end
+
 ################################################################################
 
 Then(/^the result should equal to "(.*?)"$/) do |result|

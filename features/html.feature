@@ -123,5 +123,9 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to "<p class='dropcap'>Very define and defined and even defined? words</p>"
 
-    
+  Scenario: HTML ⇒ TG
+    Given the input string is taken from file "spec/output.html"
+    And parser is "html"
+    When input string is reversed with unparse_and_roll
+    Then the result should equal to content of file "spec/input.tgm"
 

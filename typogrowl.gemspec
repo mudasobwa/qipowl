@@ -5,6 +5,7 @@ Gem::Specification.new do |s|
   s.name = 'typogrowl'
   s.version = Typogrowl::VERSION
   s.platform = Gem::Platform::RUBY
+  spec.license = 'MIT'
   s.date = '2013-09-08'
   s.authors = ['Alexei Matyushkin']
   s.email = 'am@mudasobwa.ru'
@@ -33,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'bueller'
   
   s.add_dependency 'psych'
+  s.add_dependency 'nokogiri'
   s.add_dependency 'typogrowth'
 end
 

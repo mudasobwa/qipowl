@@ -7,6 +7,12 @@ module Typogrowl
     def vacant?
       (self.flatten - [nil]).empty?
     end
+    # Symplifies `case` statement to select any of values
+    # @param other the element to check against set of values
+    # @return +true+ if the param is presented in the array, +false+ otherwise
+    def ===(other)
+      self.include? other
+    end
   end
   class ::Hash
     %w{bowl unbowl}.each { |m|
