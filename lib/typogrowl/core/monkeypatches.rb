@@ -36,14 +36,14 @@ module Typogrowl
     ASCII_UTF = UTF_ASCII.invert
 
     def bowl!
-      self if self.gsub!(/[#{ASCII_ALL.join}]/, UTF_ASCII)
+      self if self.gsub!(/[#{Regexp.quote(ASCII_ALL.join)}]/, UTF_ASCII)
     end
     def bowl
       (out = self.dup).bowl!
       out
     end
     def unbowl!
-      self if self.gsub!(/[#{UTF_ALL.join}]/, ASCII_UTF)
+      self if self.gsub!(/[#{Regexp.quote(UTF_ALL.join)}]/, ASCII_UTF)
     end
     def unbowl
       (out = self.dup).unbowl!
@@ -61,6 +61,10 @@ module Typogrowl
     end
     def uncarriage!
       self.gsub!(/#{CARRIAGE_RETURN}/, "\n")
+    end
+
+    def to_filename
+      self.bowl.gsub(/\s/, "#{NBSP}")
     end
   end
 end
