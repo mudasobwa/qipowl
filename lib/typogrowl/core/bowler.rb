@@ -80,11 +80,11 @@ module Typogrowl
       rules = case file_or_hash
               when Hash then file_or_hash
               when String then YAML.load_file(file_or_hash)
-              end.bowl
+              end
       @mapping.rmerge!(rules)
       fix_mapping if respond_to?(:fix_mapping)
-    rescue
-      logger.warn "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
+#    rescue
+#      logger.warn "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
     end
 
     # Everything is a DSL, remember?
@@ -193,11 +193,11 @@ module Typogrowl
     #
     # @return [String] preprocessed string
     def defreeze str
-      raise Exception.new "Reserved symbols are used in input. Aborting…" \
-        if /[#{String::BOWL_SYMBOLS}]/ =~ str
+#      raise Exception.new "Reserved symbols are used in input. Aborting…" \
+#        if /[#{String::BOWL_SYMBOLS}]/ =~ str
       out = str.dup
       @mapping[:synsugar].each { |re, subst|
-        out.gsub! /#{re}/, subst
+        out.gsub!(/#{re}/, subst)
       } if @mapping[:synsugar]
       out.bowl
     end

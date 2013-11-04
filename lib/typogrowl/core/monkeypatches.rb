@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require_relative '../utils/hash_recursive_merge'
+
 module Typogrowl
   class ::Array
     # Checks whether an array contains non-nil elements
