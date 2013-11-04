@@ -309,7 +309,7 @@ module Typogrowl
       str = super str
       @mapping[:block].each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
-          "#{$1}('#{$2}', '#{$3.uncarriage false}')"
+          "#{$1}('#{$2}', '#{$3.carriage false}')"
         }
       }
       str
@@ -350,7 +350,7 @@ module Typogrowl
         
         # create alias for nested
         Html.class_eval %Q{
-          alias :#{method} :#{orig}
+          alias :#{method.to_s.bowl} :#{orig}
         }
         # after all, we need to process this nested operator
         return send(method, args)
@@ -381,14 +381,14 @@ module Typogrowl
       }.each { |section, meth|
         @mapping[section].each { |tag, htmltag|
           Html.class_eval %Q{
-            alias :#{tag} :#{meth}
+            alias :#{tag.to_s.bowl} :#{meth}
           } unless self.class.instance_methods(false).include?(tag)
         }
       }
       @mapping[:custom].each { |tag, re|
         Html.class_eval %Q{
-          def #{tag} *args
-            ["#{re.bowl}", args]
+          def #{tag.to_s.bowl} *args
+            ["#{re.to_s.bowl}", args]
           end
         } unless self.class.instance_methods(false).include?(tag)
       }

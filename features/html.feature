@@ -26,7 +26,7 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input                  | output                             |
-        | "— Wikipedia, http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
+        | "— Wikipedia, http://wikipedia.org" | "<p class='dropcap'><small><a href='http://wikipedia.org'>Wikipedia</a></small></p>" |
         | "Wikipedia¹http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†" | "<p class='dropcap'><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
         | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p class='dropcap'><img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'> goes here.</p>" |

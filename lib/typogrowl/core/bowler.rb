@@ -84,7 +84,7 @@ module Typogrowl
       @mapping.rmerge!(rules)
       fix_mapping if respond_to?(:fix_mapping)
 #    rescue
-#      logger.warn "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
+#      logger.error "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
     end
 
     # Everything is a DSL, remember?
@@ -218,7 +218,7 @@ module Typogrowl
       # FIXME Understand, why reverse here    ⇓⇓⇓⇓⇓⇓⇓ is needed and (!) works
       courses = str.split(/\R{2,}/).reverse
       courses.each {|dish|
-        rest = eval(dish.uncarriage)
+        rest = eval(dish.carriage)
         harvest(nil, orphan([*rest].join(SEPARATOR))) if rest
       } unless courses.nil?
       @yielded.reverse.join("\n")
@@ -232,7 +232,7 @@ module Typogrowl
     #
     # @return [String] the result of processing.
     def serveup str
-      @out = str.carriage.unbowl
+      @out = str.uncarriage.unbowl
     end
 
     # Lookups the section in YAML rules file for the given tag.

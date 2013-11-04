@@ -32,7 +32,7 @@ module Typogrowl
         [[char].pack("U"), [char + CODEPOINT_ORIGIN].pack("U")]
       }.flatten]
     }
-    UTF_ALL = [UTF_SYMBOLS, UTF_DIGITS, UTF_LETTERS_SMALL, UTF_LETTERS_CAP]
+    UTF_ALL = [UTF_SYMBOLS.values, UTF_DIGITS.values, UTF_LETTERS_SMALL.values, UTF_LETTERS_CAP.values]
     
     UTF_ASCII = UTF_SYMBOLS.merge(UTF_DIGITS).merge(UTF_LETTERS_SMALL).merge(UTF_LETTERS_CAP)
     ASCII_UTF = UTF_ASCII.invert
