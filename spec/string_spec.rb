@@ -9,7 +9,7 @@ describe String do
   describe "#bowl" do
     context 'bowled string' do
       it 'contains no ruby symbols' do
-        expect(/[#{String::RUBY_SYMBOLS}]/ =~ @string.bowl).to eql nil 
+        expect(/[#{Regexp.quote String::ASCII_ALL.join}]/ =~ @string.bowl).to eql nil 
       end
     end
       
@@ -27,15 +27,6 @@ describe String do
       end
     end
   end
-  
-  describe "#entitify" do
-    context 'entitified string' do
-      it "is contains no restricted symbols even if applied to bowled string" do
-        expect(@string.bowl.entitify.unbowl).to eql @entitified
-      end
-    end
-  end
-  
-  
+    
 end
 

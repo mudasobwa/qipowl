@@ -309,7 +309,7 @@ module Typogrowl
       str = super str
       @mapping[:block].each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
-          "#{$1}('#{$2}', '#{$3.carriage false}')"
+          "#{$1}('#{$2}', '#{$3.carriage}')"
         }
       }
       str

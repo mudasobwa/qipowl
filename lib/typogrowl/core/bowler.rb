@@ -81,7 +81,7 @@ module Typogrowl
               when Hash then file_or_hash
               when String then YAML.load_file(file_or_hash)
               end
-      @mapping.rmerge!(rules)
+      @mapping.rmerge!(rules) if rules
       fix_mapping if respond_to?(:fix_mapping)
 #    rescue
 #      logger.error "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
@@ -115,7 +115,10 @@ module Typogrowl
     # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
     def initialize file = nil
       @mapping = {}
-      merge_rules file || "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
+      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
+      file = fname if !file && File.exist?(fname)
+      
+      merge_rules file
     end
 
   private
