@@ -134,18 +134,18 @@ module Typogrowl
       def start_element name, attributes = []
         tg_name = name.to_sym # FIXME add “†class” if class is presented in attrs
         @tg +=  case tg_name
-                when @mapping[:enclosures].values
+                when *@mapping[:enclosures].values
                   @level += 1
                   "\n\n"
-                when @mapping[:flush].values
+                when *@mapping[:flush].values
                   " #{@mapping[:flush].key(tg_name)}\n"
-                when @mapping[:block].values
+                when *@mapping[:block].values
                   "\n\n#{@mapping[:block].key(tg_name)}"
-                when @mapping[:inplace].values
+                when *@mapping[:inplace].values
                   "#{@mapping[:inplace].key(tg_name)}"
-                when @mapping[:magnet].values
+                when *@mapping[:magnet].values
                   "#{@mapping[:magnet].key(tg_name)}"
-                when @mapping[:linewide].values
+                when *@mapping[:linewide].values
                   "#{' '*@level if @level > 0}#{@mapping[:linewide].key(tg_name)} "
                 else
                   ""
@@ -158,16 +158,16 @@ module Typogrowl
         tg_name = name.to_sym # FIXME add “†class” if class is presented in attrs
         puts "End: #{tg_name}"
         @tg +=  case tg_name
-                when @mapping[:enclosures].values
+                when *@mapping[:enclosures].values
                   @level -= 1
                   "\n\n"
-                when @mapping[:block].values
+                when *@mapping[:block].values
                   "\n#{@mapping[:block].key(tg_name)}\n\n"
-                when @mapping[:inplace].values
+                when *@mapping[:inplace].values
                   "#{@mapping[:inplace].key(tg_name)}"
-                when @mapping[:magnet].values
+                when *@mapping[:magnet].values
                   "\n"
-                when @mapping[:linewide].values
+                when *@mapping[:linewide].values
                   "\n"
                 else
                   ""
