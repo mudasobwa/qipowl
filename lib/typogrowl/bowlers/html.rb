@@ -276,7 +276,7 @@ module Typogrowl
         prv = @mapping[:enclosures][@callee]
         nxt = @mapping[:enclosures][callee]
         if prv && (!callee || level(callee) <= level(@callee))
-          @yielded.each { |str| str.gsub! /#{level(@callee).bracketify}/, closing(prv) }
+          @yielded.each { |str| str.gsub! /#{level(@callee).␚ify}/, closing(prv) }
           @yielded.last.sub! /\A/, opening(prv)
         end
         str += closing(nxt) \
@@ -285,13 +285,16 @@ module Typogrowl
         #    level while being on zeroth
         (level(callee) - 1).downto(level(@callee)) { |i|
           logger.debug "Jump down levels #{level(@callee)} ⇒ #{level(callee)} Context: #{str}"
-          str += i.bracketify
+          str += i.␚ify
         } unless nested_base(callee) == nested_base(@callee)
         # if there was a jump up layers, e.g. we encountered second
         #    level while being on fifth
         (level(@callee) - 1).downto(level(callee)) { |i|
           logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str}"
-          @yielded.each { |str| str.gsub! /#{i.bracketify}/, '' }
+          @yielded.each { |s|
+            logger.warn "Control characters left in the output. Trying to fix by removal." \
+              if s.gsub!(/#{i.␚ify}/, '')
+          }
         } unless nested_base(callee) == nested_base(@callee)
         @callee = callee
       end

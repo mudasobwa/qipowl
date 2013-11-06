@@ -69,4 +69,10 @@ module Typogrowl
       self.bowl.gsub(/\s/, "#{NBSP}")
     end
   end
+  
+  class ::Fixnum
+    def ␚ify
+      "␚#{self}␚"
+    end
+  end
 end
