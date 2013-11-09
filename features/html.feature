@@ -115,6 +115,9 @@ Feature: Composer for HTML produces HTML
         | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p class='dropcap'>Here <img alt='Image' src='http://mudasobwa.ru/images/am.jpg'> goes</p>" |
         | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'><figcaption><p>Figure</p></figcaption></figure>" |
         | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
+        | "Here _italic_ goes" | "<p class='dropcap'>Here <em>italic</em> goes</p>" |
+        | "Here **bold** goes" | "<p class='dropcap'>Here <strong>bold</strong> goes</p>" |
+        | "Here `code` goes" | "<p class='dropcap'>Here <code>code</code> goes</p>" |
 
   Scenario: Full processing
     Given the input string is taken from file "spec/full_input.tgm"

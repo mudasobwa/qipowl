@@ -230,7 +230,7 @@ module Typogrowl
     #
     # @return [String] the result of processing.
     def serveup str
-      @out = str.uncarriage.unbowl
+      @out = str.uncarriage.un␚ify.unbowl
     end
 
   end

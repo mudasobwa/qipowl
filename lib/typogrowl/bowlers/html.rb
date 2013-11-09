@@ -242,7 +242,7 @@ module Typogrowl
         (level(@callee) - 1).downto(level(callee)) { |i|
           logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str}"
           @yielded.each { |s|
-            logger.warn "Control characters left in the output. Trying to fix by removal." \
+            logger.warn "Control characters (level=#{i}) left in the output. Trying to fix by removal." \
               if s.gsub!(/#{i.␚ify}/, '')
           }
         } unless nested_base(callee) == nested_base(@callee)
@@ -306,8 +306,9 @@ module Typogrowl
       # Inplace tags, like “≡” for ≡bold decoration≡ 
       # FIXME Not efficient!
       @mapping.inplace.each { |tag, htmltag|
-        if method.to_s.start_with? tag.to_s
-          return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
+        tag = tag.to_s.bowl
+        if method.to_s.start_with? tag
+            return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
             send(tag, eval($1)).bowl
           }.split(SEPARATOR)
         end

@@ -74,6 +74,10 @@ module Typogrowl
       self.gsub!(/\s*#{CARRIAGE_RETURN}\s*/, $/)
     end
 
+    def un␚ify
+      self.gsub(/␚(.*?)␚/, '')
+    end
+    
     def to_filename
       self.bowl.gsub(/\s/, "#{NBSP}")
     end
