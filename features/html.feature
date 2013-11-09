@@ -44,6 +44,12 @@ Feature: Composer for HTML produces HTML
         | "http://youtu.be/gokeLEC8dZc" | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
         | "YouTube http://youtu.be/gokeLEC8dZc inline test." | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
 
+  Scenario: Address
+    Given the input string is "℁  ≡Twitter≡ ⏎  ☎ +1(987)5554321 ⏎  ✉ info@twitter.com"
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should equal to "<address><strong>Twitter</strong> <br> <span class='phone'>☎ +1(987)5554321</span> <br> <span class='email'>✉ info@twitter.com</span></address>"
+  
   Scenario Outline: Magnets
     Given the input string is <input>
     And parser is "html"
@@ -85,6 +91,7 @@ Feature: Composer for HTML produces HTML
         | input               | output                             |
         | "List: • li1 • li2" | "<p class='dropcap'>List:</p><ul><li>li1</li><li>li2</li></ul>" |
         | "Data: ▶ dt — dd ▶ dt — dd" | "<p class='dropcap'>Data:</p><dl><dt>dt</dt><dd>dd</dd><dt>dt</dt><dd> dd</dd></dl>" |
+        | "§1 Header" | "<h1>Header</h1>" |
 
   Scenario Outline: Customs
     Given the input string is <input>
@@ -110,7 +117,7 @@ Feature: Composer for HTML produces HTML
         | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
 
   Scenario: Full processing
-    Given the input string is taken from file "spec/input.tgm"
+    Given the input string is taken from file "spec/full_input.tgm"
     And parser is "html"
     And rules from "lib/tagmaps/markdown2html.yaml" are merged in
     When input string is processed with parser
@@ -123,9 +130,9 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to "<p class='dropcap'>Very define and defined and even defined? words</p>"
 
-  Scenario: HTML ⇒ TG
-    Given the input string is taken from file "spec/output.html"
-    And parser is "html"
-    When input string is reversed with unparse_and_roll
-    Then the result should equal to content of file "spec/input.tgm"
+#  Scenario: HTML ⇒ TG
+#    Given the input string is taken from file "spec/output.html"
+#    And parser is "html"
+#    When input string is reversed with unparse_and_roll
+#    Then the result should equal to content of file "spec/input.tgm"
 

@@ -5,6 +5,7 @@ require 'uri'
 
 require_relative 'monkeypatches'
 require_relative '../utils/logging'
+require_relative '../core/mapping'
 
 # @author Alexei Matyushkin
 module Typogrowl
@@ -53,6 +54,14 @@ module Typogrowl
       serveup roast defreeze @in = str
     end
 
+    # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
+    def initialize file = nil
+      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
+      file = fname if !file && File.exist?(fname)
+      
+      @mapping = Mapping.new self.class, file
+    end
+
     # Helper method to add custom DSL description to processing.
     #
     # In case one wants `☢` symbol to be treated as markup for warnings,
@@ -77,12 +86,7 @@ module Typogrowl
     # @return [Hash] the result of merging new rules against the standard set.
     #
     def merge_rules file_or_hash
-      rules = case file_or_hash
-              when Hash then file_or_hash
-              when String then YAML.load_file(file_or_hash)
-              end
-      @mapping.rmerge!(rules) if rules
-      fix_mapping if respond_to?(:fix_mapping)
+      @mapping.merge! file_or_hash
 #    rescue
 #      logger.error "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
     end
@@ -110,15 +114,6 @@ module Typogrowl
       method, *args = special_handler(method, *args, &block) \
         if self.private_methods.include?(:special_handler)
       [method, args].flatten
-    end
-
-    # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
-    def initialize file = nil
-      @mapping = {}
-      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
-      file = fname if !file && File.exist?(fname)
-      
-      merge_rules file
     end
 
   private
@@ -199,9 +194,9 @@ module Typogrowl
 #      raise Exception.new "Reserved symbols are used in input. Aborting…" \
 #        if /[#{String::BOWL_SYMBOLS}]/ =~ str
       out = str.dup
-      @mapping[:synsugar].each { |re, subst|
+      @mapping.synsugar.each { |re, subst|
         out.gsub!(/#{re}/, subst)
-      } if @mapping[:synsugar]
+      } if @mapping.synsugar
       out.bowl
     end
 
@@ -224,7 +219,7 @@ module Typogrowl
         rest = eval(dish.carriage)
         harvest(nil, orphan([*rest].join(SEPARATOR))) if rest
       } unless courses.nil?
-      @yielded.reverse.join("\n")
+      @yielded.reverse.join($/)
     end
 
     # Post-processing of roasted input. By default it simply {String#unbowl}s
@@ -238,16 +233,5 @@ module Typogrowl
       @out = str.uncarriage.unbowl
     end
 
-    # Lookups the section in YAML rules file for the given tag.
-    #
-    # @param [Symbol] tag to lookup section for
-    # @return [Symbol] section found or nil if there were no such section.
-    # @private
-    def section tag
-      result = @mapping.each { |k, v|
-        break k if Hash === v && v.keys.include?(tag)
-      }
-      return Symbol === result ? result : nil
-    end
   end
 end

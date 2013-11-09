@@ -4,6 +4,7 @@ require 'net/http'
 require 'nokogiri'
 
 require_relative '../core/bowler'
+require_relative '../bowlers/htmldoc'
 
 module Typogrowl
   # Markup processor for Html output.
@@ -13,21 +14,21 @@ module Typogrowl
     # `:linewide` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
-      harvest __callee__, tagify(@mapping[:linewide][__callee__], {}, args)
+      harvest __callee__, tagify(@mapping.get(:linewide, __callee__), {}, args)
     end
     
     # `:inplace` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Array] the array of words with trimmed `inplace` tag
     def ≡ *args
-      tagify(@mapping[:inplace][__callee__], {}, args)
+      tagify(@mapping.get(:inplace, __callee__), {}, args)
     end
     
     # `:flush` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Array] the array of words with prepended `flush` tag
     def ⏎ *args
-      [opening(@mapping[:flush][__callee__]), args]
+      [opening(@mapping.get(:flush, __callee__)), args]
     end
     
     # `:flash` handler for horizontal rule; it differs from default
@@ -36,7 +37,7 @@ module Typogrowl
     # @return [Nil] nil
     def —— *args
       harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-      harvest __callee__, opening(@mapping[:flush][__callee__])
+      harvest __callee__, opening(@mapping.get(:flush, __callee__))
     end
     
     # `:block` default handler
@@ -47,9 +48,9 @@ module Typogrowl
     def Λ param, *args
       harvest __callee__, 
               tagify(
-                      @mapping[:block][__callee__], 
+                      @mapping.get(:block, __callee__), 
                       {:class=>param.strip}, 
-                      args.join(SEPARATOR).entitify
+                      args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
                     )
     end
 
@@ -68,7 +69,7 @@ module Typogrowl
     # @return [Array] the array of words with trimmed `magnet` tag
     def ☎ *args
       param, *rest = args.flatten
-      [tagify(@mapping[:magnet][__callee__], {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
+      [tagify(@mapping.get(:magnet, __callee__), {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
     end
     
     # `:linewide` handler for data lists (required since data list items
@@ -92,7 +93,7 @@ module Typogrowl
       when :img 
         opening :img, { :src => href, :alt => title.join(SEPARATOR) }
       else 
-        tagify @mapping[:inplace][__callee__], {:href => href}, title
+        tagify @mapping.get(:inplace, __callee__), {:href => href}, title
       end
     end
 
@@ -121,58 +122,7 @@ module Typogrowl
     # @return [Array] the array of words with trimmed `abbr` tag
     def † *args
       term, *title = args.flatten
-      tagify @mapping[:inplace][__callee__], {:title => title.join(SEPARATOR)}, term
-    end
-
-    class HtmlDoc < Nokogiri::XML::SAX::Document
-      attr_reader :tg
-      def initialize mapping, str = ''
-        @mapping = mapping
-        @tg = str
-        @level = -1
-      end
-      def start_element name, attributes = []
-        tg_name = name.to_sym # FIXME add “†class” if class is presented in attrs
-        @tg +=  case tg_name
-                when *@mapping[:enclosures].values
-                  @level += 1
-                  "\n\n"
-                when *@mapping[:flush].values
-                  " #{@mapping[:flush].key(tg_name)}\n"
-                when *@mapping[:block].values
-                  "\n\n#{@mapping[:block].key(tg_name)}"
-                when *@mapping[:inplace].values
-                  "#{@mapping[:inplace].key(tg_name)}"
-                when *@mapping[:magnet].values
-                  "#{@mapping[:magnet].key(tg_name)}"
-                when *@mapping[:linewide].values
-                  "#{' '*@level if @level > 0}#{@mapping[:linewide].key(tg_name)} "
-                else
-                  ""
-                end
-      end
-      def characters str
-        @tg += str
-      end
-      def end_element name
-        tg_name = name.to_sym # FIXME add “†class” if class is presented in attrs
-        puts "End: #{tg_name}"
-        @tg +=  case tg_name
-                when *@mapping[:enclosures].values
-                  @level -= 1
-                  "\n\n"
-                when *@mapping[:block].values
-                  "\n#{@mapping[:block].key(tg_name)}\n\n"
-                when *@mapping[:inplace].values
-                  "#{@mapping[:inplace].key(tg_name)}"
-                when *@mapping[:magnet].values
-                  "\n"
-                when *@mapping[:linewide].values
-                  "\n"
-                else
-                  ""
-                end
-      end
+      tagify @mapping.get(:inplace, __callee__), {:title => title.join(SEPARATOR)}, term
     end
 
     def unparse_and_roll str
@@ -273,11 +223,11 @@ module Typogrowl
     # @param [String] str to be harvested
     def harvest callee, str
       unless callee == @callee
-        prv = @mapping[:enclosures][@callee]
-        nxt = @mapping[:enclosures][callee]
+        prv = @mapping.get(:enclosures, @callee)
+        nxt = @mapping.get(:enclosures, callee)
         if prv && (!callee || level(callee) <= level(@callee))
-          @yielded.each { |str| str.gsub! /#{level(@callee).␚ify}/, closing(prv) }
-          @yielded.last.sub! /\A/, opening(prv)
+          @yielded.each { |s| s.gsub!(/#{level(@callee).␚ify}/, closing(prv)) }
+          @yielded.last.sub!(/\A/, opening(prv))
         end
         str += closing(nxt) \
           if nxt && (!@callee || level(callee) >= level(@callee))
@@ -304,13 +254,13 @@ module Typogrowl
     # @see Typogrowl::Bowler#defreeze
     # 
     # Additionally it checks if tag is a `:block` tag and 
-    # substitutes all the carriage returns (`\n`) with special symbol
+    # substitutes all the carriage returns (`$/`) with special symbol
     # {String::CARRIAGE_RETURN} to prevent format damage.
     # 
     # @param [String] str to be defreezed
     def defreeze str
       str = super str
-      @mapping[:block].each { |tag, htmltag| 
+      @mapping.block.each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
           "#{$1}('#{$2}', '#{$3.carriage}')"
         }
@@ -344,12 +294,7 @@ module Typogrowl
       if level(method) > 0
         # original (not nested) method. e.g. “•” for “  •”
         orig = nested_base method
-        
-        # section, the original method belongs to
-        sect = section orig
-        @mapping[sect][method] = @mapping[sect][orig] if @mapping[sect]
-        @mapping[:enclosures][method] = @mapping[:enclosures][orig] \
-          if @mapping[:enclosures][orig]
+        @mapping.dup_key orig, method
         
         # create alias for nested
         Html.class_eval %Q{
@@ -360,7 +305,7 @@ module Typogrowl
       end
       # Inplace tags, like “≡” for ≡bold decoration≡ 
       # FIXME Not efficient!
-      @mapping[:inplace].each { |tag, htmltag|
+      @mapping.inplace.each { |tag, htmltag|
         if method.to_s.start_with? tag.to_s
           return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
             send(tag, eval($1)).bowl
@@ -370,34 +315,6 @@ module Typogrowl
       [method, args].flatten
     end
 
-    # Fixes mapping after initialization and merging rules by dynamically
-    # appending aliases and custom methods to class for rules.
-    #
-    # @return [Hash] rules
-    def fix_mapping
-      { 
-        :flush => :⏎,
-        :block => :Λ,
-        :magnet => :☎,
-        :inplace => :≡,
-        :linewide => :•
-      }.each { |section, meth|
-        @mapping[section].each { |tag, htmltag|
-          Html.class_eval %Q{
-            alias :#{tag.to_s.bowl} :#{meth}
-          } unless self.class.instance_methods(false).include?(tag)
-        }
-      }
-      @mapping[:custom].each { |tag, re|
-        Html.class_eval %Q{
-          def #{tag.to_s.bowl} *args
-            ["#{re.to_s.bowl}", args]
-          end
-        } unless self.class.instance_methods(false).include?(tag)
-      }
-      @mapping
-    end
-    
     # Determines content of remote link by href.
     # @param [String] href link to remote resource
     # @return [Symbol] content type (`:img` or `:text` currently)

@@ -36,7 +36,14 @@ module Typogrowl
     
     UTF_ASCII = UTF_SYMBOLS.merge(UTF_DIGITS).merge(UTF_LETTERS_SMALL).merge(UTF_LETTERS_CAP)
     ASCII_UTF = UTF_ASCII.invert
-
+    
+    def hsub! hash
+      self if self.gsub!(hash.keys.join('|'), hash)
+    end
+    def hsub hash
+      (out = self.dup).hsub! hash
+      out
+    end
     def bowl!
       self if self.gsub!(/[#{Regexp.quote(ASCII_ALL.join)}]/, UTF_ASCII)
     end
@@ -52,17 +59,19 @@ module Typogrowl
       out
     end
 
+    HTML_ENTITIES = Hash[[['<', 'lt'], ['>', 'gt'], ['&', 'amp']].map { |ent| [ent.first.bowl, "&#{ent.last};"] }]
+
     def carriage
-      self.gsub(/\R/, "#{CARRIAGE_RETURN}")
+      self.gsub(/\R/, " #{CARRIAGE_RETURN} ")
     end
     def carriage!
-      self.gsub!(/\R/, "#{CARRIAGE_RETURN}")
+      self.gsub!(/\R/, " #{CARRIAGE_RETURN} ")
     end
     def uncarriage
-      self.gsub(/#{CARRIAGE_RETURN}/, "\n")
+      self.gsub(/\s*#{CARRIAGE_RETURN}\s*/, $/)
     end
     def uncarriage!
-      self.gsub!(/#{CARRIAGE_RETURN}/, "\n")
+      self.gsub!(/\s*#{CARRIAGE_RETURN}\s*/, $/)
     end
 
     def to_filename
