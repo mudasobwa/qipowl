@@ -54,15 +54,18 @@ module Typogrowl
 
     def remove_spice key
       section = SPICES.each { |spice| break spice if @hash[spice].keys.include?(key) }
+      result = {}
       if @hash[section]
-        @hash[section].delete key
-        enclosures.delete key
+        result[:section] = section
+        result[:value] = @hash[section].delete(key)
+        result[:enclosure] = enclosures.delete(key)
         @clazz.class_eval %Q{
           remove_method :#{key.bowl}
         } if @clazz.instance_methods(false).include?(key.bowl)
       else
-        logger.warn "Trying to remove key “#{key}” from an invalid section “#{section}”. Ignoring…"
+        logger.warn "Trying to remove inexisting key “#{key}” (sections: “#{section}”). Ignoring…"
       end
+      result
     end
       
     def [] section
