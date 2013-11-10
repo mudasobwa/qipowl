@@ -31,13 +31,13 @@
   :† : :abbr
 
 :linewide :
-  :✎ : :comment
   :• : :li
   :◦ : :li†active
   :▶ : :dt
   :▷ : :dt
   :℁ : :address
   :〉 : :p
+  :✎ : :comment
   :§1 : :h1
   :§2 : :h2
   :§3 : :h3
