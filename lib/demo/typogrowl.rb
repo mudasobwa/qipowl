@@ -12,9 +12,11 @@ before do
   session[:typo] ||= Typogrowl.tg_md__html
 end
 
-get '/bowler/mapping' do
+get '/mapping/:type' do |type|
+  raise Exception.new "Type #{type} is not supported. Aborting." \
+    unless type == 'html'
   content_type :json
-  session[:typo].mapping.to_json
+  session[:typo].mapping.hash.to_json
 end
 
 get '/bowler/:type' do |type|

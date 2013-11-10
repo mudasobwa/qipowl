@@ -6,7 +6,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Typogrowl Demo</title>
+        <title>Typogrowl for HTML</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -16,11 +16,54 @@
                 padding-top: 50px;
                 padding-bottom: 20px;
             }
+            table.mapping {
+                font: 9px monospace;
+            }
         </style>
         <link rel="stylesheet" href="css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        
+        <script>
+            function parseit() {
+              $.get( "/bowler/html", { text: $('#text').val() } )
+                .done(function( data ) {
+                  $('#result').html (data)
+                });
+            }
+            function fillSyntaxRules() {
+              $("#syntaxrules").empty();
+              $("#syntaxrules").append("<br><div id='syntaxrulesdiv' class='tab-content'></div>");
+              $.getJSON( "/mapping/html", { } )
+                .done(function( data ) {
+                  var tabs = ["<li class='active'><a href='#mapping-show-hide' data-toggle='tab'>show/hide mapping</a></li>"]
+                  var divs = ["<div class='tab-pane fade active in' id='mapping-show-hide'> </div>"]
+                  $.each( data, function( key, val ) {
+                    tabs.push( "<li><a href='#" + key + "' data-toggle='tab'>" + key + "</a></li>" );
+                    div = "<div class='tab-pane fade' id='" + key + "'>" +
+                          "<table class='table table-condensed table-striped mapping' id='" + key + "-table'>" +
+                          "<thead><tr><td width='50%'>Key</td><td>Value</td></tr></thead><tbody>";
+                    $.each( val, function( k, v ) {
+                      v = v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                      div += "<tr><td>" + k + "</td><td>" + v + "</td></tr>"
+                    });
+                    div += "</tbody></table></div>";
+                    divs.push(div)
+                  });
+                  $( "<ul/>", {
+                    "class": "nav nav-tabs",
+                    "id": "syntaxresultul",
+                    html: tabs.join( "" )
+                  }).appendTo( "#syntaxrules" );
+                  $( "<div/>", {
+                    "class": "tab-content",
+                    "id": "syntaxresultdiv",
+                    html: divs.join( "" )
+                  }).appendTo( "#syntaxrules" );
+                });
+            }
+        </script>
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -39,7 +82,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="http://github.com/mudasobwa/typogrowl">Source</a></li>
-            <li><a href="html.html">HTML</a></li>
+            <li class="active"><a href="#">HTML</a></li>
             <!--li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -66,24 +109,54 @@
       </div>
     </div>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Typogrowl rules</h1>
-        <p><em>Typogrowl</em> is the next generation markup environment. It’s not the
-            markup language only, since it provides the very efficient and straightforward
-            library to produce custom markups. It′s not the markup library either,
-            since it comes with ready-to-use markdown-like markup and 2HTML converter.</p>
-        <p><a class="btn btn-primary btn-lg" href="https://github.com/mudasobwa/typogrowl#usage">Learn more &raquo;</a></p>
-      </div>
-    </div>
+    <div class="container" id="syntaxrules"> </div>
 
+    <hr>
+        
     <div class="container">
+      <!-- Example row of columns -->
       <div class="row">
         <div class="col-lg-6">
+          <h2>Input text here:</h2>
+          <textarea style="margin-bottom:0.2em;" type="text" rows="21" id="text" name="text" class="form-control">
+§1 Welcome!
+
+Typogrowl helps you to format rich using plain text. This para is, for instance, the leading one in terms of bootstrap ( `class='lead'`).
+
+¶ This is a text with typogrowl markup. 
+
+• unbulleted lists:
+ • nice
+ • handy
+• ordered lists are as well.
+
+★ Feel free to test:
+▷ bulleted lists — with “•” symbol
+▷ data lists — with “▶”
+▷ blockquotes — with “〉” and nesteds
+▷ links — with “ ¹” and other human readables
+
+§3 Even bootstrap classes are available:
+
+• “☆” for “muted” text as well as descendants:
+ • “★” for “primary” text
+ • “☛” for “success” text
+ • “☞” for “info” text
+• “☣” for “warning” text
+• “☢” for “danger” text
+
+✎ 
+Comments are visible in HTML source only
+✎
+
+Hope you’ll enjoy!
+          </textarea>
+          <button type="submit" onclick="parseit();" class="btn btn-success">Submit!</button>
         </div>
         <div class="col-lg-6">
-        </div>
+          <h2>Result:</h2>
+          <div id="result" style="padding:1em; border:1px solid #ddd;"></div>
+       </div>
       </div>
 
       <hr>
@@ -105,6 +178,9 @@
             g.src='//www.google-analytics.com/ga.js';
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script-->
+        <script>
+            $( document ).ready( function() { fillSyntaxRules(); parseit(); } )
+        </script>
 
     </body>
 </html>

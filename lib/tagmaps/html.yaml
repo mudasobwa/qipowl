@@ -1,4 +1,4 @@
-# FIXME keys are to written in non-bowl version and translated later
+# FIXME keys are to be written in non-bowl version and translated later
 :synsugar :
   '—\p{Blank}+(.+),\s*(\S+)' : '↓ ⚓\2 \1⚓'
   '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s|␍|\Z)' : '⚓\2 \1⚓'
