@@ -59,9 +59,18 @@ module Typogrowl
     # @param [String] param the text to be places on the same string as opening tag
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Nil] nil
-    def ✎ param, *args
+    def ✍ param, *args
       harvest __callee__, 
-        "<!-- [#{param.strip}]#{args.join(SEPARATOR)}-->"      
+        "<!-- [#{param.strip}]#{args.join(SEPARATOR)} -->"      
+    end
+
+    # `:inline` handler for comment (required because comments are
+    # formatted in HTML in some specific way.)
+    # @param [String] param the text to be places on the same string as opening tag
+    # @param [Array] args the words, gained since last call to {#harvest}
+    # @return [Nil] nil
+    def ✎ *args
+      harvest __callee__, "<!-- #{args.join(SEPARATOR)} -->" 
     end
 
     # `:magnet` default handler
