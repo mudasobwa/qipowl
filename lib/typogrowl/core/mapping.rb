@@ -27,13 +27,42 @@ module Typogrowl
     end
 
     def get section, key
-      key.nil? ? nil : @hash[section][key.to_sym] || @hash[section][key.to_s.unbowl.to_sym]
+      key.nil? ? nil : @hash[section][key] || @hash[section][key.unbowl]
     end
 
-    def dup_key original, dupped
-      section = section_for original
-      @hash[section][dupped] = @hash[section][original] if @hash[section]
-      enclosures[dupped] = enclosures[original] if enclosures[original]
+    def dup_spice original, dupped
+      section = SPICES.each { |spice| break spice if @hash[spice].keys.include?(original) }
+      if @hash[section]
+        @hash[section][dupped] = @hash[section][original] 
+        enclosures[dupped] = enclosures[original] if enclosures[original]
+      else
+        logger.warn "Trying to dup unexisting spice “#{original}”, ignoring…"
+      end
+    end
+    
+    def add_spice section, key, value, enclosure_value = null
+      if SPICES.include?(section)
+        @hash[section][key] = value
+        enclosures[key] = enclosure_value if enclosure_value
+        @clazz.class_eval %Q{
+          alias_method :#{key.bowl}, :#{@hash[section].first.first}
+        } unless @clazz.instance_methods(false).include?(key.bowl)
+      else
+        logger.warn "Trying to add key “#{key}” in an invalid section “#{section}”. Ignoring…"
+      end
+    end
+
+    def remove_spice key
+      section = SPICES.each { |spice| break spice if @hash[spice].keys.include?(key) }
+      if @hash[section]
+        @hash[section].delete key
+        enclosures.delete key
+        @clazz.class_eval %Q{
+          remove_method :#{key.bowl}
+        } if @clazz.instance_methods(false).include?(key.bowl)
+      else
+        logger.warn "Trying to remove key “#{key}” from an invalid section “#{section}”. Ignoring…"
+      end
     end
       
     def [] section
@@ -87,26 +116,19 @@ module Typogrowl
         spice_method = @hash[spice].first.first
         @hash[spice].each { |tag, htmltag|
           clazz.class_eval %Q{
-            alias :#{tag.to_s.bowl} :#{spice_method}
-          } unless clazz.instance_methods(false).include?(tag)
+            alias_method :#{tag.bowl}, :#{spice_method}
+          } unless clazz.instance_methods(false).include?(tag.bowl)
         }
       }
       PEPPER.each { |pep|
         @hash[pep].each { |tag, re|
           clazz.class_eval %Q{
-            def #{tag.to_s.bowl} *args
-              ["#{re.to_s.bowl}", args]
+            def #{tag.bowl} *args
+              ["#{re.bowl}", args]
             end
-          } unless clazz.instance_methods(false).include?(tag)
+          } unless clazz.instance_methods(false).include?(tag.bowl)
         }
       }
-    end
-
-    def section_for tag
-      result = SPICES.each { |spice|
-        break spice if @hash[spice].keys.include?(tag)
-      }
-      result.to_sym rescue nil
     end
 
   end

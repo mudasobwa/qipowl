@@ -83,6 +83,15 @@ module Typogrowl
     end
   end
   
+  class ::Symbol
+    def bowl
+      self.to_s.bowl.to_sym
+    end
+    def unbowl
+      self.to_s.unbowl.to_sym
+    end
+  end
+  
   class ::Fixnum
     def ␚ify
       "␚#{self}␚"

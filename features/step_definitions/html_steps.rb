@@ -12,6 +12,14 @@ Given(/^the input string is taken from file "(.*?)"$/) do |f|
   @content = File.read(f)
 end
 
+Given(/^rule "(.*?)" is added to mapping as "(.*?)" in "(.*?)" section with "(.*?)" enclosure$/) do |key, value, section, enclosure|
+  @parser.mapping.add_spice section.to_sym, key.to_sym, value.to_sym, enclosure.to_sym
+end
+
+Given(/^rule "(.*?)" is removed from mapping$/) do |key|
+  @parser.mapping.remove_spice key.to_sym
+end
+
 Given(/^rules from "(.*?)" are merged in$/) do |f|
   @parser.merge_rules f
 end
@@ -29,6 +37,10 @@ end
 ################################################################################
 
 Then(/^the result should equal to "(.*?)"$/) do |result|
+  expect(@result).to eq(result)
+end
+
+Then(/^the result should equal to$/) do |result|
   expect(@result).to eq(result)
 end
 

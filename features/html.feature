@@ -126,6 +126,25 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to content of file "spec/output.html"
 
+  Scenario: Adding spice
+    Given the input string is "List: × li1 × li2"
+    And parser is "html"
+    And rule "×" is added to mapping as "li" in "linewide" section with "ol" enclosure
+    When input string is processed with parser
+    Then the result should equal to 
+      """
+      <p class='dropcap'>List:</p>
+      <ol><li>li1</li>
+      <li>li2</li></ol>
+      """
+
+  Scenario: Removing spice
+    Given the input string is "List: ◦ li1 ◦ li2"
+    And parser is "html"
+    And rule "◦" is removed from mapping
+    When input string is processed with parser
+    Then the result should equal to "<p class='dropcap'>List: ◦ li1 ◦ li2</p>"
+
   Scenario: Weird behaviour with words starting with “ni”
     Given the input string is "Very define and defined and even defined? words"
     And parser is "html"

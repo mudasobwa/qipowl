@@ -82,7 +82,7 @@ module Typogrowl
     end
     # Alias for {#▶}, according to YAML rules specifies additional 
     # class for the data list `<dl>` tag behind (`dl-horizontal`.)
-    alias :▷ :▶
+    alias_method :▷, :▶
     
     # Handler for anchors.
     # @param [Array] args the words, gained since last call to {#harvest}
@@ -140,7 +140,7 @@ module Typogrowl
     # the rules file contains `:≈ : :em` definition for emphasis markup under
     # the `:inplace` section, the class will be extended with:
     # 
-    #     alias :≈ :≡
+    #     alias_method :≈, :≡
     #     
     # where the `:≡` is the default processing method for `:inplace` tags.
     # 
@@ -294,11 +294,11 @@ module Typogrowl
       if level(method) > 0
         # original (not nested) method. e.g. “•” for “  •”
         orig = nested_base method
-        @mapping.dup_key orig, method
+        @mapping.dup_spice orig, method
         
         # create alias for nested
         Html.class_eval %Q{
-          alias :#{method.to_s.bowl} :#{orig}
+          alias_method :#{method.to_s.bowl}, :#{orig}
         }
         # after all, we need to process this nested operator
         return send(method, args)
