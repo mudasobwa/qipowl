@@ -13,6 +13,7 @@ Feature: Composer for HTML produces HTML
         | "here ≈italic≈ goes"   | "<p class='dropcap'>here <em>italic</em> goes</p>" |
         | "here ≡bold≡ goes"     | "<p class='dropcap'>here <strong>bold</strong> goes</p>" |
         | "here ↓small↓ goes"    | "<p class='dropcap'>here <small>small</small> goes</p>" |
+        | "here ÷deleted÷ goes"    | "<p class='dropcap'>here <del>deleted</del> goes</p>" |
         | "here λcodeλ goes"     | "<p class='dropcap'>here <code>code</code> goes</p>" |
         | "here ≡λbold codeλ≡ goes" | "<p class='dropcap'>here <strong><code>bold code</code></strong> goes</p>" |
         | "here λ≡code bold≡λ goes" | "<p class='dropcap'>here <code><strong>code bold</strong></code> goes</p>" |

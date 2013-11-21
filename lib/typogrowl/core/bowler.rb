@@ -62,6 +62,7 @@ module Typogrowl
       @mapping = Mapping.new self.class, file
     end
 
+    # (see Mapping#merge!)
     # Helper method to add custom DSL description to processing.
     #
     # In case one wants `☢` symbol to be treated as markup for warnings,
@@ -70,25 +71,11 @@ module Typogrowl
     # class” in terms of HTML, all we need is to do:
     #
     #     tg = Typogrowl::Html.new
-    #     tg.merge_rules { :linewide => { :☢ => :p†warning }}
-    #
-    # In case the processing is more complicated, one might need to
-    # implement the respective method in `Bowler` descendant:
-    #
-    #     def ☢ *args
-    #       args.map { |arg| arg.upcase }
-    #     end
-    #
-    # In the latter example all the words beyond `☢` will be uppercased.
-    #
-    # @param [Hash|String] file_or_hash if string is given as the parameter, it’s treated as the name of YAML rules file. `Hash` is being merged explicitly.
-    #
-    # @return [Hash] the result of merging new rules against the standard set.
-    #
-    def merge_rules file_or_hash
-      @mapping.merge! file_or_hash
+    #     tg.mapping.merge! { :linewide => { :☢ => :p†warning }}
+    def merge_rules other
+      @mapping.merge! other
 #    rescue
-#      logger.error "Inconsistent call to `merge_rules`. Param: #{file_or_hash}."
+#      logger.error "Inconsistent call to `merge_rules`. Param: #{other}."
     end
 
     # Everything is a DSL, remember?

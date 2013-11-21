@@ -1,20 +1,26 @@
-![Typogrowl](/images/owl.png)
+![qipowl](/images/owl.png)
 
-_Typogrowl_ is the next generation markup environment. It’s not the
+## Name
+
+_qipowl_ (pronounced as **keep all**)
+
+## Intro
+
+_qipowl_ is the next generation markup environment. It’s not the
 markup language only, since it provides the very efficient and straightforward
 library to produce custom markups. It′s not the markup library either,
 since it comes with ready-to-use markdown-like markup and 2HTML converter.
 
-The main idea of _Typogrowl_ is to yield the power of 
+The main idea of _qipowl_ is to yield the power of 
 [DSL in Ruby](http://jroller.com/rolsen/entry/building_a_dsl_in_ruby).
 The whole input text is treated neither more nor less than `DSL`. 
 That gives the user an ability to make virtually every term in input text
 the _operating entity_.
 
-_Typogrowl_ utilizes UTF-8 heavily. The standard markup (here and further:
-_Typogrowl markup_, or _TGM_) lays on unicode characters instead of
+_qipowl_ utilizes UTF-8 heavily. The standard markup (here and further:
+_qipowl markup_, or _qp_) lays on unicode characters instead of
 legacy asterisks and underscores in markdown. It brings the better 
-readability to plain text before it’s processed with _Typogrowl_ and
+readability to plain text before it’s processed with _qipowl_ and
 allows more readable `DSL` for processing. For instance, the input:
 
     §3 Emphasized text
@@ -58,13 +64,13 @@ project.
 
 ## Internals
 
-_Typogrowl_ markup implementation consists of two parts: markup definition
+_qipowl_ markup implementation consists of two parts: markup definition
 (kinda `yaml` file) and markup processor. The latter derives from base
-processor implementation `Typogrowl::Bowler`.
+processor implementation `Qipowl::Bowler`.
 
 ### Markup definition
 
-_Typogrowl_ understands six types of ‘operators’:
+_qipowl_ understands six types of ‘operators’:
 
 * flush
 * block
@@ -173,7 +179,7 @@ for generic words. Please use on your own risk.
 
 ### Extending
 
-Extending _Typogrowl_ is as easy as writing a couple of strings in YAML format.
+Extending _qipowl_ is as easy as writing a couple of strings in YAML format.
 Let’s take a look at additional rules file for markdown support:
 
 ```yaml
@@ -200,7 +206,7 @@ Let’s take a look at additional rules file for markdown support:
 ```
 
 Bold, italic, code, images, links, blockquotes (including nesteds) are now 
-supported by _Typogrowl_. Let any one of you who is not delighted with, 
+supported by _qipowl_. Let any one of you who is not delighted with, 
 be the first to throw a stone at me.
 
 Need custom support for `github`-flavored markdown _strikethrough_? Oneliner
@@ -251,7 +257,7 @@ Or install it yourself as:
 ```ruby
 require 'typogrowl'
 …
-tg =  Typogrowl::Html.new 
+tg =  Qipowl::Html.new 
 puts tg.parse_and_roll(text)
 ```
 
@@ -260,7 +266,7 @@ or even simplier
 ```ruby
 require 'typogrowl'
 …
-tg =  Typogrowl.tg_md__html # typogrowl markup _and_ markdown
+tg =  Qipowl.tg_md__html # typogrowl markup _and_ markdown
 
 puts tg.parse_and_roll(text)
 ```
