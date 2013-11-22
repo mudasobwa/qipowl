@@ -19,6 +19,14 @@
             table.mapping {
                 font: 9px monospace;
             }
+            table.mapping thead {
+                font-size: 12px;
+                font-weight: bold;
+            }
+            div#syntaxresultdiv {
+                overflow-y: scroll;
+                height: 150px;
+            }
             div#result {
                 overflow-y: scroll;
             }
@@ -99,6 +107,9 @@
                           "<table class='table table-condensed table-striped mapping' id='" + key + "-table'>" +
                           "<thead><tr><td width='40%'>Key</td><td width='40%'>Value</td><td>Action</td></tr></thead><tbody>";
                     $.each( val, function( k, v ) {
+                      if (!(typeof v === 'string')) {
+                        v = JSON.stringify(v);
+                      }
                       v = v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
                       delBtn = "<a href='javascript:deleteMappingKey(\"" + k + "\")' class='btn btn-primary btn-xs' role='button'>—</a>";
                       div += "<tr><td>" + k + "</td><td>" + v + "</td><td>" + delBtn + "</td></tr>"
