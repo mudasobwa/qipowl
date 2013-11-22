@@ -56,8 +56,12 @@
   :✇ : :video
   :⚘ : :figure
 
-:custom :
-  :ghgh : "<a class='tag'>ghgh</a>"
+:handshake :
+  :∈ : :mathml
+  :⊂ : 
+    :tag  : :mathml
+    :from : :space
+    :till : :dot
 
 :enclosures :
   :• : :ul

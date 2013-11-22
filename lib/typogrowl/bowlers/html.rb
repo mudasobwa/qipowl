@@ -31,7 +31,7 @@ module Typogrowl
       [opening(@mapping.get(:flush, __callee__)), args]
     end
     
-    # `:flash` handler for horizontal rule; it differs from default
+    # `:flush` handler for horizontal rule; it differs from default
     # handler since orphans around must be handled as well.
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Nil] nil
@@ -92,6 +92,18 @@ module Typogrowl
     # Alias for {#▶}, according to YAML rules specifies additional 
     # class for the data list `<dl>` tag behind (`dl-horizontal`.)
     alias_method :▷, :▶
+    
+    # `:handshake` default handler
+    # @param [String] from packed as string operand “before”
+    # @param [String] from packed as string operand “after”
+    # @return 
+    def ∈ *args
+      from, till, *rest = args.flatten
+      tag = @mapping.get(:handshake, __callee__)
+      tag = tag[:tag] if Hash === tag
+      [tagify(tag, {}, "#{from}#{__callee__}#{till}".gsub(String::WIDESPACE, ' ')), rest]
+    end
+    alias_method :⊂, :∈
     
     # Handler for anchors.
     # @param [Array] args the words, gained since last call to {#harvest}
@@ -300,28 +312,25 @@ module Typogrowl
     # @return [Array] the array of words
     def special_handler method, *args, &block
       # Sublevel markers, e.g. “ •” is level 2 line-item
-      if level(method) > 0
-        # original (not nested) method. e.g. “•” for “  •”
-        orig = nested_base method
-        @mapping.dup_spice orig, method
-        
+      if level(method) > 0 && @mapping.dup_spice(orig = nested_base(method), method)
         # create alias for nested
         Html.class_eval %Q{
           alias_method :#{method.to_s.bowl}, :#{orig}
         }
         # after all, we need to process this nested operator
         return send(method, args)
+      else
+        # Inplace tags, like “≡” for ≡bold decoration≡ 
+        # FIXME Not efficient!
+        @mapping.inplace.each { |tag, htmltag|
+          tag = tag.to_s.bowl
+          if method.to_s.start_with? tag
+              return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
+              send(tag, eval($1)).bowl
+            }.split(SEPARATOR)
+          end
+        }
       end
-      # Inplace tags, like “≡” for ≡bold decoration≡ 
-      # FIXME Not efficient!
-      @mapping.inplace.each { |tag, htmltag|
-        tag = tag.to_s.bowl
-        if method.to_s.start_with? tag
-            return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
-            send(tag, eval($1)).bowl
-          }.split(SEPARATOR)
-        end
-      }
       [method, args].flatten
     end
 

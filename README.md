@@ -6,10 +6,9 @@ _qipowl_ (pronounced as **keep all**)
 
 ## Intro
 
-_qipowl_ is the next generation markup environment. It’s not the
-markup language only, since it provides the very efficient and straightforward
-library to produce custom markups. It′s not the markup library either,
-since it comes with ready-to-use markdown-like markup and 2HTML converter.
+_qipowl_ is the next generation parser environment. It’s not the
+library for parsing, rather it is the framework to build extensive
+parsers for virtually every markup anyone may imagine.
 
 The main idea of _qipowl_ is to yield the power of 
 [DSL in Ruby](http://jroller.com/rolsen/entry/building_a_dsl_in_ruby).
@@ -17,7 +16,17 @@ The whole input text is treated neither more nor less than `DSL`.
 That gives the user an ability to make virtually every term in input text
 the _operating entity_.
 
-_qipowl_ utilizes UTF-8 heavily. The standard markup (here and further:
+## Examples
+
+This chapter should be the last one, but who wants to read technical details
+without any clue of how they might be applied? So, here we go.
+
+### Shipping with: Markright
+
+Right is looking right past up and down, right? _qipowl_ comes with built-in
+markright parser, which is superset of markdown.
+
+_qipowl_ markright utilizes UTF-8 heavily. The standard markup (here and further:
 _qipowl markup_, or _qp_) lays on unicode characters instead of
 legacy asterisks and underscores in markdown. It brings the better 
 readability to plain text before it’s processed with _qipowl_ and
@@ -77,6 +86,8 @@ _qipowl_ understands six types of ‘operators’:
 * magnet
 * inplace
 * linewide
+* handshake
+* kiss
 * custom
 
 #### :flush
@@ -120,6 +131,7 @@ This operator is the only one which preserves the line breaks.
 
 #### :magnet
 
+Almost the same as `:inplace` but does not require closing match.
 Operates on the following text piece until the space. E.g.
 
     :magnet
@@ -137,7 +149,8 @@ for the markup:
 
 Acts mostly like `:block` but inside one text block (text blocks are
 likely paragraphs, delimited with double carriage returns.) Requires
-closing element.
+closing element. Inplace operators are of highest priority and may
+overlap.
 
     :inplace
       :≡ : :strong
@@ -171,6 +184,48 @@ will produce:
     <ul><li>Nested li 1</li>
     <li>Nested li 2</li></ul>
     <li>Line item 2</li></ul>
+
+#### :handshake
+
+**TODO** rewrite examples for latex
+
+The group contains operators, acting on left and right operands between
+the delimiters given. By default it takes the whole line from `^` till `$`.
+
+    :handshake :
+      :∈ : :mathml
+      :⊂ :
+        :tag  : :mathml
+        :from : '\s'
+        :till : '.'
+        
+The following syntax 
+
+    Let we have A ⊂ ∅. Then the following formula is OK:
+    ∀ a ∈ ∅
+    which is evident, though.
+    
+will produce:
+
+    Let we have <mathml>A ⊂ ∅</mathml>. Then the following formula is OK:
+    <mathml>∀ a ∈ ∅</mathml>
+    which is evident, though.
+
+#### :kiss
+
+Almost the same as `:handshake` but operates on the preceeding/following pair of
+text piece without spaces. E.g.
+
+    :kiss
+      :÷ : :mathml
+
+The following syntax 
+
+    The formula 12 ÷ 5 is simple.
+    
+will produce:
+
+    The formula <mathml>12 ÷ 5</mathml> is simple.
 
 #### :custom
 

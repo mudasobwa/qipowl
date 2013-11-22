@@ -184,7 +184,26 @@ module Typogrowl
       @mapping.synsugar.each { |re, subst|
         out.gsub!(/#{re}/, subst)
       } if @mapping.synsugar
-      out.bowl
+      out.bowl!
+      @mapping.handshake.each { |k, v|
+        v = Hash[[[:tag, v]]] if Symbol === v
+        %i(from till).each { |key|
+          v[key] = :space unless v[key]
+          v[key] =  case v[key] # FIXME. That’s ugly. Invent the right way!!!
+                    when :space then '\S'
+                    when :dot   then "[^#{'.'.bowl}]"
+                    when :comma then "[^#{','.bowl}]"
+                    when :colon then "[^#{':'.bowl}]"
+                    when :punctuation then "[^#{'.,;:!?'.bowl}]"
+                    else '\R'
+                    end
+        }
+        out.gsub!(/(#{v[:from]}*\s*)#{k}(\s*#{v[:till]}*)/) {
+          from, till = $~[1,2]
+          "#{k} #{from.gsub(/\s/, String::WIDESPACE)} #{till.gsub(/\s/, String::WIDESPACE)} "
+        }
+      } if @mapping.handshake
+      out
     end
 
     # …Drum-roll… Main handler.
@@ -200,9 +219,8 @@ module Typogrowl
     # @return [String] roasted input. It still requires to be {String#unbowl}ed.
     def roast str
       @yielded = []
-      # FIXME Understand, why reverse here    ⇓⇓⇓⇓⇓⇓⇓ is needed and (!) works
       courses = str.split(/\R{2,}/).reverse
-      courses.each {|dish|
+      courses.each { |dish|
         rest = eval(dish.carriage)
         harvest(nil, orphan([*rest].join(SEPARATOR))) if rest
       } unless courses.nil?

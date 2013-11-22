@@ -94,15 +94,15 @@ Feature: Composer for HTML produces HTML
         | "Data: ▶ dt — dd ▶ dt — dd" | "<p class='dropcap'>Data:</p><dl><dt>dt</dt><dd>dd</dd><dt>dt</dt><dd> dd</dd></dl>" |
         | "§1 Header" | "<h1>Header</h1>" |
 
-  Scenario Outline: Customs
+  Scenario Outline: Handshakes
     Given the input string is <input>
     And parser is "html"
     When input string is processed with parser
     Then the result should equal to <output>
 
     Examples:
-        | input               | output                             |
-        | "Here ghgh goes" | "<p class='dropcap'>Here <a class='tag'>ghgh</a> goes</p>" |
+        | input                 | output                             |
+        | "Let we have A ⊂ ∅." | "<p class='dropcap'>Let we have <mathml>A ⊂ ∅</mathml> .</p>" |
 
   Scenario Outline: Markdown atavisms ⇒ links
     Given the input string is <input>

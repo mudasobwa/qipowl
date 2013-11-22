@@ -15,6 +15,7 @@ module Typogrowl
   # 
   class ::String
     NBSP = "\u{00A0}"
+    WIDESPACE = "\u{FF00}"
     CARRIAGE_RETURN = '␍'
     NULL = '␀'
     ASCII_SYMBOLS, ASCII_DIGITS, ASCII_LETTERS_SMALL, ASCII_LETTERS_CAP = [

@@ -21,8 +21,11 @@ module Typogrowl
   #   `:flush`, `:block`, `:magnet`, `:inplace`, `:linewide`; each
   #   of them is operated in different manner in {Bowler}s. Spices
   #   are provided with an ability of adding/removing items
-  # - {Mapping.PEPPER} I don’t know if we need it at all
-  # - {Mapping.SALT} members are operated as “supervisors” of “spices”,
+  # - {Mapping.PEPPER} children deal with both left and right side
+  #   operands (corresponding methods have two parameters and
+  #   bowler must perform some preprocessing to make a function-like
+  #   entity from the `A op B`)
+  # - {Mapping.SALT} members operate as “supervisors” of “spices”,
   #   currently we support `:enclosures` for enclosing HTML tags
   #
   # Mapping may be loaded from YAML file, merged agains other YAML file.
@@ -34,11 +37,11 @@ module Typogrowl
 
     RECIPE = %i(includes)
     SUGAR  = %i(synsugar)
+    PEPPER = %i(handshake)
     SPICES = %i(flush block magnet inplace linewide)
-    PEPPER = %i(custom)
     SALT   = %i(enclosures)
 
-    (SUGAR + SPICES + SALT).each { |section|
+    (SUGAR + PEPPER + SPICES + SALT).each { |section|
       define_method(section) { self[section] }
     }
     
@@ -70,9 +73,8 @@ module Typogrowl
       if @hash[section]
         @hash[section][dupped] = @hash[section][original] 
         enclosures[dupped] = enclosures[original] if enclosures[original]
-      else
-        logger.warn "Trying to dup unexisting spice “#{original}”, ignoring…"
       end
+      return @hash[section]
     end
     
     # Adds new +entity+ in the section specified.
@@ -193,23 +195,16 @@ module Typogrowl
     #
     # @param [Class] clazz the class to extend with this mapping
     def extend_class clazz
-      SPICES.each { |spice|
-        next unless @hash[spice]
+      (SPICES + PEPPER).each { |spice|
+        next unless @hash[spice] && !@hash[spice].empty?
         spice_method = @hash[spice].first.first
+        raise "First tag in #{spice} section must have the corresponding method defined explicitly" unless \
+          clazz.instance_methods(false).include?(spice_method)
         @hash[spice].each { |tag, htmltag|
           clazz.class_eval %Q{
             alias_method :#{tag.bowl}, :#{spice_method}
           } unless clazz.instance_methods(false).include?(tag.bowl)
         }
-      }
-      PEPPER.each { |pep|
-        @hash[pep].each { |tag, re|
-          clazz.class_eval %Q{
-            def #{tag.bowl} *args
-              ["#{re.bowl}", args]
-            end
-          } unless clazz.instance_methods(false).include?(tag.bowl)
-        } if @hash[pep]
       }
     end
 
