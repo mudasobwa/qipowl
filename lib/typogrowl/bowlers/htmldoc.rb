@@ -26,7 +26,7 @@ module Typogrowl
               when *@mapping[:magnet].values
                 "#{@mapping[:magnet].key(tg_name)}"
               when *@mapping[:linewide].values
-                "#{' '*@level if @level > 0}#{@mapping[:linewide].key(tg_name)} "
+                "#{' '*@level if @level > 0}#{@mapping[:linewide].key(tg_name)} "
               else
                 ""
               end

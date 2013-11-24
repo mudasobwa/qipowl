@@ -4,7 +4,8 @@ lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'optparse'
-require_relative '../lib/typogrowl/core/monkeypatches'
+#require_relative '../lib/typogrowl/core/monkeypatches'
+require_relative '../lib/typogrowl'
 
 # options = {}
 OptionParser.new do |opts|
@@ -29,4 +30,5 @@ file_or_string = ARGV.first
 
 file_or_string = File.read(file_or_string) if File.exist?(file_or_string)
 
-puts file_or_string.bowl
+# puts file_or_string.bowl
+puts Typogrowl::Html.new.parse_and_roll file_or_string

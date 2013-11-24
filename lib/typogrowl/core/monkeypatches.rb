@@ -15,7 +15,25 @@ module Typogrowl
   # 
   class ::String
     NBSP = "\u{00A0}"
+    
+    SYMBOL_FOR_SPACE = "\u{2420}" # ␠
+    
     WIDESPACE = "\u{FF00}"
+    EN_SPACE = "\u{2002}"
+    EM_SPACE = "\u{2003}"
+    THREE_PER_EM_SPACE = "\u{2004}"
+    FOUR_PER_EM_SPACE = "\u{2005}"
+    SIX_PER_EM_SPACE = "\u{2006}"
+    FIGURE_SPACE = "\u{2007}"
+    PUNCTUATION_SPACE = "\u{2008}"
+    THIN_SPACE = "\u{2009}"
+    HAIR_SPACE = "\u{200A}"
+    ZERO_WIDTH_SPACE = "\u{200B}"
+    NARROW_NO_BREAK_SPACE = "\u{202F}"
+    MEDIUM_MATHEMATICAL_SPACE = "\u{205F}"
+    ZERO_WIDTH_NO_BREAK_SPACE = "\u{FEFF}"
+    IDEOGRAPHIC_SPACE = "\u{3000}"    
+    
     CARRIAGE_RETURN = '␍'
     NULL = '␀'
     ASCII_SYMBOLS, ASCII_DIGITS, ASCII_LETTERS_SMALL, ASCII_LETTERS_CAP = [
@@ -39,28 +57,28 @@ module Typogrowl
     ASCII_UTF = UTF_ASCII.invert
     
     def hsub! hash
-      self if self.gsub!(hash.keys.join('|'), hash)
+      self.gsub!(/#{hash.keys.join('|')}/, hash)
     end
     def hsub hash
       (out = self.dup).hsub! hash
       out
     end
     def bowl!
-      self if self.gsub!(/[#{Regexp.quote(ASCII_ALL.join)}]/, UTF_ASCII)
+      self.gsub!(/[#{Regexp.quote(ASCII_ALL.join)}]/, UTF_ASCII)
     end
     def bowl
       (out = self.dup).bowl!
       out
     end
     def unbowl!
-      self if self.gsub!(/[#{Regexp.quote(UTF_ALL.join)}]/, ASCII_UTF)
+      self.gsub!(/[#{Regexp.quote(UTF_ALL.join)}]/, ASCII_UTF)
     end
     def unbowl
       (out = self.dup).unbowl!
       out
     end
 
-    HTML_ENTITIES = Hash[[['<', 'lt'], ['>', 'gt'], ['&', 'amp']].map { |ent| [ent.first.bowl, "&#{ent.last};"] }]
+    HTML_ENTITIES = Hash[[['<', 'lt'], ['>', 'gt'], ['&', 'amp']].map { |k, v| [k.bowl, "&#{v};"] }]
 
     def carriage
       self.gsub(/\R/, " #{CARRIAGE_RETURN} ")
@@ -69,10 +87,12 @@ module Typogrowl
       self.gsub!(/\R/, " #{CARRIAGE_RETURN} ")
     end
     def uncarriage
-      self.gsub(/\s*#{CARRIAGE_RETURN}\s*/, $/)
+      self.gsub(/[[:blank:]]*#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+))
     end
     def uncarriage!
-      self.gsub!(/\s*#{CARRIAGE_RETURN}\s*/, $/)
+      self.gsub!(/[[:blank:]]*#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+))
     end
 
     def un␚ify
@@ -98,4 +118,5 @@ module Typogrowl
       "␚#{self}␚"
     end
   end
+    
 end

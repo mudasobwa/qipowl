@@ -35,6 +35,6 @@ Gem::Specification.new do |s|
   
   s.add_dependency 'psych'
   s.add_dependency 'nokogiri'
-  s.add_dependency 'typogrowth'
+  s.add_dependency 'htmlbeautifier'
 end
 

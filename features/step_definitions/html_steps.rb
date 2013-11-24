@@ -34,22 +34,26 @@ When(/^input string is reversed with unparse_and_roll$/) do
   @result = @parser.unparse_and_roll @content
 end
 
+When(/^the result is printed out to file "(.*?)"$/) do |file|
+  File.write(file, @result_unstripped)
+end
+
 ################################################################################
 
 Then(/^the result should equal to "(.*?)"$/) do |result|
-  expect(@result).to eq(result)
+  expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))
 end
 
 Then(/^the result should equal to$/) do |result|
-  expect(@result).to eq(result)
+  expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))
 end
 
 Then(/^the result should start with to "(.*?)"$/) do |result|
-  expect(@result).to match(/^#{result}/)
+  expect(@result.gsub(/\s*/, '')).to match(/^#{result.gsub(/\s*/, '')}/)
 end
 
 Then(/^the result should be multiline and almost equal to "(.*?)"$/) do |result|
-  expect(@result.gsub /\R/, '').to eq(result)
+  expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))
 end
 
 Then(/^the result should equal to content of file "(.*?)"$/) do |file|

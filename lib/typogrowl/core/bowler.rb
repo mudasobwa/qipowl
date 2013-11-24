@@ -200,7 +200,7 @@ module Typogrowl
         }
         out.gsub!(/(#{v[:from]}*\s*)#{k}(\s*#{v[:till]}*)/) {
           from, till = $~[1,2]
-          "#{k} #{from.gsub(/\s/, String::WIDESPACE)} #{till.gsub(/\s/, String::WIDESPACE)} "
+          "#{k} #{from.gsub(/\s/, String::SYMBOL_FOR_SPACE)} #{till.gsub(/\s/, String::SYMBOL_FOR_SPACE)} "
         }
       } if @mapping.handshake
       out

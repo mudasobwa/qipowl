@@ -30,8 +30,8 @@ Feature: Composer for HTML produces HTML
         | "— Wikipedia, http://wikipedia.org" | "<p class='dropcap'><small><a href='http://wikipedia.org'>Wikipedia</a></small></p>" |
         | "Wikipedia¹http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†" | "<p class='dropcap'><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
-        | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p class='dropcap'><img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'> goes here.</p>" |
-        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'><figcaption><p>Standalone picture</p></figcaption></figure>" |
+        | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p class='dropcap'><img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Standalone picture</p></figcaption></figure>" |
 
   Scenario Outline: Syntactic sugar with carriage returns
     Given the input string is <input>
@@ -41,15 +41,15 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input                  | output                             |
-        | "http://www.youtube.com/watch?v=gokeLEC8dZc" | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
-        | "http://youtu.be/gokeLEC8dZc" | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
-        | "YouTube http://youtu.be/gokeLEC8dZc inline test." | "<iframe width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
+        | "http://www.youtube.com/watch?v=gokeLEC8dZc" | "<iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
+        | "http://youtu.be/gokeLEC8dZc" | "<iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
+        | "YouTube http://youtu.be/gokeLEC8dZc inline test." | "<p class='dropcap'>YouTube</p><iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'" |
 
   Scenario: Address
     Given the input string is "℁  ≡Twitter≡ ⏎  ☎ +1(987)5554321 ⏎  ✉ info@twitter.com"
     And parser is "html"
     When input string is processed with parser
-    Then the result should equal to "<address><strong>Twitter</strong> <br> <span class='phone'>☎ +1(987)5554321</span> <br> <span class='email'>✉ info@twitter.com</span></address>"
+    Then the result should equal to "<address><strong>Twitter</strong> <br/> <span class='phone'>☎ +1(987)5554321</span> <br/> <span class='email'>✉ info@twitter.com</span></address>"
   
   Scenario Outline: Magnets
     Given the input string is <input>
@@ -70,7 +70,7 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input     | output                             |
-        | "A ⏎ B"   | "<p class='dropcap'>A <br> B</p>"  |
+        | "A ⏎ B"   | "<p class='dropcap'>A <br/> B</p>"  |
 
   Scenario Outline: Flushes (multiliners)
     Given the input string is <input>
@@ -80,7 +80,7 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input     | output                             |
-        | "A —— B"  | "<p class='dropcap'>A</p><hr><p class='dropcap'>B</p>" |
+        | "A —— B"  | "<p class='dropcap'>A</p><hr/><p class='dropcap'>B</p>" |
 
   Scenario Outline: Linewides
     Given the input string is <input>
@@ -91,7 +91,7 @@ Feature: Composer for HTML produces HTML
     Examples:
         | input               | output                             |
         | "List: • li1 • li2" | "<p class='dropcap'>List:</p><ul><li>li1</li><li>li2</li></ul>" |
-        | "Data: ▶ dt — dd ▶ dt — dd" | "<p class='dropcap'>Data:</p><dl><dt>dt</dt><dd>dd</dd><dt>dt</dt><dd> dd</dd></dl>" |
+        | "Data: ▶ dt — dd ▶ dt — dd" | "<p class='dropcap'>Data:</p><dl><dt>dt</dt><dd>dd</dd><dt>dt</dt><dd>dd</dd></dl>" |
         | "§1 Header" | "<h1>Header</h1>" |
 
   Scenario Outline: Handshakes
@@ -113,8 +113,8 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input               | output                             |
-        | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p class='dropcap'>Here <img alt='Image' src='http://mudasobwa.ru/images/am.jpg'> goes</p>" |
-        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'><figcaption><p>Figure</p></figcaption></figure>" |
+        | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p class='dropcap'>Here <img alt='Image' src='http://mudasobwa.ru/images/am.jpg'/> goes</p>" |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Figure</p></figcaption></figure>" |
         | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
         | "Here _italic_ goes" | "<p class='dropcap'>Here <em>italic</em> goes</p>" |
         | "Here **bold** goes" | "<p class='dropcap'>Here <strong>bold</strong> goes</p>" |
@@ -125,6 +125,7 @@ Feature: Composer for HTML produces HTML
     And parser is "html"
     And rules from "lib/tagmaps/markdown2html.yaml" are merged in
     When input string is processed with parser
+    And the result is printed out to file "spec/full_output.html"
     Then the result should equal to content of file "spec/output.html"
 
   Scenario: Adding spice

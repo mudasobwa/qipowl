@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'net/http'
-require 'nokogiri'
+require 'htmlbeautifier'
 
 require_relative '../core/bowler'
 require_relative '../bowlers/htmldoc'
@@ -11,6 +11,7 @@ module Typogrowl
   # 
   # This class produces HTML from markup as Markdown does.
   class Html < Bowler
+        
     # `:linewide` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
@@ -28,7 +29,7 @@ module Typogrowl
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Array] the array of words with prepended `flush` tag
     def ⏎ *args
-      [opening(@mapping.get(:flush, __callee__)), args]
+      [standalone(@mapping.get(:flush, __callee__)), args]
     end
     
     # `:flush` handler for horizontal rule; it differs from default
@@ -37,7 +38,7 @@ module Typogrowl
     # @return [Nil] nil
     def —— *args
       harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-      harvest __callee__, opening(@mapping.get(:flush, __callee__))
+      harvest __callee__, standalone(@mapping.get(:flush, __callee__))
     end
     
     # `:block` default handler
@@ -61,7 +62,7 @@ module Typogrowl
     # @return [Nil] nil
     def ✍ param, *args
       harvest __callee__, 
-        "<!-- [#{param.strip}]#{args.join(SEPARATOR)} -->"      
+        "<!-- [#{param.strip}]#{args.join(SEPARATOR)}-->"      
     end
 
     # `:inline` handler for comment (required because comments are
@@ -86,8 +87,11 @@ module Typogrowl
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Nil] nil
     def ▶ *args
-      dt, dd = args.join(SEPARATOR).split(/\s*—\s*/)
-      harvest __callee__, "#{tagify :dt, {}, dt}#{tagify :dd, {}, dd}"
+      dt, dd = args.join(SEPARATOR).split(/\s+(?:#{@mapping.params(:dd).join('|')})\s+/)
+      harvest __callee__, %Q(
+                             #{tagify :dt, {}, dt}
+                             #{tagify :dd, {}, dd}
+                            )
     end
     # Alias for {#▶}, according to YAML rules specifies additional 
     # class for the data list `<dl>` tag behind (`dl-horizontal`.)
@@ -101,7 +105,7 @@ module Typogrowl
       from, till, *rest = args.flatten
       tag = @mapping.get(:handshake, __callee__)
       tag = tag[:tag] if Hash === tag
-      [tagify(tag, {}, "#{from}#{__callee__}#{till}".gsub(String::WIDESPACE, ' ')), rest]
+      [tagify(tag, {}, "#{from}#{__callee__}#{till}".gsub(String::SYMBOL_FOR_SPACE, ' ')), rest]
     end
     alias_method :⊂, :∈
     
@@ -112,7 +116,7 @@ module Typogrowl
       href, *title = args.flatten
       case get_href_content(href)
       when :img 
-        opening :img, { :src => href, :alt => title.join(SEPARATOR) }
+        standalone :img, { :src => href, :alt => title.join(SEPARATOR) }
       else 
         tagify @mapping.get(:inplace, __callee__), {:href => href}, title
       end
@@ -124,8 +128,10 @@ module Typogrowl
     def ✇ *args
       id, *rest = args.flatten
       harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
-      harvest __callee__, "<iframe width='560' height='315' src='http://www.youtube.com/embed/#{id}' 
-               frameborder='0' allowfullscreen></iframe>"
+      harvest __callee__, %Q(
+            <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id}' 
+                    frameborder='0' allowfullscreen></iframe>
+          )
     end
     
     # Handler for standalone pictures and
@@ -135,7 +141,16 @@ module Typogrowl
     # @return [Nil] nil
     def ⚘ *args
       href, *title = args.flatten
-      harvest __callee__, "<figure><img src='#{href}'><figcaption><p>#{title.join(SEPARATOR)}</p></figcaption></figure>"
+      harvest __callee__, %Q(
+                              <figure>
+                              <img src='#{href}'/>
+                              <figcaption>
+                              <p>
+                              #{title.join(SEPARATOR)}
+                              </p>
+                              </figcaption>
+                              </figure>
+                            )
     end
     
     # Handler for abbrs.
@@ -188,7 +203,9 @@ module Typogrowl
       tag, *clazz = tag.to_s.split('†')
       clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
       attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
-      "<#{tag}#{clazz}#{attrs}>"
+      %Q(
+        <#{tag}#{clazz}#{attrs}>
+      )
     end
     
     # Constructs closing html tag for the input given.
@@ -196,7 +213,16 @@ module Typogrowl
     # @param [String] tag to produce closing tag string from.
     # @return [String] opening tag for the input given.
     def closing tag
-      "</#{tag.to_s.split('†').first}>"
+      %Q(
+        </#{tag.to_s.split('†').first}>
+      )
+    end
+
+    # (see opening)
+    # Acts most like an {#opening} method, but closes an element inplace
+    # (used for `hr`, `br`, `img`).
+    def standalone tag, params={}
+      opening(tag, params).sub('>', '/>')
     end
 
     # Constructs valid tag for the input given, concatenating
@@ -207,8 +233,7 @@ module Typogrowl
     # @param [Array] args the words, to be tagged around. 
     # @return [String] opening tag for the input given.
     def tagify tag, params, *args
-      args = args.join(SEPARATOR) if Array === args
-      "#{opening tag, params}#{args.strip}#{closing tag}"
+      "#{opening tag, params}#{[*args].join(SEPARATOR)}#{closing tag}"
     end
 
     # Produces html paragraph tag (`<p>`) with class `dropcap`.
@@ -247,21 +272,21 @@ module Typogrowl
         prv = @mapping.get(:enclosures, @callee)
         nxt = @mapping.get(:enclosures, callee)
         if prv && (!callee || level(callee) <= level(@callee))
-          @yielded.each { |s| s.gsub!(/#{level(@callee).␚ify}/, closing(prv)) }
           @yielded.last.sub!(/\A/, opening(prv))
+          @yielded.each { |s| s.gsub!(/#{level(@callee).␚ify}/) { closing(prv) } }
         end
         str += closing(nxt) \
           if nxt && (!@callee || level(callee) >= level(@callee))
         # if there was a jump down layers, e.g. we encountered second
         #    level while being on zeroth
         (level(callee) - 1).downto(level(@callee)) { |i|
-          logger.debug "Jump down levels #{level(@callee)} ⇒ #{level(callee)} Context: #{str}"
+          logger.debug "Jump down levels #{level(@callee)} ⇒ #{level(callee)} Context: #{str.split($/).first}"
           str += i.␚ify
         } unless nested_base(callee) == nested_base(@callee)
         # if there was a jump up layers, e.g. we encountered second
         #    level while being on fifth
         (level(@callee) - 1).downto(level(callee)) { |i|
-          logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str}"
+          logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str.split($/).first}"
           @yielded.each { |s|
             logger.warn "Control characters (level=#{i}) left in the output. Trying to fix by removal." \
               if s.gsub!(/#{i.␚ify}/, '')
@@ -272,7 +297,7 @@ module Typogrowl
       super callee, str
     end
     
-    # @see Typogrowl::Bowler#defreeze
+    # @see {Typogrowl::Bowler#defreeze}
     # 
     # Additionally it checks if tag is a `:block` tag and 
     # substitutes all the carriage returns (`$/`) with special symbol
@@ -283,10 +308,21 @@ module Typogrowl
       str = super str
       @mapping.block.each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
-          "#{$1}('#{$2}', '#{$3.carriage}')"
+          "#{$1}('#{$2}', '#{$3}')"
         }
       }
       str
+    end
+
+    # @see {Typogrowl::Bowler#serveup}
+    #
+    # Additionally it beatifies the output HTML
+    # 
+    # @param [String] str to be roasted
+    def serveup str
+      result = ''
+      HtmlBeautifier::Beautifier.new(result).scan(super str)
+      result
     end
 
     # @see Typogrowl::Bowler#method_missing

@@ -55,6 +55,10 @@ module Typogrowl
       merge! yaml
     end
 
+    def params key
+      [*@hash[:params][key]]
+    end
+
     # Returns value for the key from section.
     #
     # @param [Symbol] section the section to retrieve value for key from

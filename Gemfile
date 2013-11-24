@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in typogrowl.gemspec
 gemspec
 
-gem "typogrowth", :path => '../typogrowth'
+gem "htmlbeautifier", :git => 'https://github.com/threedaymonk/htmlbeautifier'
 
 gem "diff-lcs", :git => 'git://github.com/halostatue/diff-lcs.git'
 
