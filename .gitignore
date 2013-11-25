@@ -13,6 +13,7 @@ pkg
 rdoc
 spec/reports
 test/tmp
+data/internals
 test/version_tmp
 tmp
 /nbproject/
