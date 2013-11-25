@@ -2,6 +2,6 @@
 
 require 'bundler/setup'
 require 'yaml'
-require 'typogrowl'
+require 'qipowl'
 require 'rspec/expectations'
 

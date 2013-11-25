@@ -8,7 +8,7 @@ require_relative '../utils/logging'
 require_relative '../core/mapping'
 
 # @author Alexei Matyushkin
-module Typogrowl
+module Qipowl
 
   # Base class for all the parsers.
   #
@@ -70,7 +70,7 @@ module Typogrowl
     # Since “warning” behaves exactly as the paragraph, but has the “special
     # class” in terms of HTML, all we need is to do:
     #
-    #     tg = Typogrowl::Html.new
+    #     tg = Qipowl::Html.new
     #     tg.mapping.merge! { :linewide => { :☢ => :p†warning }}
     def merge_rules other
       @mapping.merge! other
@@ -140,7 +140,7 @@ module Typogrowl
     # After we have this part of input processed, it should be considered
     # “done.” So block processors call {#harvest} to store processed parts.
     #
-    # @param [Symbol] callee of this method. Typogrowl hardly relies on method namings and sometimes we may need to know if the call was made by, say, lineitem DSL (`•`), not datalist (`▷`).
+    # @param [Symbol] callee of this method. Qipowl hardly relies on method namings and sometimes we may need to know if the call was made by, say, lineitem DSL (`•`), not datalist (`▷`).
     # @param [String] str string to yield
     #
     # @return nil

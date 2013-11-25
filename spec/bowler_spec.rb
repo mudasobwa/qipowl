@@ -2,9 +2,9 @@
 
 require_relative 'spec_helper'
 
-describe Typogrowl::Bowler do
+describe Qipowl::Bowler do
   before(:each) do
-    @parser = Typogrowl::Bowler.new
+    @parser = Qipowl::Bowler.new
     @string = File.read("#{File.dirname(__FILE__)}/input.tgm")
   end
 

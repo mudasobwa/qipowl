@@ -2,7 +2,7 @@
 
 require_relative '../utils/hash_recursive_merge'
 
-module Typogrowl
+module Qipowl
   class ::Array
     # Checks whether an array contains non-nil elements
     # @return +true+ if an array does not contain non-nils and +false+ otherwise

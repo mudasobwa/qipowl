@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 Given(/^parser is "(.*?)"$/) do |clazz|
-  @parser = eval("Typogrowl::#{clazz.capitalize}.new")
+  @parser = eval("Qipowl::#{clazz.capitalize}.new")
 end
 
 Given(/^the input string is "(.*?)"$/) do |str|

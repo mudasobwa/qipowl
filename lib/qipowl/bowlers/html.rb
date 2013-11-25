@@ -6,7 +6,7 @@ require 'htmlbeautifier'
 require_relative '../core/bowler'
 require_relative '../bowlers/htmldoc'
 
-module Typogrowl
+module Qipowl
   # Markup processor for Html output.
   # 
   # This class produces HTML from markup as Markdown does.
@@ -237,7 +237,7 @@ module Typogrowl
     end
 
     # Produces html paragraph tag (`<p>`) with class `dropcap`.
-    # @see Typogrowl::Bowler#orphan
+    # @see Qipowl::Bowler#orphan
     # @param str the words, to be put in paragraph tag.
     # @return [String] tagged words.
     def orphan str
@@ -260,7 +260,7 @@ module Typogrowl
       (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
 
-    # @see Typogrowl::Bowler#harvest
+    # @see Qipowl::Bowler#harvest
     # 
     # Additionally it checks if there was a `:linewide` item, requiring
     # surrounding html element (like `<ul>` aroung several `<li>`s.)
@@ -297,7 +297,7 @@ module Typogrowl
       super callee, str
     end
     
-    # @see {Typogrowl::Bowler#defreeze}
+    # @see {Qipowl::Bowler#defreeze}
     # 
     # Additionally it checks if tag is a `:block` tag and 
     # substitutes all the carriage returns (`$/`) with special symbol
@@ -314,7 +314,7 @@ module Typogrowl
       str
     end
 
-    # @see {Typogrowl::Bowler#serveup}
+    # @see {Qipowl::Bowler#serveup}
     #
     # Additionally it beatifies the output HTML
     # 
@@ -325,7 +325,7 @@ module Typogrowl
       result
     end
 
-    # @see Typogrowl::Bowler#method_missing
+    # @see Qipowl::Bowler#method_missing
     #
     # Lazy extends class with methods for nested `:linewide`s and 
     # handles calls for words starting with elements from `:inplace` section.

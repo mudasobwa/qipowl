@@ -6,7 +6,7 @@ require_relative '../utils/hash_recursive_merge'
 require_relative '../utils/logging'
 
 # @author Alexei Matyushkin
-module Typogrowl
+module Qipowl
   
   # Operates +mapping+ for loaded +YAML+ rules files.
   #
@@ -151,7 +151,7 @@ module Typogrowl
     # Since “warning” behaves exactly as the paragraph, but has the “special
     # class” in terms of HTML, all we need is to do:
     #
-    #     tg = Typogrowl::Html.new
+    #     tg = Qipowl::Html.new
     #     tg.mapping.merge! { :linewide => { :☢ => :p†warning }}
     #
     # In case the processing is more complicated, one might need to

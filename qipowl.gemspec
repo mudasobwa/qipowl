@@ -1,16 +1,16 @@
 $:.push File.expand_path("../lib", __FILE__)
-require 'typogrowl/version'
+require 'qipowl/version'
 
 Gem::Specification.new do |s|
-  s.name = 'typogrowl'
-  s.version = Typogrowl::VERSION
+  s.name = 'qipowl'
+  s.version = Qipowl::VERSION
   s.platform = Gem::Platform::RUBY
   s.license = 'MIT'
   s.date = '2013-09-08'
   s.authors = ['Alexei Matyushkin']
   s.email = 'am@mudasobwa.ru'
-  s.homepage = 'http://github.com/mudasobwa/typogrowl'
-  s.summary = %Q{Modern markdown ancestor}
+  s.homepage = 'http://github.com/mudasobwa/qipowl'
+  s.summary = %Q{Parser framework totally based on DSL}
   s.description = %Q{Multipurpose DSL-based pure text parser.}
   s.extra_rdoc_files = [
     'LICENSE',

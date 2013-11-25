@@ -2,9 +2,9 @@
 
 require_relative 'spec_helper'
 
-describe Typogrowl::Html do
+describe Qipowl::Html do
   before(:each) do
-    @parser = Typogrowl.tg_md__html
+    @parser = Qipowl.tg_md__html
     @string = File.read("#{File.dirname(__FILE__)}/input.tgm")
   end
 

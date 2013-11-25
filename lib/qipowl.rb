@@ -1,12 +1,9 @@
 # encoding: utf-8
 
-require_relative "typogrowl/version"
+require_relative "qipowl/version"
+require_relative "qipowl/bowlers/html"
 
-#require "typogrowl/utils/io"
-require_relative "typogrowl/core/bowler"
-require_relative "typogrowl/bowlers/html"
-
-module Typogrowl
+module Qipowl
   def self.tg__html
     Html.new
   end

@@ -4,12 +4,12 @@ require 'cgi'
 require 'json'
 require 'sinatra'
 
-require_relative '../typogrowl'
+require_relative '../qipowl'
 
 use Rack::Session::Pool, :expire_after => 2592000
 
 before do
-  session[:typo] ||= Typogrowl.tg_md__html
+  session[:typo] ||= Qipowl.tg_md__html
 end
 
 get '/html/mapping' do

@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 
-module Typogrowl
+module Qipowl
 
   class HtmlDoc < Nokogiri::XML::SAX::Document
     attr_reader :tg
