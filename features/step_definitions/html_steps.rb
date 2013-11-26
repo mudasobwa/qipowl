@@ -24,6 +24,10 @@ Given(/^rules from "(.*?)" are merged in$/) do |f|
   @parser.merge_rules f
 end
 
+Given(/^parser class is "(.*?)"$/) do |name|
+  @parser_class = name
+end
+
 ################################################################################
 
 When(/^input string is processed with parser$/) do
@@ -35,10 +39,20 @@ When(/^input string is reversed with unparse_and_roll$/) do
 end
 
 When(/^the result is printed out to file "(.*?)"$/) do |file|
-  File.write(file, @result_unstripped)
+  File.write(file, @result)
+end
+
+When(/^input string is processed with parser’s class function$/) do
+  @result = eval("Qipowl::#{@parser_class.capitalize}.parse '#{@content}'")
 end
 
 ################################################################################
+
+Then(/^the result should be printed to stdout as is$/) do
+  puts '='*40
+  puts @result
+  puts '='*40
+end
 
 Then(/^the result should equal to "(.*?)"$/) do |result|
   expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))

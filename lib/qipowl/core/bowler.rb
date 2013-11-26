@@ -50,16 +50,16 @@ module Qipowl
     # @param [String] str the string to be processed
     # @return [String] the result of string evaluation
     def parse_and_roll str
-      @callee = nil
       serveup roast defreeze @in = str
     end
 
     # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
     def initialize file = nil
-      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{self.class.name.downcase.split('::').last}.yaml"
+      rules = self.class.name.downcase.split('::').last.split('_').first
+      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{rules}.yaml"
       file = fname if !file && File.exist?(fname)
       
-      @mapping = Mapping.new self.class, file
+      @mapping = Mapping.new self.class, file if file
     end
 
     # (see Mapping#merge!)
@@ -145,7 +145,7 @@ module Qipowl
     #
     # @return nil
     def harvest callee, str
-      @yielded << str
+      @yielded << str unless str.vacant?
       nil
     end
 
@@ -181,11 +181,11 @@ module Qipowl
 #      raise Exception.new "Reserved symbols are used in input. Aborting…" \
 #        if /[#{String::BOWL_SYMBOLS}]/ =~ str
       out = str.dup
-      @mapping.synsugar.each { |re, subst|
+      @mapping[:synsugar].each { |re, subst|
         out.gsub!(/#{re}/, subst)
-      } if @mapping.synsugar
+      } if @mapping[:synsugar]
       out.bowl!
-      @mapping.handshake.each { |k, v|
+      @mapping[:handshake].each { |k, v|
         v = Hash[[[:tag, v]]] if Symbol === v
         %i(from till).each { |key|
           v[key] = :space unless v[key]
@@ -202,7 +202,7 @@ module Qipowl
           from, till = $~[1,2]
           "#{k} #{from.gsub(/\s/, String::SYMBOL_FOR_SPACE)} #{till.gsub(/\s/, String::SYMBOL_FOR_SPACE)} "
         }
-      } if @mapping.handshake
+      } if @mapping[:handshake]
       out
     end
 
@@ -222,7 +222,7 @@ module Qipowl
       courses = str.split(/\R{2,}/).reverse
       courses.each { |dish|
         rest = eval(dish.carriage)
-        harvest(nil, orphan([*rest].join(SEPARATOR))) if rest
+        harvest(nil, orphan([*rest].join(SEPARATOR)))
       } unless courses.nil?
       @yielded.reverse.join($/)
     end

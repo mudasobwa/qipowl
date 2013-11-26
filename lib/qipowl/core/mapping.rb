@@ -42,7 +42,11 @@ module Qipowl
     SALT   = %i(enclosures)
 
     (SUGAR + PEPPER + SPICES + SALT).each { |section|
-      define_method(section) { self[section] }
+      define_method section, ->(key, precisely = false) {
+        precisely or key.nil? ?
+          @hash[section][key] :
+          @hash[section][key.unbowl] || @hash[section][key.unbowl.wstrip]
+      }
     }
     
     # Default initializer.
@@ -55,6 +59,15 @@ module Qipowl
       merge! yaml
     end
 
+    # Quick accessor for sections.
+    #
+    # @param [Symbol] section the section to retrieve
+    # @return [Hash] the subhash of main YAML for the given section
+    def [] section
+      raise "Invalid section #{section}" unless (SUGAR + SPICES + PEPPER + SALT).include?(section)
+      @hash[section]
+    end
+    
     def params key
       [*@hash[:params][key]]
     end
@@ -64,9 +77,9 @@ module Qipowl
     # @param [Symbol] section the section to retrieve value for key from
     # @param [Symbol] key the key to retrieve value for
     # @return [String|Symbol] the value for the key from the section given
-    def get section, key
-      key.nil? ? nil : @hash[section][key] || @hash[section][key.unbowl]
-    end
+    #def get section, key
+    #  key.nil? ? nil : @hash[section][key] || @hash[section][key.unbowl]
+    #end
 
     # Duplicates key from {Mapping.SPICES} and the corresponding {Mapping.SALT} with other name.
     #
@@ -76,7 +89,7 @@ module Qipowl
       section = SPICES.each { |spice| break spice if @hash[spice].keys.include?(original) }
       if @hash[section]
         @hash[section][dupped] = @hash[section][original] 
-        enclosures[dupped] = enclosures[original] if enclosures[original]
+        @hash[:enclosures][dupped] = @hash[:enclosures][original] if @hash[:enclosures][original]
       end
       return @hash[section]
     end
@@ -107,10 +120,10 @@ module Qipowl
     def add_spice section, key, value, enclosure_value = null
       if SPICES.include?(section)
         @hash[section][key] = value
-        enclosures[key] = enclosure_value if enclosure_value
+        @hash[:enclosures][key] = enclosure_value if enclosure_value
         @clazz.class_eval %Q{
           alias_method :#{key.bowl}, :#{@hash[section].first.first}
-        } unless @clazz.instance_methods(false).include?(key.bowl)
+        } unless @clazz.instance_methods(true).include?(key.bowl)
       else
         logger.warn "Trying to add key “#{key}” in an invalid section “#{section}”. Ignoring…"
       end
@@ -125,25 +138,16 @@ module Qipowl
       if @hash[section]
         result[:section] = section
         result[:value] = @hash[section].delete(key)
-        result[:enclosure] = enclosures.delete(key)
+        result[:enclosure] = @hash[:enclosures].delete(key)
         @clazz.class_eval %Q{
           remove_method :#{key.bowl}
-        } if @clazz.instance_methods(false).include?(key.bowl)
+        } if @clazz.instance_methods(true).include?(key.bowl)
       else
         logger.warn "Trying to remove inexisting key “#{key}” (sections: “#{section}”). Ignoring…"
       end
       result
     end
 
-    # Quick accessor for sections.
-    #
-    # @param [Symbol] section the section to retrieve
-    # @return [Hash] the subhash of main YAML for the given section
-    def [] section
-      raise "Invalid section #{section}" unless (SUGAR + SPICES + PEPPER + SALT).include?(section)
-      @hash[section]
-    end
-    
     # Helper method to add custom DSL description to processing.
     #
     # In case one wants `☢` symbol to be treated as markup for warnings,
@@ -202,12 +206,12 @@ module Qipowl
       (SPICES + PEPPER).each { |spice|
         next unless @hash[spice] && !@hash[spice].empty?
         spice_method = @hash[spice].first.first
-        raise "First tag in #{spice} section must have the corresponding method defined explicitly" unless \
-          clazz.instance_methods(false).include?(spice_method)
+#        logger.debug "Deriving default #{spice} method" unless \
+#          clazz.instance_methods(false).include?(spice_method)
         @hash[spice].each { |tag, htmltag|
           clazz.class_eval %Q{
             alias_method :#{tag.bowl}, :#{spice_method}
-          } unless clazz.instance_methods(false).include?(tag.bowl)
+          } unless clazz.instance_methods(true).include?(tag.bowl)
         }
       }
     end
@@ -219,7 +223,7 @@ module Qipowl
     # @param [String] file the file to load YAML from
     # @return [Hash|Nil] the result if it was loaded successfully, nil otherwise
     def hash_from_yaml file
-      ['', "#{Dir.pwd}/", 'tagmaps/', 'lib/tagmaps/'].each { |dir|
+      hash = ['', "#{Dir.pwd}/", 'tagmaps/', 'lib/tagmaps/'].each { |dir|
         result = YAML.load_file("#{dir}#{file}") rescue nil
         break result if result
       }

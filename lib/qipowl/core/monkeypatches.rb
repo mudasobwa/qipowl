@@ -56,6 +56,10 @@ module Qipowl
     UTF_ASCII = UTF_SYMBOLS.merge(UTF_DIGITS).merge(UTF_LETTERS_SMALL).merge(UTF_LETTERS_CAP)
     ASCII_UTF = UTF_ASCII.invert
     
+    def vacant?
+      nil? || empty?
+    end
+    
     def hsub! hash
       self.gsub!(/#{hash.keys.join('|')}/, hash)
     end
@@ -99,6 +103,10 @@ module Qipowl
       self.gsub(/␚(.*?)␚/, '')
     end
     
+    def wstrip
+      self.gsub(/#{NBSP}/, '')
+    end
+    
     def to_filename
       self.bowl.gsub(/\s/, "#{NBSP}")
     end
@@ -110,6 +118,9 @@ module Qipowl
     end
     def unbowl
       self.to_s.unbowl.to_sym
+    end
+    def wstrip
+      self.to_s.wstrip.to_sym
     end
   end
   

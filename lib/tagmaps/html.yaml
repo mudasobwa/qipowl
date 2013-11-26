@@ -2,7 +2,7 @@
   - 'html2.yaml'
 
 :synsugar :
-  '—\p{Blank}+(.+),\s*(\S+)' : '↓ ⚓\2 \1⚓'
+  '^\s*—\p{Blank}+(.+),\s*(\S+)' : '↓ ⚓\2 \1⚓'
   '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s|;\s|␍|\Z)' : '⚓\2 \1⚓'
   '(\S+)†(.+?)†' : '†\1 \2†'
 # http://youtu.be/SAJ_TzLqy1U?t=6s
@@ -31,6 +31,7 @@
   :λ : :code
   :⚓ : :a
   :† : :abbr
+  :✁ : :del
 
 :linewide :
   :• : :li

@@ -7,29 +7,36 @@ require_relative '../core/bowler'
 require_relative '../bowlers/htmldoc'
 
 module Qipowl
+  # Module placeholder for dynamically created bowlers
+  module Bowlers
+  end
+  
   # Markup processor for Html output.
   # 
   # This class produces HTML from markup as Markdown does.
   class Html < Bowler
-        
+    
+    # Amount of unnamed instances of the class (needed for new class name generation)
+    @@inst_count = 0
+    
     # `:linewide` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
-      harvest __callee__, tagify(@mapping.get(:linewide, __callee__), {}, args)
+      harvest __callee__, tagify(@mapping.linewide(__callee__), {}, args)
     end
     
     # `:inplace` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Array] the array of words with trimmed `inplace` tag
     def ≡ *args
-      tagify(@mapping.get(:inplace, __callee__), {}, args)
+      tagify(@mapping.inplace(__callee__), {}, args)
     end
     
     # `:flush` default handler
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Array] the array of words with prepended `flush` tag
     def ⏎ *args
-      [standalone(@mapping.get(:flush, __callee__)), args]
+      [standalone(@mapping.flush(__callee__)), args]
     end
     
     # `:flush` handler for horizontal rule; it differs from default
@@ -38,7 +45,7 @@ module Qipowl
     # @return [Nil] nil
     def —— *args
       harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-      harvest __callee__, standalone(@mapping.get(:flush, __callee__))
+      harvest __callee__, standalone(@mapping.flush(__callee__))
     end
     
     # `:block` default handler
@@ -49,7 +56,7 @@ module Qipowl
     def Λ param, *args
       harvest __callee__, 
               tagify(
-                      @mapping.get(:block, __callee__), 
+                      @mapping.block(__callee__), 
                       {:class=>param.strip}, 
                       args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
                     )
@@ -79,7 +86,7 @@ module Qipowl
     # @return [Array] the array of words with trimmed `magnet` tag
     def ☎ *args
       param, *rest = args.flatten
-      [tagify(@mapping.get(:magnet, __callee__), {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
+      [tagify(@mapping.magnet(__callee__), {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
     end
     
     # `:linewide` handler for data lists (required since data list items
@@ -103,7 +110,7 @@ module Qipowl
     # @return 
     def ∈ *args
       from, till, *rest = args.flatten
-      tag = @mapping.get(:handshake, __callee__)
+      tag = @mapping.handshake(__callee__)
       tag = tag[:tag] if Hash === tag
       [tagify(tag, {}, "#{from}#{__callee__}#{till}".gsub(String::SYMBOL_FOR_SPACE, ' ')), rest]
     end
@@ -118,7 +125,7 @@ module Qipowl
       when :img 
         standalone :img, { :src => href, :alt => title.join(SEPARATOR) }
       else 
-        tagify @mapping.get(:inplace, __callee__), {:href => href}, title
+        tagify @mapping.inplace(__callee__), {:href => href}, title
       end
     end
 
@@ -158,7 +165,12 @@ module Qipowl
     # @return [Array] the array of words with trimmed `abbr` tag
     def † *args
       term, *title = args.flatten
-      tagify @mapping.get(:inplace, __callee__), {:title => title.join(SEPARATOR)}, term
+      tagify @mapping.inplace(__callee__), {:title => title.join(SEPARATOR)}, term
+    end
+
+    def parse_and_roll str
+      @callee = nil
+      super str
     end
 
     def unparse_and_roll str
@@ -187,6 +199,31 @@ module Qipowl
     def initialize file = nil
       super
       merge_rules file if file
+    end
+#    private_class_method :new
+    
+    # @todo Check if this will not lead to memory leaks
+    # @todo Problem: we are currently shitting the general namespace
+    #
+    # @param name [String] name of the bowler to save for future use;
+    #   if omitted, will be generated automatically
+    def self.parse str, name = nil
+      clazz = nil
+      name_ok = !name.nil? && \
+                begin
+                  clazz = Qipowl::Bowlers.const_get(name)
+                  clazz.is_a? Class
+                  clazz < self
+                rescue NameError
+                  false
+                end
+      
+      unless name_ok
+        name = "#{self.name.split('::').last}_#{@@inst_count += 1}"
+        clazz = Qipowl::Bowlers.const_set(name, Class.new(self))
+      end
+
+      clazz.new.parse_and_roll str
     end
     
   private
@@ -233,7 +270,8 @@ module Qipowl
     # @param [Array] args the words, to be tagged around. 
     # @return [String] opening tag for the input given.
     def tagify tag, params, *args
-      "#{opening tag, params}#{[*args].join(SEPARATOR)}#{closing tag}"
+      text = [*args].join(SEPARATOR)
+      text.vacant? ? '' : "#{opening tag, params}#{text}#{closing tag}"
     end
 
     # Produces html paragraph tag (`<p>`) with class `dropcap`.
@@ -241,7 +279,7 @@ module Qipowl
     # @param str the words, to be put in paragraph tag.
     # @return [String] tagged words.
     def orphan str
-      tagify :p, {:class => 'dropcap'}, str.to_s.strip
+      tagify(:p, {:class => 'dropcap'}, str.to_s.strip)
     end
 
     # Computes the level of the `:linewide` element by counting
@@ -255,7 +293,7 @@ module Qipowl
     # @return [Integer] the level requested. 
     #
     def level oper
-      return 0 if oper.nil?
+      return -1 if oper.nil?
       oper = oper.to_s
       (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
@@ -268,30 +306,18 @@ module Qipowl
     # @param [Symbol] callee of method
     # @param [String] str to be harvested
     def harvest callee, str
-      unless callee == @callee
-        prv = @mapping.get(:enclosures, @callee)
-        nxt = @mapping.get(:enclosures, callee)
-        if prv && (!callee || level(callee) <= level(@callee))
-          @yielded.last.sub!(/\A/, opening(prv))
-          @yielded.each { |s| s.gsub!(/#{level(@callee).␚ify}/) { closing(prv) } }
-        end
-        str += closing(nxt) \
-          if nxt && (!@callee || level(callee) >= level(@callee))
-        # if there was a jump down layers, e.g. we encountered second
-        #    level while being on zeroth
-        (level(callee) - 1).downto(level(@callee)) { |i|
-          logger.debug "Jump down levels #{level(@callee)} ⇒ #{level(callee)} Context: #{str.split($/).first}"
+      if callee.nil? || callee != @callee
+        level(callee).downto(level(@callee) + 1) { |i|
           str += i.␚ify
-        } unless nested_base(callee) == nested_base(@callee)
-        # if there was a jump up layers, e.g. we encountered second
-        #    level while being on fifth
-        (level(@callee) - 1).downto(level(callee)) { |i|
-          logger.debug "Jump up levels #{level(@callee)} ⇒ #{level(callee)}. Context: #{str.split($/).first}"
-          @yielded.each { |s|
-            logger.warn "Control characters (level=#{i}) left in the output. Trying to fix by removal." \
-              if s.gsub!(/#{i.␚ify}/, '')
+        } if @mapping.enclosures(callee)
+
+        if prev_enclosure = @mapping.enclosures(@callee)
+          level(@callee).downto(level(callee) + 1) { |i|
+            @yielded.last.sub!(/\A/, opening(prev_enclosure))
+            @yielded.each { |s| s.gsub!(/#{i.␚ify}/) { closing(prev_enclosure) } }
           }
-        } unless nested_base(callee) == nested_base(@callee)
+        end
+        
         @callee = callee
       end
       super callee, str
@@ -306,7 +332,7 @@ module Qipowl
     # @param [String] str to be defreezed
     def defreeze str
       str = super str
-      @mapping.block.each { |tag, htmltag| 
+      @mapping[:block].each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
           "#{$1}('#{$2}', '#{$3}')"
         }
@@ -321,7 +347,13 @@ module Qipowl
     # @param [String] str to be roasted
     def serveup str
       result = ''
-      HtmlBeautifier::Beautifier.new(result).scan(super str)
+      served = super(str)
+      begin
+        HtmlBeautifier::Beautifier.new(result).scan(served)
+      rescue
+        logger.error "Was unable to tidyfy resulting HTML. Returning as is."
+        result = served
+      end
       result
     end
 
@@ -350,7 +382,7 @@ module Qipowl
       # Sublevel markers, e.g. “ •” is level 2 line-item
       if level(method) > 0 && @mapping.dup_spice(orig = nested_base(method), method)
         # create alias for nested
-        Html.class_eval %Q{
+        self.class.class_eval %Q{
           alias_method :#{method.to_s.bowl}, :#{orig}
         }
         # after all, we need to process this nested operator
@@ -358,7 +390,7 @@ module Qipowl
       else
         # Inplace tags, like “≡” for ≡bold decoration≡ 
         # FIXME Not efficient!
-        @mapping.inplace.each { |tag, htmltag|
+        @mapping[:inplace].each { |tag, htmltag|
           tag = tag.to_s.bowl
           if method.to_s.start_with? tag
               return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|

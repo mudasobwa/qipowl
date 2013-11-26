@@ -154,6 +154,20 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to "<p class='dropcap'>Very define and defined and even defined? words</p>"
 
+  Scenario: Blockquotes
+    Given the input string is taken from file "data/blockquote.tg"
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should be printed to stdout as is
+    Then the result should equal to "<h2>Blockquotes</h2><blockquote><p>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</p><blockquote><blockquote><blockquote><p>Nestedblockquotefirstline</p></blockquote></blockquote><p>Nestedblockquotesecondline</p></blockquote><p>Loremipsumparatext2.</p></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><p>Intro1.</p><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><p>Blockquotestandalone.</p></blockquote><blockquote><p>Intro2.</p><ul><li>listitem2.1</li><li>listitem2.2</li></ul><p>Continuingintro2.</p></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
+  
+  Scenario: Blockquotes with class method
+    Given the input string is taken from file "data/blockquote.tg"
+    And parser class is "html"
+    When input string is processed with parser’s class function
+    Then the result should be printed to stdout as is
+    Then the result should equal to "<h2>Blockquotes</h2><blockquote><p>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</p><blockquote><blockquote><blockquote><p>Nestedblockquotefirstline</p></blockquote></blockquote><p>Nestedblockquotesecondline</p></blockquote><p>Loremipsumparatext2.</p></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><p>Intro1.</p><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><p>Blockquotestandalone.</p></blockquote><blockquote><p>Intro2.</p><ul><li>listitem2.1</li><li>listitem2.2</li></ul><p>Continuingintro2.</p></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
+  
 #  Scenario: HTML ⇒ TG
 #    Given the input string is taken from file "spec/output.html"
 #    And parser is "html"
