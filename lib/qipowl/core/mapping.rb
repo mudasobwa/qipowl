@@ -90,6 +90,9 @@ module Qipowl
       if @hash[section]
         @hash[section][dupped] = @hash[section][original] 
         @hash[:enclosures][dupped] = @hash[:enclosures][original] if @hash[:enclosures][original]
+        @clazz.class_eval %Q{
+          alias_method :#{dupped.bowl}, :#{original}
+        } unless @clazz.instance_methods(true).include?(dupped.bowl)
       end
       return @hash[section]
     end

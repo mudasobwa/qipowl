@@ -380,12 +380,8 @@ module Qipowl
     # @return [Array] the array of words
     def special_handler method, *args, &block
       # Sublevel markers, e.g. “ •” is level 2 line-item
-      if level(method) > 0 && @mapping.dup_spice(orig = nested_base(method), method)
-        # create alias for nested
-        self.class.class_eval %Q{
-          alias_method :#{method.to_s.bowl}, :#{orig}
-        }
-        # after all, we need to process this nested operator
+      if level(method) > 0
+        @mapping.dup_spice(nested_base(method), method)
         return send(method, args)
       else
         # Inplace tags, like “≡” for ≡bold decoration≡ 
