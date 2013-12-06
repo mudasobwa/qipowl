@@ -15,6 +15,10 @@ spec/reports
 test/tmp
 data/internals
 data/ruhoh-site
+data/octopress-site/
+data/ruhoh-site-garbage/
+data/ruhoh.rb/
+data/site/
 test/version_tmp
 tmp
 /nbproject/
