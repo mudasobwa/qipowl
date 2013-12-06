@@ -57,7 +57,7 @@ module Qipowl
       harvest __callee__, 
               tagify(
                       @mapping.block(__callee__), 
-                      {:class=>param.strip}, 
+                      {:class => (param.strip.empty? ? 'auto' : param.strip)}, 
                       args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
                     )
     end
@@ -67,18 +67,18 @@ module Qipowl
     # @param [String] param the text to be places on the same string as opening tag
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Nil] nil
-    def ✍ param, *args
-      harvest __callee__, 
-        "<!-- [#{param.strip}]#{args.join(SEPARATOR)}-->"      
+    def ✍ *args
+      []
     end
 
-    # `:inline` handler for comment (required because comments are
-    # formatted in HTML in some specific way.)
+    # `:magnet` handler for reference to Livejournal user.
     # @param [String] param the text to be places on the same string as opening tag
     # @param [Array] args the words, gained since last call to {#harvest}
     # @return [Nil] nil
     def ✎ *args
-      harvest __callee__, "<!-- #{args.join(SEPARATOR)} -->" 
+      param, *rest = args.flatten
+      ljref = "<span style='white-space: nowrap;'><a href='http://#{param}.livejournal.com/profile?mode=full'><img src='http://l-stat.livejournal.com/img/userinfo.gif' alt='[info]' style='border: 0pt none ; vertical-align: bottom; padding-right: 1px;' height='17' width='17'></a><a href='http://#{param}.livejournal.com/?style=mine'><b>#{param}</b></a></span>"
+      [ljref, rest]
     end
 
     # `:magnet` default handler
@@ -87,6 +87,11 @@ module Qipowl
     def ☎ *args
       param, *rest = args.flatten
       [tagify(@mapping.magnet(__callee__), {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
+    end
+    
+    def ☇ *args
+      param, *rest = args.flatten
+      [tagify(@mapping.magnet(__callee__), {:name => param}, String::ZERO_WIDTH_SPACE), rest]
     end
     
     # `:linewide` handler for data lists (required since data list items
@@ -148,7 +153,8 @@ module Qipowl
     # @return [Nil] nil
     def ⚘ *args
       href, *title = args.flatten
-      harvest __callee__, %Q(
+#      harvest __callee__, %Q(
+      %Q(
                               <figure>
                               <img src='#{href}'/>
                               <figcaption>
@@ -170,7 +176,7 @@ module Qipowl
 
     def parse_and_roll str
       @callee = nil
-      super str
+      (super str).gsub(/\s+([.,;:!?])/, '\1')
     end
 
     def unparse_and_roll str
@@ -240,9 +246,7 @@ module Qipowl
       tag, *clazz = tag.to_s.split('†')
       clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
       attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
-      %Q(
-        <#{tag}#{clazz}#{attrs}>
-      )
+      "\n<#{tag}#{clazz}#{attrs}>"
     end
     
     # Constructs closing html tag for the input given.
@@ -250,9 +254,7 @@ module Qipowl
     # @param [String] tag to produce closing tag string from.
     # @return [String] opening tag for the input given.
     def closing tag
-      %Q(
-        </#{tag.to_s.split('†').first}>
-      )
+      "</#{tag.to_s.split('†').first}>\n"
     end
 
     # (see opening)
@@ -293,9 +295,8 @@ module Qipowl
     # @return [Integer] the level requested. 
     #
     def level oper
-      return -1 if oper.nil?
-      oper = oper.to_s
-      (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
+      (oper = oper.to_s).gsub(/#{String::NBSP}/, '').empty? ?
+        -1 : (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
     end
 
     # @see Qipowl::Bowler#harvest
@@ -334,7 +335,7 @@ module Qipowl
       str = super str
       @mapping[:block].each { |tag, htmltag| 
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
-          "#{$1}('#{$2}', '#{$3}')"
+          "#{$1}('#{$2}', '#{$3}')\n\n"
         }
       }
       str
@@ -351,7 +352,7 @@ module Qipowl
       begin
         HtmlBeautifier::Beautifier.new(result).scan(served)
       rescue
-        logger.error "Was unable to tidyfy resulting HTML. Returning as is."
+        logger.error "Was unable to tidyfy resulting HTML. Returning as is:"
         result = served
       end
       result
@@ -381,8 +382,7 @@ module Qipowl
     def special_handler method, *args, &block
       # Sublevel markers, e.g. “ •” is level 2 line-item
       if level(method) > 0
-        @mapping.dup_spice(nested_base(method), method)
-        return send(method, args)
+        return send(method, args) if @mapping.dup_spice(nested_base(method), method)
       else
         # Inplace tags, like “≡” for ≡bold decoration≡ 
         # FIXME Not efficient!
@@ -402,21 +402,31 @@ module Qipowl
     # @param [String] href link to remote resource
     # @return [Symbol] content type (`:img` or `:text` currently)
     def get_href_content href
-      uri = URI(href.to_s.unbowl)
-      Net::HTTP.start(uri.host, uri.port) do |http|
-        http.open_timeout = 3
-
-        request = Net::HTTP::Head.new uri
-        response = http.request request
-        case response.to_hash["content-type"].first
-        when /image/ then return :img
-        when /text/ then return :text
-        end
+      href = href.to_s.unbowl.strip
+      if href.end_with?(* %w{png jpg jpeg gif PNG JPG JPEG GIF})
+        :img
+      elsif /\/\/i\.chzbgr/ =~ href
+        :img
+      else
+        :text
       end
-      :unknown
-    rescue
-      logger.warn "Unable to determine link type: no internet connection. Reverting to default."
-      :unknown
+        
+    #  uri = URI(href.to_s.unbowl)
+    #  Net::HTTP.start(uri.host, uri.port) do |http|
+    #    http.open_timeout = 1
+    #    http.read_timeout = 1
+    #
+    #    request = Net::HTTP::Head.new uri
+    #    response = http.request request
+    #    case response.to_hash["content-type"].first
+    #    when /image/ then return :img
+    #    when /text/ then return :text
+    #    end
+    #  end
+    #  :unknown
+    #rescue
+    #  logger.warn "Unable to determine link [#{href.to_s.unbowl}] type: no internet connection. Reverting to default."
+    #  :unknown
     end
 
     # Determines nested method’s base (e.g. “•” for [second level] “  •”)
@@ -426,4 +436,13 @@ module Qipowl
       nested ? nested.to_s[level(nested), nested.length].to_sym : nil
     end
   end
+end
+
+if __FILE__ == $0
+  
+  i = 0
+  Dir.glob("#{File.dirname(__FILE__)}/../../../data/octopress-site/source/_posts/**/*.owl").each {|f|
+    puts "Processing ##{i += 1}: #{f}"
+    Qipowl::Html.parse File.read(f)
+  }
 end

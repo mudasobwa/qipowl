@@ -27,11 +27,11 @@ Feature: Composer for HTML produces HTML
 
     Examples:
         | input                  | output                             |
-        | "— Wikipedia, http://wikipedia.org" | "<p class='dropcap'><small><a href='http://wikipedia.org'>Wikipedia</a></small></p>" |
+        | "‒ Wikipedia, http://wikipedia.org" | "<p class='dropcap'><br/><small><a href='http://wikipedia.org'>Wikipedia</a></small></p>" |
         | "Wikipedia¹http://wikipedia.org" | "<p class='dropcap'><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†" | "<p class='dropcap'><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
         | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p class='dropcap'><img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
-        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Standalone picture</p></figcaption></figure>" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<pclass='dropcap'><figure><imgsrc='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Standalonepicture</p></figcaption></figure></p>" |
 
   Scenario Outline: Syntactic sugar with carriage returns
     Given the input string is <input>
@@ -114,7 +114,7 @@ Feature: Composer for HTML produces HTML
     Examples:
         | input               | output                             |
         | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p class='dropcap'>Here <img alt='Image' src='http://mudasobwa.ru/images/am.jpg'/> goes</p>" |
-        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<figure><img src='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Figure</p></figcaption></figure>" |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "<pclass='dropcap'><figure><imgsrc='http://mudasobwa.ru/images/am.jpg'/><figcaption><p>Figure</p></figcaption></figure></p>" |
         | "Here [Link](http://wikipedia.org/) goes" | "<p class='dropcap'>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
         | "Here _italic_ goes" | "<p class='dropcap'>Here <em>italic</em> goes</p>" |
         | "Here **bold** goes" | "<p class='dropcap'>Here <strong>bold</strong> goes</p>" |
@@ -147,6 +147,62 @@ Feature: Composer for HTML produces HTML
     When input string is processed with parser
     Then the result should equal to "<p class='dropcap'>List: ◦ li1 ◦ li2</p>"
 
+  Scenario: Standalone images
+    Given the input string is
+      """
+      ---
+      Preamble: given
+      ---
+      
+      〉
+      http://mudasobwa.ru/i/self.jpg With caption
+        ‒ Wiki, http://wikipedia.ru
+      
+      Nice?
+      """
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should equal to "<blockquote><divclass='blockquote'><figure><imgsrc='http://mudasobwa.ru/i/self.jpg'/><figcaption><p>Withcaption<br/><small><ahref='http://wikipedia.ru'>Wiki</a></small></p></figcaption></figure></div></blockquote><pclass='dropcap'>Nice?</p>"
+
+  Scenario: Weird StackLevelTooDeep
+    Given the input string is
+      """
+---
+Preamble: given
+---
+      
+  Да, я устал. Немного есть. ⏎
+ Да, лихорадит и бросает. ⏎
+   А в горле комом бьется спесь. ⏎
+ От ресторанов до красавиц. ⏎
+Боюсь работы, дней, себя
+
+А ты ведь просто ⏎
+      ищешь себя — ⏎
+Тебе они — невзначай. ⏎
+Знаешь ведь — проще прожить любя, ⏎
+    даже, если — печаль．
+      """
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should equal to "<pclass='dropcap'>  Да,яустал.Немногоесть.<br/> Да,лихорадитибросает.<br/>   Авгорлекомомбьетсяспесь.<br/> Отресторановдокрасавиц.<br/>Боюсьработы,дней,себя</p>"
+
+  Scenario: Weird Quote
+    Given the input string is
+      """
+Λ
+@@ -348,7 +348,7 @@ case "$DISTRO" in- rm -rf /usr /lib/nvidia-current/xorg/xorg+ rm -rf /usr/lib/nvidia-current/xorg/xorg
+Λ
+
+‒ https://github.com/MrMEEE/bumblebee/commit/a047be85247755cdbe0acce6#diff-1, https://github.com/MrMEEE/bumblebee/commit/a047be85247755cdbe0acce6#diff-1
+"""
+    And parser is "html"
+    When input string is processed with parser
+    Then the result should equal to
+      """
+<preclass='auto'>@@-348,7+348,7@@case"$DISTRO"in-rm-rf/usr/lib/nvidia-current/xorg/xorg+rm-rf/usr/lib/nvidia-current/xorg/xorg</pre><pclass='dropcap'><br/><small><ahref='https://github.com/MrMEEE/bumblebee/commit/a047be85247755cdbe0acce6#diff-1'>https://github.com/MrMEEE/bumblebee/commit/a047be85247755cdbe0acce6#diff-1</a></small></p>
+      """
+
   Scenario: Weird behaviour with words starting with “ni”
     Given the input string is "Very define and defined and even defined? words"
     And parser is "html"
@@ -158,15 +214,14 @@ Feature: Composer for HTML produces HTML
     Given the input string is taken from file "data/blockquote.tg"
     And parser is "html"
     When input string is processed with parser
-    Then the result should be printed to stdout as is
-    Then the result should equal to "<h2>Blockquotes</h2><blockquote><p>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</p><blockquote><blockquote><blockquote><p>Nestedblockquotefirstline</p></blockquote></blockquote><p>Nestedblockquotesecondline</p></blockquote><p>Loremipsumparatext2.</p></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><p>Intro1.</p><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><p>Blockquotestandalone.</p></blockquote><blockquote><p>Intro2.</p><ul><li>listitem2.1</li><li>listitem2.2</li></ul><p>Continuingintro2.</p></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
+#    Then the result should be printed to stdout as is
+    Then the result should equal to "<h2>Blockquotes</h2><blockquote><divclass='blockquote'>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</div><blockquote><blockquote><blockquote><divclass='blockquote'>Nestedblockquotefirstline</div></blockquote></blockquote><divclass='blockquote'>Nestedblockquotesecondline</div></blockquote><divclass='blockquote'>Loremipsumparatext2.</div></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><divclass='blockquote'>Intro1.</div><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><divclass='blockquote'>Blockquotestandalone.</div></blockquote><blockquote><divclass='blockquote'>Intro2.</div><ul><li>listitem2.1</li><li>listitem2.2</li></ul><divclass='blockquote'>Continuingintro2.</div></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
   
   Scenario: Blockquotes with class method
     Given the input string is taken from file "data/blockquote.tg"
     And parser class is "html"
     When input string is processed with parser’s class function
-    Then the result should be printed to stdout as is
-    Then the result should equal to "<h2>Blockquotes</h2><blockquote><p>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</p><blockquote><blockquote><blockquote><p>Nestedblockquotefirstline</p></blockquote></blockquote><p>Nestedblockquotesecondline</p></blockquote><p>Loremipsumparatext2.</p></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><p>Intro1.</p><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><p>Blockquotestandalone.</p></blockquote><blockquote><p>Intro2.</p><ul><li>listitem2.1</li><li>listitem2.2</li></ul><p>Continuingintro2.</p></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
+    Then the result should equal to "<h2>Blockquotes</h2><blockquote><divclass='blockquote'>Loremipsumdolorsitamet,consecteturadipiscingelit.Integerposuereerataante.</div><blockquote><blockquote><blockquote><divclass='blockquote'>Nestedblockquotefirstline</div></blockquote></blockquote><divclass='blockquote'>Nestedblockquotesecondline</div></blockquote><divclass='blockquote'>Loremipsumparatext2.</div></blockquote><pclass='dropcap'>Someparatext.</p><blockquote><divclass='blockquote'>Intro1.</div><ul><li>listitem<strong>withbold</strong>1</li><li>listitem<em>emphasized</em></li><ul><li>nestedlistitem1</li><li>nestedlistitem2</li></ul></ul></blockquote><blockquote><divclass='blockquote'>Blockquotestandalone.</div></blockquote><blockquote><divclass='blockquote'>Intro2.</div><ul><li>listitem2.1</li><li>listitem2.2</li></ul><divclass='blockquote'>Continuingintro2.</div></blockquote><pclass='dropcap'>Blockquotestandalone.</p>"  
   
 #  Scenario: HTML ⇒ TG
 #    Given the input string is taken from file "spec/output.html"

@@ -68,7 +68,7 @@ module Qipowl
                 @inside = :figure
                 "\n\n"
               when :figcaption then " "
-              when :img then fix_href(current_attrs['src'], 'http://mudasobwa.ru/i/')
+              when :img then fix_href(current_attrs['src'])
               when :span, :sup
                 if current_attrs['class'].nil?
                   ''
@@ -135,7 +135,7 @@ module Qipowl
     
   private
     def fix_href href, site = 'http://mudasobwa.ru/'
-      href.start_with?('http://') ? href : href.gsub(/\A\/+/, '').prepend(site)
+      href.start_with?('http') ? href : href.gsub(/\A\/+/, '').prepend(site)
     end
   end
 
@@ -182,7 +182,7 @@ file_errors = "#{File.dirname(__FILE__)}/../../../data/internals/errors.txt"
 FileUtils.rm file_errors if File.exist? file_errors
 
 FileUtils.mkdir("#{File.dirname(__FILE__)}/../../../data/site")                
-%w{txt pic ref twt}.each {|d| FileUtils.mkdir("#{File.dirname(__FILE__)}/../../../data/site/#{d}")}
+# %w{txt pic ref twt}.each {|d| FileUtils.mkdir("#{File.dirname(__FILE__)}/../../../data/site/#{d}")}
 
 puts "Reading #{file} …"
 File.readlines(file).each { |l|
@@ -194,6 +194,8 @@ File.readlines(file).each { |l|
     parser.parse(prepare data[2])
     tags.rmerge! html_doc.tags
     body = postpare(html_doc.qp)
+    
+    body = body.strip if body
     
     id    = data[0]
     title = data[1].gsub(/'/, "’")
@@ -228,20 +230,25 @@ categories: [#{stype}]
 ---
 
 )
-    owl_text << (type == 4 ? "☛ " : "§1 ")
-    owl_text << title
-    owl_text << "\n\n"
+#    owl_text << (type == 4 ? "☛ " : "§1 ")
+#    owl_text << title
+#    owl_text << "\n\n"
 
     owl_text << case type
                 when 2
                   "#{img} #{body.gsub(/\R/, ' ⏎ ')}"
                 when 3
                   q_ref = q_url[/http:\/\/(.*?)\/|\Z/, 1].split('.').last(2).join('.') rescue nil
-                  "\n〉 #{quote.strip}\n— #{q_url}, #{q_ref ? q_ref : q_url}\n\n"
+                  "\n〉 #{quote.strip}\n‒ #{q_ref ? q_ref : q_url}, #{q_url}\n\n#{body}"
                 else body
                 end
 
-    File.open("#{File.dirname(__FILE__)}/../../../data/site/#{stype}/#{title.to_filename}.owl", 'a') { |f| f.write(owl_text) }
+    fname = "#{date.split.first}-#{title.to_filename}.owl"
+    fname = (1..100).each {|i|
+      break "#{date.split.first}-#{title.to_filename}-#{i}.owl" \
+        unless File.exist?("#{File.dirname(__FILE__)}/../../../data/site/#{date.split.first}-#{title.to_filename}-#{i}.owl")
+    } if File.exist?("#{File.dirname(__FILE__)}/../../../data/site/#{fname}")
+    File.open("#{File.dirname(__FILE__)}/../../../data/site/#{fname}", 'a') { |f| f.write(owl_text) }
 
   rescue Exception => e
     puts '—'*40

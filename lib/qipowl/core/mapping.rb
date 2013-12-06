@@ -93,8 +93,10 @@ module Qipowl
         @clazz.class_eval %Q{
           alias_method :#{dupped.bowl}, :#{original}
         } unless @clazz.instance_methods(true).include?(dupped.bowl)
+        @hash[section]
+      else
+        nil
       end
-      return @hash[section]
     end
     
     # Adds new +entity+ in the section specified.
@@ -230,6 +232,7 @@ module Qipowl
         result = YAML.load_file("#{dir}#{file}") rescue nil
         break result if result
       }
+      Hash === hash ? hash : {}
     end
   end
 end

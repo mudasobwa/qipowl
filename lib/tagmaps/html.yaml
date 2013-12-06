@@ -2,36 +2,42 @@
   - 'html2.yaml'
 
 :synsugar :
-  '^\s*—\p{Blank}+(.+),\s*(\S+)' : '↓ ⚓\2 \1⚓'
-  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\,\s|;\s|␍|\Z)' : '⚓\2 \1⚓'
+# Figure dash
+  '^\s*‒\p{Blank}+(.+),\s*(\S+)' : ' ⏎ ↓ ⚓\2 \1⚓'
+  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\.\Z|\,\s|;\s|␍|\Z)' : '⚓\2 \1⚓'
   '(\S+)†(.+?)†' : '†\1 \2†'
 # http://youtu.be/SAJ_TzLqy1U?t=6s
   'http://youtu\.be/([A-Za-z0-9_]+)(?:\?t=(\d+)s)?' : '✇ \1'
 # http://www.youtube.com/watch?v=SAJ_TzLqy1U
-  'http://www\.youtube\.com/watch\?v=([A-Za-z0-9_]+)' : '✇ \1'
+  'http://www\.youtube\.com/(?:watch\?v=|v/)([A-Za-z0-9_]+)' : '✇ \1'
 # Standalone images and quotes
-  '^(http://\S+)(\s*.*)$' : '⚘ \1 \2'
+  '^(https?://\S+)(\s*.*)$' : '⚘ \1 \2'
 
 :flush :
   :⏎ : :br
   :—— : :hr
 
 :block : 
-  :Λ : :pre
   :✍ : :comment
+  :Λ : :pre
+  :'---' : :comment
 
 :magnet :
   :☎ : :span†phone
   :✉ : :span†email
+  :✎ : :lj
+  :☇ : :a
 
 :inplace :
   :≡ : :strong
   :≈ : :em
+  :↑ : :sup
   :↓ : :small
   :λ : :code
   :⚓ : :a
   :† : :abbr
   :✁ : :del
+  :✿_span_nobr : :nobr
 
 :linewide :
   :• : :li
@@ -39,8 +45,7 @@
   :▶ : :dt
   :▷ : :dt
   :℁ : :address
-  :〉 : :p
-  :✎ : :comment
+  :〉 : :div†blockquote
   :§1 : :h1
   :§2 : :h2
   :§3 : :h3
@@ -48,7 +53,7 @@
   :§5 : :h5
   :§6 : :h6
   :☆ : :p†text_muted
-  :★ : :p†text_primary
+  :★ : :em
   :☛ : :p†text_success
   :☞ : :p†text_info
   :☣ : :p†text_warning
@@ -56,6 +61,10 @@
   :¶ : :p†lead
   :✇ : :video
   :⚘ : :figure
+  :✿_p_address : :p†epigraph
+  :✿_p_epigraph : :p†epigraph
+  :✿_p_afterepigraph : :p†afterepigraph
+  :✿_p_auto : :p†drop_cap
 
 :handshake :
   :∈ : :mathml
@@ -65,7 +74,7 @@
     :till : :dot
 
 :enclosures :
-  :• : :ul
+  :• : :ul†fancy
   :◦ : :ol
   :▶ : :dl
   :▷ : :dl†dl_horizontal

@@ -108,7 +108,7 @@ module Qipowl
     end
     
     def to_filename
-      self.gsub(/[#{Regexp.quote(ASCII_SYMBOLS.join)}]/, UTF_ASCII).gsub(/\s/, "#{NBSP}")[0..64]
+      self.gsub(/[#{Regexp.quote(ASCII_SYMBOLS.join)}]/, UTF_ASCII).gsub(/\s/, "#{NBSP}")[0..50]
     end
   end
   

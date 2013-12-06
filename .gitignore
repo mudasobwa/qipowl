@@ -14,6 +14,7 @@ rdoc
 spec/reports
 test/tmp
 data/internals
+data/ruhoh-site
 test/version_tmp
 tmp
 /nbproject/

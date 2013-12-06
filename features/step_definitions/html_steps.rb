@@ -28,6 +28,10 @@ Given(/^parser class is "(.*?)"$/) do |name|
   @parser_class = name
 end
 
+Given(/^the input string is$/) do |string|
+  @content = string
+end
+
 ################################################################################
 
 When(/^input string is processed with parser$/) do

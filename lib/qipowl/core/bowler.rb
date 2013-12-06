@@ -221,7 +221,17 @@ module Qipowl
       @yielded = []
       courses = str.split(/\R{2,}/).reverse
       courses.each { |dish|
-        rest = eval(dish.carriage)
+        rest = begin
+          eval(dish.strip.carriage)
+        rescue Exception => e
+          msg = e.message.dup
+          logger.error '='*78
+          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}], will return as is… Dish follows:"
+          logger.error '-'*78
+          logger.error dish
+          logger.error '='*78
+          [*dish]
+        end
         harvest(nil, orphan([*rest].join(SEPARATOR)))
       } unless courses.nil?
       @yielded.reverse.join($/)

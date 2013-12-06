@@ -76,9 +76,9 @@
   pupsum.
 </p>
 <blockquote>
-  <p>
+  <div class='blockquote'>
     Markdown blockquotes test.
-  </p>
+  </div>
 </blockquote>
 <p class='dropcap'>
   Markdown code test.
@@ -109,14 +109,16 @@
   <img alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/>
   goes here.
 </p>
-<figure>
-  <img src='http://mudasobwa.ru/images/am.jpg'/>
-  <figcaption>
-    <p>
-      Standalone picture
-    </p>
-  </figcaption>
-</figure>
+<p class='dropcap'>
+  <figure>
+    <img src='http://mudasobwa.ru/images/am.jpg'/>
+    <figcaption>
+      <p>
+        Standalone picture
+      </p>
+    </figcaption>
+  </figure>
+</p>
 <pre class='ruby'>
   @mapping[:inplace].each { |tag, htmltag|
       if method &lt; 5 &amp;&amp; method &gt; 2
@@ -124,9 +126,6 @@
       end
     }
 </pre>
-<!-- [FIXME]
-Comment is the most outrageneous feature!
--->
 <ul>
   <li>
     Line item 1
@@ -144,24 +143,24 @@ Comment is the most outrageneous feature!
   </li>
 </ul>
 <blockquote>
-  <p>
+  <div class='blockquote'>
     Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
 Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
 Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
-  </p>
+  </div>
   <blockquote>
-    <p>
+    <div class='blockquote'>
       Nested BQ 1
-    </p>
-    <p>
+    </div>
+    <div class='blockquote'>
       Nested BQ 2
-    </p>
+    </div>
   </blockquote>
 </blockquote>
 <blockquote>
-  <p>
+  <div class='blockquote'>
     Blockquote 2
-  </p>
+  </div>
   <ul>
     <li>
       line item 1
@@ -178,7 +177,7 @@ Blockquote 1 Blockquote 1 Blockquote 1 Blockquote 1
       line item 2
     </li>
   </ul>
-  <p>
+  <div class='blockquote'>
     Blockquote 3
-  </p>
+  </div>
 </blockquote>
