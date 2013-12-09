@@ -4,18 +4,17 @@ lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'optparse'
-#require_relative '../lib/typogrowl/core/monkeypatches'
 require_relative '../lib/qipowl'
 
-# options = {}
+options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} FILE|STRING"
 
-  # Output style
-  #opts.on("-o", "--out FILE", [:full, :symbol],
-  #        "Output style (full, symbol); default: full") do |type|
-  #  options[:type] = type
-  #end
+  # Bowl result?
+  opts.on("-a", "--action ACTION", [:bowl, :ruby, :cmd, :yaml, :html],
+          "Action to apply on input (bowl, ruby, cmd, yaml, html); default: html") do |action|
+    options[:action] = action || :bowl
+  end
 
   # No argument, shows at tail.  This will print an options summary.
   opts.on_tail("-h", "--help", "Show this message") do
@@ -27,8 +26,19 @@ end.parse!
 raise "Run `#{$0} --help` for execution examples. Exiting…" if ARGV.size.zero?
 
 file_or_string = ARGV.first
-
 file_or_string = File.read(file_or_string) if File.exist?(file_or_string)
 
-# puts file_or_string.bowl
-puts Qipowl::Html.parse file_or_string
+case options[:action]
+when :bowl
+  puts file_or_string.bowl
+when :ruby
+  puts Qipowl::Mapping.new(nil, file_or_string).to_ruby
+when :html
+  puts Qipowl::Html.parse file_or_string
+when :cmd
+  puts Qipowl::Cmd.execute file_or_string
+when :yaml
+  puts Qipowl::Yaml.parse file_or_string
+else
+  puts Qipowl::Html.parse file_or_string
+end  

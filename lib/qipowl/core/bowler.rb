@@ -107,6 +107,7 @@ module Qipowl
     # The handler of the last “orphaned” text block in the input string.
     #
     # E.g.:
+    #     
     #     Here goes a quite significant list:
     #
     #     • line item 1
@@ -119,7 +120,6 @@ module Qipowl
     # Since we still need to handle it somehow, the {#orphan} method is here.
     #
     # @param [String] str the string to be operated “bu default rule”
-    #
     # @return [String] the processed input (in derivatives, here it returns the untouched input string itself)
     def orphan str
       str
@@ -151,15 +151,10 @@ module Qipowl
 
     # Preprocessor of input string. The best candidate to override in
     # descendants in case of input should be slightly “normalized”.
-    # By default it {String#bowl}es the input, substituting:
-    #
-    # - symbols like dots, commas and parenthesis to Burmese letters
-    # (I was unable to locate Klingon in UTF tables, pity on me);
-    # - digits staying alone are prepended with another weird UTF symbol,
-    # making it well-formed ruby methods;
-    # - ruby method omonims, available in this context, are prepended with
-    # same UTF symbol, and therefore are made distinguishable from
-    # methods themselves. Now it’s safe to have input string, containing,
+    # By default it {String#bowl}es the input, substituting
+    # ASCII symbols like letters, digits, dots, commas and parenthesis
+    # to the same symbols within fullwidth latin set (`U+FF01` — `U+FFFF`).
+    # Now it’s safe to have input string, containing,
     # say, `I like eval` text inside.
     #
     # Html parser, for instances, utilizes this method to provide support
@@ -175,16 +170,15 @@ module Qipowl
     # @todo Make this configurable
     #
     # @param [String] str string to prepare for {#roast}
-    #
     # @return [String] preprocessed string
     def defreeze str
-#      raise Exception.new "Reserved symbols are used in input. Aborting…" \
-#        if /[#{String::BOWL_SYMBOLS}]/ =~ str
       out = str.dup
       @mapping[:synsugar].each { |re, subst|
         out.gsub!(/#{re}/, subst)
       } if @mapping[:synsugar]
+
       out.bowl!
+
       @mapping[:handshake].each { |k, v|
         v = Hash[[[:tag, v]]] if Symbol === v
         %i(from till).each { |key|
@@ -194,15 +188,19 @@ module Qipowl
                     when :dot   then "[^#{'.'.bowl}]"
                     when :comma then "[^#{','.bowl}]"
                     when :colon then "[^#{':'.bowl}]"
+                    when :eol   then '.'
                     when :punctuation then "[^#{'.,;:!?'.bowl}]"
-                    else '\R'
+                    else '.'
                     end
         }
-        out.gsub!(/(#{v[:from]}*\s*)#{k}(\s*#{v[:till]}*)/) {
-          from, till = $~[1,2]
-          "#{k} #{from.gsub(/\s/, String::SYMBOL_FOR_SPACE)} #{till.gsub(/\s/, String::SYMBOL_FOR_SPACE)} "
-        }
+        out = out.split(/\R/).map { |line|
+          line.gsub(/(#{v[:from]}*\s*)#{k.bowl}(\s*#{v[:till]}*)/) {
+            from, till = $~[1,2]
+            " #{k.bowl} #{from.spacefy} #{till.spacefy} "
+          }
+        }.join("\n")
       } if @mapping[:handshake]
+
       out
     end
 
@@ -214,8 +212,8 @@ module Qipowl
     #
     # Yes, the backbone call in this method is call to `eval (input)`.
     #
-    # @param [String] str the input string. NB! It might be dangerous to call this method without preceeding call to {#defreeze} (mainly {String#bowl} on input inside {#defreeze}).
-    #
+    # @param [String] str the input string. NB! It might be dangerous to call this method
+    #   without preceeding call to {#defreeze} (mainly {String#bowl} on input inside {#defreeze}).
     # @return [String] roasted input. It still requires to be {String#unbowl}ed.
     def roast str
       @yielded = []
@@ -242,10 +240,9 @@ module Qipowl
     # in {#defreeze} it’s the right place to revert it back.
     #
     # @param [String] str roasted output.
-    #
     # @return [String] the result of processing.
     def serveup str
-      @out = str.uncarriage.un␚ify.unbowl
+      @out = str.uncarriage.un␚ify.unspacefy.unbowl
     end
 
   end

@@ -81,6 +81,24 @@ module Qipowl
       (out = self.dup).unbowl!
       out
     end
+    def spacefy!
+      self.gsub!(/ /, SYMBOL_FOR_SPACE)
+    end
+    def spacefy
+      (out = self.dup).spacefy!
+      out
+    end
+    def unspacefy!
+      self.gsub!(/#{SYMBOL_FOR_SPACE}/, ' ')
+    end
+    def unspacefy
+      (out = self.dup).unspacefy!
+      out
+    end
+    
+    def unuglify
+      self.unbowl.unspacefy.uncarriage.strip
+    end
 
     HTML_ENTITIES = Hash[[['<', 'lt'], ['>', 'gt'], ['&', 'amp']].map { |k, v| [k.bowl, "&#{v};"] }]
 
@@ -118,6 +136,15 @@ module Qipowl
     end
     def unbowl
       self.to_s.unbowl.to_sym
+    end
+    def spacefy
+      self.to_s.spacefy.to_sym
+    end
+    def unspacefy
+      self.to_s.unspacefy.to_sym
+    end
+    def unuglify
+      self.to_s.unuglify.to_sym
     end
     def wstrip
       self.to_s.wstrip.to_sym

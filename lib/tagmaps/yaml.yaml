@@ -1,0 +1,12 @@
+:synsugar:
+  "[\'\"]([^\\s\'\"]+)[\'\"]" : '\1'
+  ":([^\\s\'\"]+)" : '\1'
+
+:linewide :
+  :'-' : :array
+
+:handshake :
+  ':' :
+    :tag : :tupla
+    :from : :colon
+    :till : :eol

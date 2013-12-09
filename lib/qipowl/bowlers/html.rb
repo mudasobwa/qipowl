@@ -77,6 +77,7 @@ module Qipowl
     # @return [Nil] nil
     def ✎ *args
       param, *rest = args.flatten
+      param = param.unbowl
       ljref = "<span style='white-space: nowrap;'><a href='http://#{param}.livejournal.com/profile?mode=full'><img src='http://l-stat.livejournal.com/img/userinfo.gif' alt='[info]' style='border: 0pt none ; vertical-align: bottom; padding-right: 1px;' height='17' width='17'></a><a href='http://#{param}.livejournal.com/?style=mine'><b>#{param}</b></a></span>"
       [ljref, rest]
     end
@@ -86,12 +87,13 @@ module Qipowl
     # @return [Array] the array of words with trimmed `magnet` tag
     def ☎ *args
       param, *rest = args.flatten
-      [tagify(@mapping.magnet(__callee__), {}, param.to_s.prepend("#{__callee__}#{String::NBSP}")), rest]
+      param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
+      [tagify(@mapping.magnet(__callee__), {}, param), rest]
     end
     
     def ☇ *args
       param, *rest = args.flatten
-      [tagify(@mapping.magnet(__callee__), {:name => param}, String::ZERO_WIDTH_SPACE), rest]
+      [tagify(@mapping.magnet(__callee__), {:name => param.unbowl}, String::ZERO_WIDTH_SPACE), rest]
     end
     
     # `:linewide` handler for data lists (required since data list items
@@ -117,7 +119,7 @@ module Qipowl
       from, till, *rest = args.flatten
       tag = @mapping.handshake(__callee__)
       tag = tag[:tag] if Hash === tag
-      [tagify(tag, {}, "#{from}#{__callee__}#{till}".gsub(String::SYMBOL_FOR_SPACE, ' ')), rest]
+      [tagify(tag, {}, "#{from.unbowl}#{__callee__}#{till.unbowl}".gsub(String::SYMBOL_FOR_SPACE, ' ')), rest]
     end
     alias_method :⊂, :∈
     
@@ -126,6 +128,7 @@ module Qipowl
     # @return [Array] the array of words with trimmed `a` tag
     def ⚓ *args
       href, *title = args.flatten
+      href = href.unbowl
       case get_href_content(href)
       when :img 
         standalone :img, { :src => href, :alt => title.join(SEPARATOR) }
@@ -141,7 +144,7 @@ module Qipowl
       id, *rest = args.flatten
       harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
       harvest __callee__, %Q(
-            <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id}' 
+            <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id.unbowl}' 
                     frameborder='0' allowfullscreen></iframe>
           )
     end
@@ -156,7 +159,7 @@ module Qipowl
 #      harvest __callee__, %Q(
       %Q(
                               <figure>
-                              <img src='#{href}'/>
+                              <img src='#{href.unbowl}'/>
                               <figcaption>
                               <p>
                               #{title.join(SEPARATOR)}
@@ -176,7 +179,7 @@ module Qipowl
 
     def parse_and_roll str
       @callee = nil
-      (super str).gsub(/\s+([.,;:!?])/, '\1')
+      super str
     end
 
     def unparse_and_roll str
@@ -276,12 +279,12 @@ module Qipowl
       text.vacant? ? '' : "#{opening tag, params}#{text}#{closing tag}"
     end
 
-    # Produces html paragraph tag (`<p>`) with class `dropcap`.
+    # Produces html paragraph tag (`<p>`) with class `owl`.
     # @see Qipowl::Bowler#orphan
     # @param str the words, to be put in paragraph tag.
     # @return [String] tagged words.
     def orphan str
-      tagify(:p, {:class => 'dropcap'}, str.to_s.strip)
+      tagify(:p, {:class => 'owl'}, str.to_s.strip)
     end
 
     # Computes the level of the `:linewide` element by counting
@@ -348,11 +351,19 @@ module Qipowl
     # @param [String] str to be roasted
     def serveup str
       result = ''
+      %w(. , : ; ! ? »).map(&:bowl).each { |punct|
+        str.gsub!(/(?:\p{Space}|#{String::CARRIAGE_RETURN})*(#{punct})/, '\1')
+#        str.gsub!(/(#{punct})(?=\p{Alnum})/, '\1 ')
+      }
+      %w(«).map(&:bowl).each { |punct|
+        str.gsub!(/(#{punct})(?:\p{Space}|#{String::CARRIAGE_RETURN})*/, '\1')
+        str.gsub!(/(?<=\p{Alnum})(#{punct})/, ' \1')
+      }
       served = super(str)
       begin
         HtmlBeautifier::Beautifier.new(result).scan(served)
       rescue
-        logger.error "Was unable to tidyfy resulting HTML. Returning as is:"
+        logger.error "Was unable to tidyfy resulting HTML. Returning as is."
         result = served
       end
       result
@@ -399,6 +410,7 @@ module Qipowl
     end
 
     # Determines content of remote link by href.
+    # TODO Make image patterns configurable.
     # @param [String] href link to remote resource
     # @return [Symbol] content type (`:img` or `:text` currently)
     def get_href_content href

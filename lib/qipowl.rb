@@ -2,6 +2,8 @@
 
 require_relative "qipowl/version"
 require_relative "qipowl/bowlers/html"
+require_relative "qipowl/bowlers/cmd"
+require_relative "qipowl/bowlers/yaml"
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8

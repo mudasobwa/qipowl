@@ -190,7 +190,29 @@ module Qipowl
           logger.warn("Wrong recipe section: #{recipe}. Try to implement respective method in Mapping class")
       }
     ensure
-      extend_class @clazz
+      extend_class @clazz if Class === @clazz
+    end
+    
+    # Dumps this mapping to ruby code
+    #
+    # @return ruby code to implement for this mapping
+    def to_ruby
+      result = ''
+      result << "class #{@clazz.name.split('::').last}" if @clazz
+      SPICES.each { |spice|
+        @hash[spice].each { |tupla|
+          result << %Q(
+  # marker for #{tupla.last}
+  # @param args [Array] an array of already gained “words”
+  # @return [Array|Nil] a rest after processing
+  def #{tupla.first} *args
+  
+  end
+)
+        } if @hash[spice]
+      }
+      result << "end" if @clazz
+      result
     end
 
   private
@@ -210,10 +232,13 @@ module Qipowl
     def extend_class clazz
       (SPICES + PEPPER).each { |spice|
         next unless @hash[spice] && !@hash[spice].empty?
-        spice_method = @hash[spice].first.first
+        spice_method = @hash[spice].first.first.bowl
+#        logger.debug "spice_method is: [#{spice_method}] for spice: [#{spice}]"
+#        logger.debug "first is: [#{@hash[spice].first}]"
 #        logger.debug "Deriving default #{spice} method" unless \
 #          clazz.instance_methods(false).include?(spice_method)
         @hash[spice].each { |tag, htmltag|
+#          logger.debug "tag.bowl: [#{tag.bowl}], spice_method: [#{spice_method}]"
           clazz.class_eval %Q{
             alias_method :#{tag.bowl}, :#{spice_method}
           } unless clazz.instance_methods(true).include?(tag.bowl)
