@@ -4,6 +4,8 @@
 
 _qipowl_ (pronounced as **keep all**)
 
+[![Build Status](https://travis-ci.org/mudasobwa/qipowl.png)](https://travis-ci.org/mudasobwa/qipowl)
+
 ## Intro
 
 _qipowl_ is the next generation parser environment. It’s not the
