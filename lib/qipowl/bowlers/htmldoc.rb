@@ -155,7 +155,7 @@ def prepare str
      .gsub(/http:\/\/(www\.)?(secondiary|1stone|matiouchkine.net)\.ru/, 'http://mudasobwa.ru')  # obsolete site name
      .gsub(/\[(http[^\]]*)\]/, '\1')     # obsolete markdown pics
      .gsub(/<span>\s*<\/span>/, 'λ\1λ')     # obsolete markdown pics
-     .gsub(/<lj (?:comm|user)="(.*?)">/, '✎\1✎')     # obsolete markdown pics
+     .gsub(/<lj (?:comm|user)="(.*?)">/, '✎ \1')     # obsolete markdown pics
      .gsub(/<([^<>]*?@[^<>]*?)>/, '\1')     # obsolete markdown pics
      .gsub(/<imgsrc=/, '<img src=')     # obsolete markdown pics
      .gsub(/<ahref=/, '<a href=')     # obsolete markdown pics

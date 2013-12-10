@@ -59,15 +59,15 @@ Then(/^the result should be printed to stdout as is$/) do
 end
 
 Then(/^the result should equal to "(.*?)"$/) do |result|
-  expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))
+  expect(@result).to eq(result.gsub(/␍/, "\n"))
 end
 
 Then(/^the result should equal to$/) do |result|
-  expect(@result.gsub(/\s*/, '')).to eq(result.gsub(/\s*/, ''))
+  expect(@result).to eq(result)
 end
 
-Then(/^the result should start with to "(.*?)"$/) do |result|
-  expect(@result.gsub(/\s*/, '')).to match(/^#{result.gsub(/\s*/, '')}/)
+Then(/^the result should start with "(.*?)"$/) do |result|
+  expect(@result.split("\n").first.strip).to eq(result)
 end
 
 Then(/^the result should be multiline and almost equal to "(.*?)"$/) do |result|
