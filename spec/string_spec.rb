@@ -2,14 +2,14 @@ require_relative 'spec_helper'
 
 describe String do
   before(:each) do
-    @string = '\' " - ( ) { } \[ \] . , : ; ! ? ~ + * / % < > @ & | ^ = `'
-    @entitified = '\' " - ( ) { } \[ \] . , : ; ! ? ~ + * / % &lt; &gt; @ &amp; | ^ = `'
+    @string = 'Hello, world!'
+    @bowled = 'Ｈｅｌｌｏ， ｗｏｒｌｄ！'
   end
 
   describe "#bowl" do
-    context 'bowled string' do
+    context 'string is bowled' do
       it 'contains no ruby symbols' do
-        expect(/[#{Regexp.quote String::ASCII_ALL.join}]/ =~ @string.bowl).to eql nil 
+        expect(@string.bowl).to eql @bowled 
       end
     end
       

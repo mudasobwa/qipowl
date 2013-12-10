@@ -59,7 +59,7 @@ module Qipowl
       fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{rules}.yaml"
       file = fname if !file && File.exist?(fname)
       
-      @mapping = Mapping.new self.class, file if file
+      @mapping = Mapping.new(self.class, file ? file : nil)
     end
 
     # (see Mapping#merge!)

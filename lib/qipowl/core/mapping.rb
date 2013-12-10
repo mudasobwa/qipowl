@@ -56,7 +56,7 @@ module Qipowl
     def initialize clazz, yaml 
       @clazz  = clazz
       @hash   = {}
-      merge! yaml
+      merge! yaml if yaml
     end
 
     # Quick accessor for sections.
