@@ -35,11 +35,11 @@ module Qipowl
 
     attr_reader :hash
 
-    RECIPE = [:includes]
-    SUGAR  = [:synsugar]
-    PEPPER = [:handshake]
-    SPICES = [:flush, :block, :magnet, :inplace, :linewide]
-    SALT   = [:enclosures]
+    RECIPE = %i(includes)
+    SUGAR  = %i(synsugar)
+    PEPPER = %i(handshake)
+    SPICES = %i(flush block magnet inplace linewide)
+    SALT   = %i(enclosures)
 
     (SUGAR + PEPPER + SPICES + SALT).each { |section|
       define_method section, ->(key, precisely = false) {
