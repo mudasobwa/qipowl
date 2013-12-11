@@ -1,348 +1,170 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Typogrowl : Markthrough" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Typogrowl</title>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Typogrowl by mudasobwa</title>
   </head>
 
   <body>
+    <div id="container">
+      <div class="inner">
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/mudasobwa/typogrowl">View on GitHub</a>
-
-          <h1 id="project_title">Typogrowl</h1>
-          <h2 id="project_tagline">Markthrough</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/mudasobwa/typogrowl/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/mudasobwa/typogrowl/tarball/master">Download this project as a tar.gz file</a>
-            </section>
+        <header>
+          <h1>Typogrowl</h1>
+          <h2>the next generation markup environment for virtually everything</h2>
         </header>
-    </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p><img src="https://github.com/mudasobwa/typogrowl/raw/master//images/owl.png" alt="Typogrowl"></p>
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/mudasobwa/qipowl/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/mudasobwa/qipowl/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/mudasobwa/qipowl" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
 
-<p><em>Typogrowl</em> is the next generation markup environment. It’s not the
-markup language only, since it provides the very efficient and straightforward
-library to produce custom markups. It′s not the markup library either,
-since it comes with ready-to-use markdown-like markup and 2HTML converter.</p>
+        <hr>
 
-<p>The main idea of <em>Typogrowl</em> is to yield the power of 
+        <section id="main_content">
+          <p><img src="https://github.com/mudasobwa/typogrowl/raw/master/images/owl.png" alt="qipowl"></p>
+
+<p>The main idea of <em>qipowl</em> is to yield the power of 
 <a href="http://jroller.com/rolsen/entry/building_a_dsl_in_ruby">DSL in Ruby</a>.
 The whole input text is treated neither more nor less than <code>DSL</code>. 
 That gives the user an ability to make virtually every term in input text
 the <em>operating entity</em>.</p>
 
-<p><em>Typogrowl</em> utilizes UTF-8 heavily. The standard markup (here and further:
-<em>Typogrowl markup</em>, or <em>TGM</em>) lays on unicode characters instead of
-legacy asterisks and underscores in markdown. It brings the better 
-readability to plain text before it’s processed with <em>Typogrowl</em> and
-allows more readable <code>DSL</code> for processing. For instance, the input:</p>
+<h2>
+<a name="intro" class="anchor" href="#intro"><span class="octicon octicon-link"></span></a>Intro</h2>
 
-<pre><code>§3 Emphasized text
+<p>Everybody knows that parsing is annoying, error-prone and generally hazardous. That’s because the common old-school approach to parsing suc^W^W failed.</p>
 
-There are four standard modifiers for emphasizing text:
-▶ “≡” — bold
-▶ “≈” — italic
-▶ “↓” — small
-▶ “λ” — code
+<p>The problems are greatly exaggerated. The only thing we need to make the parsing process pleasant is to join <em>bootstrapping techniques</em>, <em>Ruby DSL abilities</em> and a bit of additional <em>Ruby coding</em>.</p>
 
-The formers are to surround the target text piece.
-This text contains:
-• ≡bold≡,
-• ≈italics≈,
-• ↓small↓ 
-• and even some λcodeλ.
-</code></pre>
+<p>Like Baron Münchhausen, who allegedly pulled himself and the horse on which he was sitting out of a swamp by his own hair (or like <a href="http://en.wikipedia.org/wiki/Ouroboros">Ouroboros</a> if one prefers serpentariums to swamps), the text to be parsed should… Well, it should <strong>parse itself</strong>.</p>
 
-<p>will be processed as:</p>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Muenchhausen_Herrfurth_7_500x789.jpg/152px-Muenchhausen_Herrfurth_7_500x789.jpg" alt="illustration by Oskar Herrfurth"></p>
 
-<div class="highlight highlight-html"><pre><span class="nt">&lt;h3&gt;</span>Emphasized text<span class="nt">&lt;/h3&gt;</span>
-<span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">'dropcap'</span><span class="nt">&gt;</span>There are four standard modifiers for emphasizing text:<span class="nt">&lt;/p&gt;</span>
-<span class="nt">&lt;dl&gt;&lt;dt&gt;</span>“≡”<span class="nt">&lt;/dt&gt;&lt;dd&gt;</span>bold<span class="nt">&lt;/dd&gt;</span>
-<span class="nt">&lt;dt&gt;</span>“≈”<span class="nt">&lt;/dt&gt;&lt;dd&gt;</span>italic<span class="nt">&lt;/dd&gt;</span>
-<span class="nt">&lt;dt&gt;</span>“↓”<span class="nt">&lt;/dt&gt;&lt;dd&gt;</span>small<span class="nt">&lt;/dd&gt;</span>
-<span class="nt">&lt;dt&gt;</span>“λ”<span class="nt">&lt;/dt&gt;&lt;dd&gt;</span>code<span class="nt">&lt;/dd&gt;&lt;/dl&gt;</span>
-<span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">'dropcap'</span><span class="nt">&gt;</span>The formers are to surround the target text piece.
-This text contains:<span class="nt">&lt;/p&gt;</span>
-<span class="nt">&lt;ul&gt;&lt;li&gt;&lt;strong&gt;</span>bold<span class="nt">&lt;/strong&gt;</span>,<span class="nt">&lt;/li&gt;</span>
-<span class="nt">&lt;li&gt;&lt;em&gt;</span>italics<span class="nt">&lt;/em&gt;</span>,<span class="nt">&lt;/li&gt;</span>
-<span class="nt">&lt;li&gt;&lt;small&gt;</span>small<span class="nt">&lt;/small&gt;&lt;/li&gt;</span>
-<span class="nt">&lt;li&gt;</span>and even some <span class="nt">&lt;code&gt;</span>code<span class="nt">&lt;/code&gt;</span>.<span class="nt">&lt;/li&gt;&lt;/ul&gt;</span>
-</pre></div>
+<p>Ruby DSL has <em>all</em> the prerequisites for that. Let’s see.</p>
 
-<p>The valuable subset of HTML5 is implemented directly, plus the user may
-eventually extend the list of understandable tags.</p>
+<h2>
+<a name="bowler-basics" class="anchor" href="#bowler-basics"><span class="octicon octicon-link"></span></a>Bowler Basics</h2>
 
-<p>The markup-specific symbols, like “▶” and “•” in the previous example
-may be mapped to keyboard (see <code>typo</code> file within <code>data</code> directory of the 
-project.</p>
-
-<h3>
-<a name="internals" class="anchor" href="#internals"><span class="octicon octicon-link"></span></a>Internals</h3>
-
-<p><em>Typogrowl</em> markup implementation consists of two parts: markup definition
-(kinda <code>yaml</code> file) and markup processor. The latter derives from base
-processor implementation <code>Typogrowl::Bowler</code>.</p>
+<p>The main principle of <strong>qipowl</strong> is:</p>
 
 <h4>
-<a name="markup-definition" class="anchor" href="#markup-definition"><span class="octicon octicon-link"></span></a>Markup definition</h4>
+<a name="all-the-input-text-is-interpreted-as-ruby-code" class="anchor" href="#all-the-input-text-is-interpreted-as-ruby-code"><span class="octicon octicon-link"></span></a>All the input text is interpreted as Ruby code.</h4>
 
-<p><em>Typogrowl</em> understands six types of ‘operators’:</p>
+<p>There is a rake¹ on our way, and we’re near to get on the forehead, so let’s watch our steps:</p>
 
 <ul>
-<li>flush</li>
-<li>block</li>
-<li>magnet</li>
-<li>inplace</li>
-<li>linewide</li>
-<li>custom</li>
-</ul><h5>
-<a name="flush" class="anchor" href="#flush"><span class="octicon octicon-link"></span></a>:flush</h5>
+<li>Get rid of all the symbols, which may confuse ruby interpreter (e. g. <code>ASCII</code>); we simply <code>gsub</code> all the single-byte symbols to their “<a href="http://en.wikipedia.org/wiki/Fullwidth#In_Unicode">fullwidth</a>” representation.</li>
+<li>Split input text to, say, “paragraphs” (by empty lines).</li>
+<li>Process each line of result as if it was plain Ruby (<code>eval</code>; it’s safe).</li>
+<li>
+<code>gsub</code> wide characters back to <code>Latin1</code>.</li>
+</ul><p>As we have done the four steps above, we’ve run into troubles with “undefined methods/constants” errors. Let’s see why. For instance, we are to proceed with the following string:</p>
 
-<p>The operators in this group are executed immediately and do not break
-the control flow. Technically, they are simply being substituted with 
-their representation.</p>
-
-<pre><code>:flush
-  :⏎ : :br
+<pre><code>I'm Brian, and so's my wife!
 </code></pre>
 
-<p>means that “⏎” anywhere in text will be substituted with “&lt;br&gt;”</p>
+<p>After 1st step we yield:</p>
 
-<h5>
-<a name="block" class="anchor" href="#block"><span class="octicon octicon-link"></span></a>:block</h5>
-
-<p>This group contains operators, which are driving the blocks. Such a block
-should start with the operator and ends with it. Operator may receive an
-additional parameter, located on the same string as the opening operator.</p>
-
-<pre><code>:block
-  :Λ : :pre
+<pre><code>Ｉ＇ｍ Ｂｒｉａｎ， ａｎｄ ｓｏ＇ｓ ｍｙ ｗｉｆｅ
 </code></pre>
 
-<p>means that the following block:</p>
+<p>Step 2) is omitted, since we have the only string in the input. Now let’s give a chance to step 3). If we’d stop here and try to suggest, how ruby interpreter will be dealing with this garbage. Let’s take a look at this <em>valid</em> ruby command:</p>
 
-<pre><code>Λ ruby
-  @mapping[:block].each { |tag, htmltag|
-    break if tag &lt; :inplace
-  }
-Λ
+<pre><code>puts rand hash
 </code></pre>
 
-<p>is to be left intouch (except of html is escaped inside) 
-and surrounded with <code>pre</code> tags:</p>
+<p>It surprisingly puts a huge random value. Ruby evaluates <code>hash</code>, passes the result of evaluation to <code>rand</code>, evaluates <code>rand</code> and, chaining the result, finally prints it out. Aha! But there is no such ruby functions like <code>ｗｉｆｅ</code>, <code>ｓｏ＇ｓ</code> or <code>Ｉ＇ｍ</code>. It’s time for <code>method_missing</code> come to scene.</p>
 
-<pre><code>&lt;pre class='ruby'&gt;
-  @mapping[:block].each { |tag, htmltag|
-    break if tag &amp;lt; :inplace
-  }
-&lt;/pre&gt;
+<pre><code>def respond_to?
+  true
+end
+
+def method_missing method, *args, &amp;block
+  method, *args = special_handler(method, *args, &amp;block) \
+    if self.private_methods.include?(:special_handler)
+  [method, args].flatten
+end
 </code></pre>
 
-<p>This operator is the only one which preserves the line breaks.</p>
+<p>Here we simply pass the parameters further in the chain, giving an aspect for intervention: if any of descendants have had <code>special_handler</code> method overwritten, it’ll be called.</p>
 
-<h5>
-<a name="magnet" class="anchor" href="#magnet"><span class="octicon octicon-link"></span></a>:magnet</h5>
+<p>Since we have these two methods <strong>only</strong>, we already have a void parser. It means our string will be executed as ruby code without any errors from within class, containing these methods.</p>
 
-<p>Operates on the following text piece until the space. E.g.</p>
+<pre><code>def parse string
+  eval 'Ｉ＇ｍ Ｂｒｉａｎ， ａｎｄ ｓｏ＇ｓ ｍｙ ｗｉｆｅ'
+end
 
-<pre><code>:magnet
-  :☎ : :span†phone
+# ⇒ 'Ｉ＇ｍ Ｂｒｉａｎ， ａｎｄ ｓｏ＇ｓ ｍｙ ｗｉｆｅ'
 </code></pre>
 
-<p>will produce</p>
+<p>Nice scaffold, isn’t it? Here and further we call this base class <code>Bowler</code>.</p>
 
-<pre><code>&lt;span class='phone'&gt;☎ +1(987)5554321&lt;/span&gt;
+<hr><p>¹ True rake, I mean.</p>
+
+<h2>
+<a name="bowler-scaffold" class="anchor" href="#bowler-scaffold"><span class="octicon octicon-link"></span></a>Bowler Scaffold</h2>
+
+<p>If it looks like a pan, stores like a pan, and sizzles like a pan, then it is a bowler. </p>
+
+<p>I choose the name <code>Bowler</code> for the base class because every process usually has three stages:</p>
+
+<ul>
+<li>prepare</li>
+<li>perform</li>
+<li>??? (I’ve heard there is no such word “postpare” in English</li>
+</ul><p>My process also has these stages and I needed clear easy-to-remember names for them. Here we are:</p>
+
+<ul>
+<li>defreeze</li>
+<li>roast</li>
+<li>serveup</li>
+</ul><p>Since the bowler introduced in the <a href="/mudasobwa/qipowl/wiki/1.-Bowler-Basics">previous chapter</a> has a middling meaning, we need more built-in helpers for future use. First of all, we need to fullwidth the input in <code>defreeze</code>, to break in into “paragraphs” in <code>roast</code> and to <code>gsub</code> it back to normal characters in <code>serveup</code>. Secondary, we need to be able to store some processing rules in config file (which is to be <code>YAML</code> and should be loaded by base class.)</p>
+
+<p>That’s all for now, we’ll turn back to this class later.</p>
+
+<h2>
+<a name="processing-chain" class="anchor" href="#processing-chain"><span class="octicon octicon-link"></span></a>Processing chain</h2>
+
+<p>Within default <code>Bowler</code>, the input string is simply eaten by ruby interpreter and spitted out then. Not so useful, huh?</p>
+
+<p>Well, let’s recall that <em>each</em> “word” in input string is currently handled by <code>method_missing</code>. What if we <strong>declare</strong> new method within class derived from <code>Bowler</code>?</p>
+
+<pre><code># Ｉ＇ｍ Ｂｒｉａｎ ａｎｄ ｓｏ＇ｓ ｍｙ ｗｉｆｅ
+class Herald
+  def Ｂｒｉａｎ *args
+    me = __callee__
+    [me, ', the Herald, honour me,', *args]
+  end
+end
 </code></pre>
 
-<p>for the markup:</p>
+<p>After we have the input string processed by this class, the output became:</p>
 
-<pre><code>☎ +1(987)5554321
+<pre><code>I'm Brian, the Herald, honour me, and so's my wife!
 </code></pre>
 
-<h5>
-<a name="inplace" class="anchor" href="#inplace"><span class="octicon octicon-link"></span></a>:inplace</h5>
+<p>Cute, huh?</p>
 
-<p>Acts mostly like <code>:block</code> but inside one text block (text blocks are
-likely paragraphs, delimited with double carriage returns.) Requires
-closing element.</p>
+<p>There are ready-to-use examples for command line parser, markdown-like markup to HTML parser and even YAML loader provided.</p>
+        </section>
 
-<pre><code>:inplace
-  :≡ : :strong
-</code></pre>
+        <footer>
+          Typogrowl is maintained by <a href="https://github.com/mudasobwa">mudasobwa</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
 
-<p>will convert</p>
-
-<pre><code>That is ≡bold≡ text.
-</code></pre>
-
-<p>into</p>
-
-<pre><code>That is &lt;strong&gt;bold&lt;/strong&gt; text.
-</code></pre>
-
-<h5>
-<a name="linewide" class="anchor" href="#linewide"><span class="octicon octicon-link"></span></a>:linewide</h5>
-
-<p>Those are not require closings, since they are operated on the <em>rest</em> of
-the text. Support nesting by prepending tags with <em>non-breakable space</em>:</p>
-
-<pre><code>:linewide
-  :• : li
-</code></pre>
-
-<p>The following syntax </p>
-
-<pre><code>• Line item 1
- • Nested li 1
- • Nested li 2
-• Line item 2
-</code></pre>
-
-<p>will produce:</p>
-
-<pre><code>&lt;ul&gt;&lt;li&gt;Line item 1&lt;/li&gt;
-&lt;ul&gt;&lt;li&gt;Nested li 1&lt;/li&gt;
-&lt;li&gt;Nested li 2&lt;/li&gt;&lt;/ul&gt;
-&lt;li&gt;Line item 2&lt;/li&gt;&lt;/ul&gt;
-</code></pre>
-
-<h5>
-<a name="custom" class="anchor" href="#custom"><span class="octicon octicon-link"></span></a>:custom</h5>
-
-<p>Custom is not yet fully powerful mechanism to make substitutions inplace
-for generic words. Please use on your own risk.</p>
-
-<h4>
-<a name="extending" class="anchor" href="#extending"><span class="octicon octicon-link"></span></a>Extending</h4>
-
-<p>Extending <em>Typogrowl</em> is as easy as writing a couple of strings in YAML format.
-Let’s take a look at additional rules file for markdown support:</p>
-
-<div class="highlight highlight-yaml"><pre><span class="l-Scalar-Plain">:synsugar</span> <span class="p-Indicator">:</span>
-  <span class="c1"># Code blocks, 4+ spaces indent</span>
-  <span class="s">'(?x-mi:(\R)((?:(?:\R)+(?:\s{4,}|\t).*)+\R)(?=\R))'</span> <span class="p-Indicator">:</span> <span class="s">"\\1\nΛ</span><span class="nv"> </span><span class="s">auto\\2Λ\n"</span>
-  <span class="c1"># Pictures</span>
-  <span class="s">'!\[(.*?)\]\((.*?)\)'</span> <span class="p-Indicator">:</span>  <span class="s">'⚓\2</span><span class="nv"> </span><span class="s">\1⚓'</span>
-  <span class="c1"># Links</span>
-  <span class="s">'\[(.*?)\]\((.*?)\)'</span> <span class="p-Indicator">:</span>  <span class="s">'⚓\2</span><span class="nv"> </span><span class="s">\1⚓'</span>
-  <span class="c1"># Blockquotes</span>
-  <span class="s">'^\s*&gt;'</span> <span class="p-Indicator">:</span> <span class="s">'〉'</span>
-  <span class="s">'^\s*&gt;\s*&gt;'</span> <span class="p-Indicator">:</span> <span class="s">'〉</span><span class="nv"> </span><span class="s">〉'</span>
-  <span class="s">'^\s*\*\s*\*'</span> <span class="p-Indicator">:</span> <span class="s">'〉</span><span class="nv"> </span><span class="s">•'</span>
-  <span class="s">'^\s+\*'</span> <span class="p-Indicator">:</span> <span class="s">'•</span><span class="nv"> </span><span class="s">•'</span>
-
-
-<span class="l-Scalar-Plain">:inplace</span> <span class="p-Indicator">:</span> 
-  <span class="l-Scalar-Plain">:'__'</span> <span class="p-Indicator">:</span> <span class="l-Scalar-Plain">:strong</span>
-  <span class="l-Scalar-Plain">:'**'</span> <span class="p-Indicator">:</span> <span class="l-Scalar-Plain">:strong</span>
-  <span class="l-Scalar-Plain">:'_'</span> <span class="p-Indicator">:</span> <span class="l-Scalar-Plain">:em</span>
-  <span class="l-Scalar-Plain">:'*'</span> <span class="p-Indicator">:</span> <span class="l-Scalar-Plain">:em</span>
-  <span class="l-Scalar-Plain">:'`'</span> <span class="p-Indicator">:</span> <span class="l-Scalar-Plain">:code</span>
-</pre></div>
-
-<p>Bold, italic, code, images, links, blockquotes (including nesteds) are now 
-supported by <em>Typogrowl</em>. Let any one of you who is not delighted with, 
-be the first to throw a stone at me.</p>
-
-<p>Need custom support for <code>github</code>-flavored markdown <em>strikethrough</em>? Oneliner
-inside an <code>:inplace</code> section of custom rules came on scene:</p>
-
-<div class="highlight highlight-yaml"><pre>  <span class="l-Scalar-Plain">:'~~' :strike</span>
-</pre></div>
-
-<h5>
-<a name="sophisticated-extending" class="anchor" href="#sophisticated-extending"><span class="octicon octicon-link"></span></a>Sophisticated extending</h5>
-
-<p>Whether one needs more sophisticated rules, she is to write her own 
-descendant of <code>Bowler</code> class, implementing DSL herself. E.g. <code>Html</code>
-markup uses the following DSL for handling video links to YouTube:</p>
-
-<div class="highlight highlight-ruby"><pre> <span class="c1"># Handler for Youtube video</span>
- <span class="c1"># @param [Array] args the words, gained since last call to {#harvest}</span>
- <span class="c1"># @return [Nil] nil</span>
- <span class="k">def</span> <span class="err">✇</span> <span class="o">*</span><span class="n">args</span>
-   <span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="n">rest</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">flatten</span>
-   <span class="n">harvest</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">orphan</span><span class="p">(</span><span class="n">rest</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">SEPARATOR</span><span class="p">))</span> <span class="k">unless</span> <span class="n">rest</span><span class="o">.</span><span class="n">vacant?</span>
-   <span class="n">harvest</span> <span class="n">__callee__</span><span class="p">,</span> <span class="s2">"&lt;iframe width='560' height='315' </span>
-<span class="s2">           src='http://www.youtube.com/embed/</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2">' </span>
-<span class="s2">           frameborder='0' allowfullscreen&gt;&lt;/iframe&gt;"</span>
- <span class="k">end</span>
-</pre></div>
-
-<p>Here we harvest the previously gained words (<code>rest</code>) and transform copy-pasted
-link to video into embedded frame with video content as by YouTube.</p>
-
-<h3>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h3>
-
-<p>Add this line to your application's Gemfile:</p>
-
-<pre><code>gem 'typogrowl'
-</code></pre>
-
-<p>And then execute:</p>
-
-<pre><code>$ bundle
-</code></pre>
-
-<p>Or install it yourself as:</p>
-
-<pre><code>$ gem install typogrowl
-</code></pre>
-
-<h3>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
-
-<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'typogrowl'</span>
-<span class="err">…</span>
-<span class="n">tg</span> <span class="o">=</span>  <span class="ss">Typogrowl</span><span class="p">:</span><span class="ss">:Html</span><span class="o">.</span><span class="n">new</span> 
-<span class="nb">puts</span> <span class="n">tg</span><span class="o">.</span><span class="n">parse_and_roll</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</pre></div>
-
-<p>or even simplier</p>
-
-<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'typogrowl'</span>
-<span class="err">…</span>
-<span class="n">tg</span> <span class="o">=</span>  <span class="no">Typogrowl</span><span class="o">.</span><span class="n">tg_md__html</span> <span class="c1"># typogrowl markup _and_ markdown</span>
-
-<span class="nb">puts</span> <span class="n">tg</span><span class="o">.</span><span class="n">parse_and_roll</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</pre></div>
-
-<h3>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h3>
-
-<ol>
-<li>Fork it</li>
-<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
-<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
-<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
-<li>Create new Pull Request</li>
-</ol>
-      </section>
+        
+      </div>
     </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Typogrowl maintained by <a href="https://github.com/mudasobwa">mudasobwa</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
   </body>
 </html>
