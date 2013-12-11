@@ -32,14 +32,14 @@ module Qipowl
   # hash or Mapping.
   class Mapping
     include TypoLogging
-    
+
     attr_reader :hash
 
-    RECIPE = %i(includes)
-    SUGAR  = %i(synsugar)
-    PEPPER = %i(handshake)
-    SPICES = %i(flush block magnet inplace linewide)
-    SALT   = %i(enclosures)
+    RECIPE = [:includes]
+    SUGAR  = [:synsugar]
+    PEPPER = [:handshake]
+    SPICES = [:flush, :block, :magnet, :inplace, :linewide]
+    SALT   = [:enclosures]
 
     (SUGAR + PEPPER + SPICES + SALT).each { |section|
       define_method section, ->(key, precisely = false) {

@@ -181,7 +181,7 @@ module Qipowl
 
       @mapping[:handshake].each { |k, v|
         v = Hash[[[:tag, v]]] if Symbol === v
-        %i(from till).each { |key|
+        [:from, :till].each { |key|
           v[key] = :space unless v[key]
           v[key] =  case v[key] # FIXME. That’s ugly. Invent the right way!!!
                     when :space then '\S'
