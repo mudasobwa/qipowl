@@ -4,9 +4,10 @@
 
 _qipowl_ (pronounced as **keep all**)
 
-[![Build Status](https://travis-ci.org/mudasobwa/qipowl.png)](https://travis-ci.org/mudasobwa/qipowl)
-[![Gemnasium](https://gemnasium.com/mudasobwa/qipowl.png?travis)](https://gemnasium.com/mudasobwa/qipowl)
-[![Stories in Ready](https://badge.waffle.io/mudasobwa/qipowl.png?label=ready)](http://waffle.io/mudasobwa/qipowl)
+[![Build Status](https://travis-ci.org/mudasobwa/qipowl.png)](https://travis-ci.org/mudasobwa/qipowl) |
+[![Gemnasium](https://gemnasium.com/mudasobwa/qipowl.png?travis)](https://gemnasium.com/mudasobwa/qipowl) |
+[![Stories in Ready](https://badge.waffle.io/mudasobwa/qipowl.png?label=ready)](http://waffle.io/mudasobwa/qipowl) |
+**Status:** Minimum viable product
 
 ---
 
