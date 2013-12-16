@@ -336,7 +336,7 @@ module Qipowl
     # @param [String] str to be defreezed
     def defreeze str
       str = super str
-      @mapping[:block].each { |tag, htmltag| 
+      @mapping[:block].each { |tag, htmltag|
         str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
           "#{$1}('#{$2}', '#{$3}')\n\n"
         }
