@@ -3,6 +3,11 @@
 require_relative '../utils/hash_recursive_merge'
 
 module Qipowl
+  class ::Object
+    def is_one_of? *classes
+      !classes.each { |c| break false if c === self }
+    end
+  end
   class ::Array
     # Checks whether an array contains non-nil elements
     # @return +true+ if an array does not contain non-nils and +false+ otherwise
@@ -82,7 +87,7 @@ module Qipowl
       out
     end
     def spacefy!
-      self.gsub!(/ /, SYMBOL_FOR_SPACE)
+      self.gsub!(' ', SYMBOL_FOR_SPACE)
     end
     def spacefy
       (out = self.dup).spacefy!

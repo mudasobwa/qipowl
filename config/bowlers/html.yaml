@@ -1,0 +1,103 @@
+# encoding: utf-8
+
+# bowler’s entity values: - type, -synonyms, - parent
+# possible types: - block, - alone, - grip, - magnet, - regular, - custom
+
+# html specifics: - tag, - class
+
+:entities       :
+  :block        :
+    :✍             :
+      :synonyms :
+        - :'---'
+    :Λ          :
+      :tag      : :pre
+      :class    : :code
+  :alone        :
+    :⏎             : :br
+    :——         : :hr
+  :magnet       :
+    :☎            :
+      :tag      : :span
+      :class    : :phone
+    :✉             :
+      :tag      : :span
+      :class    : :email
+      :synonyms :
+        - :mail
+    :✎             : :lj
+    :☇              : :a
+  :grip         :
+    :≡             : :strong
+    :≈          : :em
+    :↑             : :sup
+    :↓             : :small
+    :λ          : :code
+    :⚓             : :a
+    :†          : :abbr
+    :✁             : :del
+    :✿_span_nobr : :nobr
+  :regular      :
+    :•          :
+      :tag      : :li
+      :parent   :
+        :tag    : :ul
+        :class  : :fancy
+    :◦              :
+      :tag      : :li
+      :parent   : :ol
+      :class    : :active
+    :▶             :
+      :tag      : :dt
+      :parent   : :dl
+    :▷             :
+      :tag      : :dt
+      :parent   :
+        :tag    : :dl
+        :class  : :dl_horizontal
+    :℁            : :address
+    :〉          :
+      :tag      : :div
+      :parent   : :blockquote
+      :class    : :blockquote
+    :§1         : :h1
+    :§2         : :h2
+    :§3         : :h3
+    :§4         : :h4
+    :§5         : :h5
+    :§6         : :h6
+    :¶          :
+      :tag      : :p
+      :class    : :lead
+    :☆             :
+      :tag      : :p
+      :class    : :text_muted
+    :★             : :em
+    :☛             :
+      :tag      : :p
+      :class    : :text_success
+    :☞             :
+      :tag      : :p
+      :class    : :text_info
+    :☣             :
+      :tag      : :p
+      :class    : :text_warning
+    :☢             :
+      :tag      : :p
+      :class    : :text_danger
+    :✇             : :video
+    :⚘             : :figure
+    :✿_p_address :
+      :tag      : :p
+      :class    : :address
+    :✿_p_epigraph :
+      :tag      : :p
+      :class    : :epigraph
+    :✿_p_afterepigraph :
+      :tag      : :p
+      :class    : :afterepigraph
+    :✿_p_auto  :
+      :tag      : :p
+      :class    : :dropcap
+
+
