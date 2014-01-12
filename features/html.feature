@@ -3,9 +3,8 @@
 Feature: All the possibilities of HTML parser
 
   Scenario Outline: Inplace tags
-    Given the input file is "config/bowlers/html.yaml"
-    When bowler is created
-    And the input string is <input>
+    Given we use "html" bowler
+    When the input string is <input>
     And the execute method is called on bowler
     Then the result should equal to <output>
 
@@ -23,3 +22,15 @@ Feature: All the possibilities of HTML parser
         | "here ≡λbold codeλ≡ goes"     | "<p>here <strong><code>bold code</code></strong> goes</p>" |
         | "here λ≡code bold≡λ goes"     | "<p>here <code><strong>code bold</strong></code> goes</p>" |
         | "Hello, ≈World≈!"              | "<p>Hello, <em>World</em>!</p>" |
+
+
+  Scenario Outline: Alone tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input     | output                    |
+        | "A ⏎ B"   | "<p>A <br/> B</p>"        |
+        | "A —— B"  | "<p>A</p> <hr/> <p>B</p>" |

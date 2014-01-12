@@ -82,6 +82,7 @@ module Qipowl::Bowlers
 
     def roast str
       (split str).reverse.map { |dish|
+        @yielded = []
         rest = begin
           eval(dish.strip.carriage)
         rescue Exception => e
@@ -93,7 +94,8 @@ module Qipowl::Bowlers
           logger.error '='*78
           [*dish]
         end
-        harvest(nil, orphan([*rest].join(SEPARATOR)))
+        harvest(nil, orphan([*rest].join(SEPARATOR))) # FIXME Check if this is correct in all the cases
+        @yielded.pop(@yielded.size).reverse.join(SEPARATOR)
       }.reverse.join($/).uncarriage.un␚ify.unspacefy.unbowl
     end
   
@@ -143,7 +145,8 @@ module Qipowl::Bowlers
     #
     # @return nil
     def harvest callee, str
-      str
+      @yielded << str unless str.vacant?
+      nil
     end
   
   

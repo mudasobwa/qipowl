@@ -75,6 +75,9 @@ module Qipowl
             }
             nil
           end
+          def ∃_#{section}_tag entity
+                ∃_#{section}(entity)[:tag]
+          end
         }
         mapper.entities[section.to_sym].keys.each { |key|
           clazz.class_eval %Q{

@@ -13,14 +13,25 @@ module Qipowl
 ##############################################################################
 ###              Default handlers for all the types of markup              ###
 ##############################################################################
+
+      # `:grip` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Array] the array of words with trimmed `grip` tag
       def ∀_grip *args
         text = [*args].join(SEPARATOR)
         mine, rest = text.split("#{__callee__}∎", 2)
-        [tagify(∃_grip(__callee__)[:tag], {}, mine), rest]
+        [tagify(∃_grip_tag(__callee__), {}, mine), rest]
+      end
+
+      # `:alone` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Array] the array of words with prepended `alone` tag
+      def ∀_alone *args
+        [standalone(∃_alone_tag(__callee__)), args]
       end
 
 ##############################################################################
-###              Specific handlers                                         ###
+###              Grip :: Specific handlers                                 ###
 ##############################################################################
       # Handler for abbrs.
       # @param [Array] args the words, gained since last call to {#harvest}
@@ -28,8 +39,24 @@ module Qipowl
       def † *args
         term, *title = args.flatten
         mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
-        [tagify(∃_grip(__callee__)[:tag], {:title => mine}, term), rest]
+        [tagify(∃_grip_tag(__callee__), {:title => mine}, term), rest]
       end
+
+##############################################################################
+###             Alone :: Specific handlers                                 ###
+##############################################################################
+      # `:alone` handler for horizontal rule; it differs from default
+      # handler since orphans around must be handled as well.
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Nil] nil
+      def —— *args
+        harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
+        harvest __callee__, standalone(∃_alone_tag(__callee__))
+      end
+
+
+
+
     private
       # Produces html paragraph tag (`<p>`) with class `owl`.
       # @see Qipowl::Bowler#orphan
@@ -94,13 +121,6 @@ end
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
       harvest __callee__, tagify(@mapping.linewide(__callee__), {}, args)
-    end
-    
-    # `:inplace` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with trimmed `inplace` tag
-    def ≡ *args
-      tagify(@mapping.inplace(__callee__), {}, args)
     end
     
     # `:flush` default handler

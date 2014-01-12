@@ -1,9 +1,6 @@
-Given(/^the input file is "(.*?)"$/) do |f|
-  @f = f
-end
-
-When(/^bowler is created$/) do
-  @bowler = Qipowl::Ruler.new_bowler 'html'
+Given(/^we use "(.*?)" bowler$/) do |f|
+#  @f = "config/bowlers/#{f}.yaml"
+  @bowler = Qipowl::Ruler.new_bowler f
 end
 
 When(/^the input string is "(.*?)"$/) do |input|
