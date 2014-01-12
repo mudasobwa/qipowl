@@ -5,6 +5,9 @@
 
 # html specifics: - tag, - class
 
+#:includes :
+#  - 'html2.yaml'
+
 :entities       :
   :block        :
     :✍             :
@@ -100,4 +103,13 @@
       :tag      : :p
       :class    : :dropcap
 
-
+:custom :
+  '^\s*‒\p{Blank}+(.+),\s*(\S+)' : ' ⏎ ↓ ⚓\2 \1⚓'
+  '(\S+)¹(\S+?)(?=\s|\)|\.\s|\.\Z|\,\s|;\s|␍|\Z)' : '⚓\2 \1⚓'
+  '(\S+)†(.+?)†' : '†\1 \2†'
+# http://youtu.be/SAJ_TzLqy1U?t=6s
+  '^\s*http://youtu\.be/([A-Za-z0-9_]+)(?:\?t=(\d+)s)?' : '✇ \1'
+# http://www.youtube.com/watch?v=SAJ_TzLqy1U
+  '^\s*http://www\.youtube\.com/(?:watch\?v=|v/)([A-Za-z0-9_]+)' : '✇ \1'
+# Standalone images and quotes
+  '^(https?://\S+)(\s*.*)$' : '⚘ \1 \2'

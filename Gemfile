@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem "htmlbeautifier", :git => 'https://github.com/threedaymonk/htmlbeautifier'
+gem 'aquarium', '~> 0.6', :git => 'git://github.com/deanwampler/Aquarium.git'
+gem "crochets", :path => '../crochets'
 
 #gem "diff-lcs", :git => 'git://github.com/halostatue/diff-lcs.git'
 
@@ -14,3 +16,5 @@ gem "htmlbeautifier", :git => 'https://github.com/threedaymonk/htmlbeautifier'
 
 gem "rspec"
 gem "fuubar"
+
+gem 'rake', :group => :test

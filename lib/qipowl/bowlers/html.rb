@@ -9,12 +9,14 @@ require_relative '../bowlers/htmldoc'
 module Qipowl
   # Module placeholder for dynamically created bowlers
   module Bowlers
+    class Html < Bowler
+    end
   end
-  
+end
+=begin
   # Markup processor for Html output.
   # 
   # This class produces HTML from markup as Markdown does.
-  class Html < Bowler
     
     # Amount of unnamed instances of the class (needed for new class name generation)
     @@inst_count = 0
@@ -458,3 +460,4 @@ if __FILE__ == $0
     Qipowl::Html.parse File.read(f)
   }
 end
+=end

@@ -136,6 +136,9 @@ module Qipowl
   end
   
   class ::Symbol
+    def dup
+      self.to_s.dup.to_sym
+    end
     def bowl
       self.to_s.bowl.to_sym
     end
@@ -161,5 +164,5 @@ module Qipowl
       "␚#{self}␚"
     end
   end
-    
+  
 end

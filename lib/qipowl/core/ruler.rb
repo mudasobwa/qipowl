@@ -14,53 +14,60 @@ module Qipowl
   #
   # Mapping may be loaded from YAML file, as well as be merged
   # against other YAML file, hash or `Ruler` instance.  
-  class Ruler
+  module Ruler
     include TypoLogging
+    extend self
 
     @@bowlers = {} # FIXME REDIS!!!!
     @@yamls = {}
-    
-    private_class_method :new
-    
-    class << self
-      def get_bowler id: nil, type: nil
-        @@bowlers[id] || new_bowler(type, true)
-      end
-    
-      def new_bowler type, persistent = false
-        yaml, clazz = \
-          case type
-          when Class
-            ["#{type.to_s.split('::').last.downcase}", type]
-          when String, Symbol
-            ["#{type.downcase}", Qipowl::Bowlers.const_get(type.to_s.capitalize.to_sym)]
-          end
-        
-        raise NameError.new("Invalid bowler type: #{type}") \
-          unless clazz.is_a?(Class) && clazz < Qipowl::Core::Bowler
-        
-        id = "#{Time.now.to_i}#{rand(1..1_000_000_000)}"
-        name = "#{clazz.name.split('::').last}_#{id}"
-        clazz = Qipowl::Bowlers.const_set(name, Class.new(clazz))
 
-        teach_class clazz, get_yaml(yaml)
-
-        persistent ? [@@bowlers[id] = clazz.new, id] : clazz.new
-      end
+    
+    def get_bowler id: nil, type: nil
+      @@bowlers[id] || new_bowler(type, true)
+    end
+  
+    def new_bowler type, persistent = false
+      yaml, clazz = \
+        case type
+        when Class
+          ["#{type.to_s.split('::').last.downcase}", type]
+        when String, Symbol
+          ["#{type.to_s.downcase}", Qipowl::Bowlers.const_get(type.to_s.capitalize.to_sym)]
+        end
       
-    private
-      def get_yaml yaml
-        return @@yamls[yaml] if @@yamls[yaml]
+      raise NameError.new("Invalid bowler type: #{type}") \
+        unless clazz.is_a?(Class) && clazz < Qipowl::Bowlers::Bowler
+      
+      id = "#{Time.now.to_i}#{rand(1..1_000_000_000)}"
+      name = "#{clazz.name.split('::').last}_#{id}"
+      clazz = Qipowl::Bowlers.const_set(name, Class.new(clazz))
+
+      teach_class clazz, get_yaml(yaml)
+
+      persistent ? [@@bowlers[id] = clazz.new, id] : clazz.new
+    end
+      
+  private
+    def get_yaml yaml
+      return @@yamls[yaml] if @@yamls[yaml]
+      
+      clazz = Qipowl::Mappers.const_get("#{yaml.capitalize}BowlerMapper")
+      raise NameError.new("Invalid mapper type: #{clazz}") \
+        unless clazz.is_a?(Class) && clazz < Qipowl::Mappers::BowlerMapper
         
-        clazz = Qipowl::Mappers.const_get("#{yaml.capitalize}BowlerMapper")
-        raise NameError.new("Invalid mapper type: #{clazz}") \
-          unless clazz.is_a?(Class) && clazz < Qipowl::Mappers::BowlerMapper
-          
-        @@yamls[yaml] = clazz.new
-      end
-      def teach_class clazz, yaml
-        # FIXME 
-      end
+      @@yamls[yaml] = clazz.new
+    end
+    def teach_class clazz, yaml
+      clazz.const_set("CUSTOM_TAGS", yaml.hash[:custom])
+      %w(block alone magnet grip regular).each { |section|
+        clazz.const_set("#{section.upcase}_TAGS", yaml.entities[section.to_sym])
+        yaml.entities[section.to_sym].keys.each { |key|
+          clazz.class_eval %Q{
+            alias_method :'#{key}', :∀_#{section}
+          } unless clazz.instance_methods.include?(key)
+        }
+      }
+      
     end
   end
 end

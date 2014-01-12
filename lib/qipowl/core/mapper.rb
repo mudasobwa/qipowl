@@ -19,7 +19,7 @@ module Qipowl::Mappers
   # Mapping may be loaded from YAML file, as well as be merged
   # against other YAML file, hash or `Ruler` instance.
   class Mapper
-    attr_reader :hash
+    attr_reader :hash, :bowled
     def initialize input = nil
       @hash = {}
       merge!(input) unless input.nil?
@@ -35,6 +35,7 @@ module Qipowl::Mappers
       
       @hash.rmerge!(input.to_hash)
       merge_hook if private_methods.include? :merge_hook
+      @hash
     end
     private
     def load_yaml input
@@ -45,11 +46,12 @@ module Qipowl::Mappers
   end
   
   class BowlerMapper < Mapper
+    attr_reader :entities
     def initialize input = nil
-      input = self.class.name.gsub(/BowlerMapper\Z/, '') if input.nil?
+      input = self.class.name.split('::').last.downcase.gsub(/bowlermapper\Z/, '') if input.nil?
       super input
     end
-    @entities = @synonyms = nil
+    @entities = nil
     def [] entity
       @entities.each { |key, value| # :block. :alone etc
         value.each { |k, v|
@@ -61,18 +63,27 @@ module Qipowl::Mappers
       }
       nil
     end
+    def regexp_for name
+      /#{@hash[:entities][name].keys.map(&:bowl).join('|')}/
+    end
   private
     def merge_hook
-      @synonyms = {}
+      @entities = {}
       @hash[:entities].each { |key, value| # :block. :alone etc
+        @entities[key] ||= {}
         value.each { |k, v|
-          v[:synonyms].each { |syn|
-            ((@synonyms[key] ||= {})[syn] = v.dup).delete(:synonyms)
-          } if Hash === v && v[:synonyms]
+          # Append keys
+          @entities[key][k.bowl] = v.dup
+          if Hash === v
+            @entities[key][k.bowl].delete(:synonyms) 
+            # Append explicit synonyms
+            v[:synonyms].each { |syn|
+              (@entities[key][syn.bowl] = v.dup).delete(:synonyms)
+            } if v[:synonyms]
+          end
         }
       }
-      @entities = @hash[:entities].rmerge(@synonyms)
-      @synonyms
+      @entities
     end
   end
   
@@ -83,7 +94,7 @@ end
   
 if __FILE__ == $0
   require '../../qipowl'
-  y = Qipowl::BowlerMapper.new 'html'
+  y = Qipowl::Mappers::BowlerMapper.new 'html'
   require 'awesome_print'
   ap y[:mail]
 end
