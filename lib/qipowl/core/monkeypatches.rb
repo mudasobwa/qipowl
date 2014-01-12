@@ -108,17 +108,17 @@ module Qipowl
     HTML_ENTITIES = Hash[[['<', 'lt'], ['>', 'gt'], ['&', 'amp']].map { |k, v| [k.bowl, "&#{v};"] }]
 
     def carriage
-      self.gsub(/\R/, " #{CARRIAGE_RETURN} ")
+      self.gsub(/\R/, "#{CARRIAGE_RETURN}")
     end
     def carriage!
-      self.gsub!(/\R/, " #{CARRIAGE_RETURN} ")
+      self.gsub!(/\R/, "#{CARRIAGE_RETURN}")
     end
     def uncarriage
-      self.gsub(/[[:blank:]]?#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+      self.gsub(/#{CARRIAGE_RETURN}/, %Q(
 ))
     end
     def uncarriage!
-      self.gsub!(/[[:blank:]]?#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+      self.gsub!(/#{CARRIAGE_RETURN}/, %Q(
 ))
     end
 

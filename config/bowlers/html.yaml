@@ -1,12 +1,12 @@
 # encoding: utf-8
 
-# bowler’s entity values: - type, -synonyms, - parent
+# bowler’s entity values: - type, - synonyms, - parent
 # possible types: - block, - alone, - grip, - magnet, - regular, - custom
 
 # html specifics: - tag, - class
 
-#:includes :
-#  - 'html2.yaml'
+:includes :
+  - 'html_supplemental'
 
 :entities       :
   :block        :

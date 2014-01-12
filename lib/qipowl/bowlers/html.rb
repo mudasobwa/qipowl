@@ -10,6 +10,75 @@ module Qipowl
   # Module placeholder for dynamically created bowlers
   module Bowlers
     class Html < Bowler
+##############################################################################
+###              Default handlers for all the types of markup              ###
+##############################################################################
+      def ∀_grip *args
+        text = [*args].join(SEPARATOR)
+        mine, rest = text.split("#{__callee__}∎", 2)
+        [tagify(∃_grip(__callee__)[:tag], {}, mine), rest]
+      end
+
+##############################################################################
+###              Specific handlers                                         ###
+##############################################################################
+      # Handler for abbrs.
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Array] the array of words with trimmed `abbr` tag
+      def † *args
+        term, *title = args.flatten
+        mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
+        [tagify(∃_grip(__callee__)[:tag], {:title => mine}, term), rest]
+      end
+    private
+      # Produces html paragraph tag (`<p>`) with class `owl`.
+      # @see Qipowl::Bowler#orphan
+      # @param str the words, to be put in paragraph tag.
+      # @return [String] tagged words.
+      def orphan str
+        "#{tagify(:p, {}, str.to_s.strip)}"
+      end
+      # Constructs opening html tag for the input given.
+      # 
+      # To construct `abbr` tag with `title` _Title_ and class _default_:
+      # 
+      #     opening :abbr, { :title=>'Title', :class=>'default' }
+      # 
+      # @param [String] tag to produce opening tag string from.
+      # @param [Hash] params to be put into opening tag as attributes. 
+      # @return [String] opening tag for the input given.
+      def opening tag, params={}
+        tag, *clazz = tag.to_s.split('†')
+        clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
+        attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
+        "<#{tag}#{clazz}#{attrs}>"
+      end
+      
+      # Constructs closing html tag for the input given.
+      # 
+      # @param [String] tag to produce closing tag string from.
+      # @return [String] opening tag for the input given.
+      def closing tag
+        "</#{tag.to_s.split('†').first}>"
+      end
+  
+      # (see opening)
+      # Acts most like an {#opening} method, but closes an element inplace
+      # (used for `hr`, `br`, `img`).
+      def standalone tag, params={}
+        opening(tag, params).sub('>', '/>')
+      end
+      # Constructs valid tag for the input given, concatenating
+      # opening and closing tags around the text passed in `args`.
+      # 
+      # @param [String] tag to produce html tag string from.
+      # @param [Hash] params to be put into opening tag as attributes. 
+      # @param [Array] args the words, to be tagged around. 
+      # @return [String] opening tag for the input given.
+      def tagify tag, params, *args
+        text = [*args].join(SEPARATOR)
+        text.vacant? ? '' : "#{opening tag, params}#{text}#{closing tag}"
+      end
     end
   end
 end

@@ -19,7 +19,6 @@ module Qipowl::Mappers
   # Mapping may be loaded from YAML file, as well as be merged
   # against other YAML file, hash or `Ruler` instance.
   class Mapper
-    attr_reader :hash, :bowled
     def initialize input = nil
       @hash = {}
       merge!(input) unless input.nil?
@@ -29,15 +28,18 @@ module Qipowl::Mappers
     end
     def merge! input
       input = load_yaml(input) if input.is_one_of?(String, IO)
-
       raise ArgumentError.new "Invalid map for merge in Mapper" \
         unless input.respond_to? :to_hash        
-      
+
+      input.delete(:includes).each { |inc|
+        merge! inc
+      } rescue NoMethodError
+
+      @entities_dirty = true
       @hash.rmerge!(input.to_hash)
-      merge_hook if private_methods.include? :merge_hook
-      @hash
     end
-    private
+  private
+  # FIXME Make file search more flexible!!!
     def load_yaml input
       IO === input ?
         YAML.load_stream(input) :
@@ -46,28 +48,15 @@ module Qipowl::Mappers
   end
   
   class BowlerMapper < Mapper
-    attr_reader :entities
     def initialize input = nil
       input = self.class.name.split('::').last.downcase.gsub(/bowlermapper\Z/, '') if input.nil?
       super input
     end
     @entities = nil
-    def [] entity
-      @entities.each { |key, value| # :block. :alone etc
-        value.each { |k, v|
-          next unless k == entity
-          v = {:tag => v} unless Hash === v
-          v[:section] = key
-          return v
-        }
-      }
-      nil
-    end
-    def regexp_for name
-      /#{@hash[:entities][name].keys.map(&:bowl).join('|')}/
-    end
-  private
-    def merge_hook
+    @entities_dirty = true
+
+    def entities
+      return @entities unless @entities_dirty
       @entities = {}
       @hash[:entities].each { |key, value| # :block. :alone etc
         @entities[key] ||= {}
@@ -83,6 +72,7 @@ module Qipowl::Mappers
           end
         }
       }
+      @entities_dirty = false
       @entities
     end
   end

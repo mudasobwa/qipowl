@@ -57,17 +57,36 @@ module Qipowl
         
       @@yamls[yaml] = clazz.new
     end
-    def teach_class clazz, yaml
-      clazz.const_set("CUSTOM_TAGS", yaml.hash[:custom])
+    def teach_class clazz, mapper
+      clazz.const_set("CUSTOM_TAGS", mapper.to_hash[:custom])
+      clazz.class_eval %Q{
+        TAGS = CUSTOM_TAGS.dup
+      }
       %w(block alone magnet grip regular).each { |section|
-        clazz.const_set("#{section.upcase}_TAGS", yaml.entities[section.to_sym])
-        yaml.entities[section.to_sym].keys.each { |key|
+        clazz.const_set("#{section.upcase}_TAGS", mapper.entities[section.to_sym])
+        clazz.class_eval %Q{
+          TAGS.rmerge! clazz::#{section.upcase}_TAGS
+          def ∃_#{section} entity
+            self.class::#{section.upcase}_TAGS.each { |k, v|
+              next unless k == entity
+              v = {:tag => v} unless Hash === v
+              v[:section] = k
+              return v
+            }
+            nil
+          end
+        }
+        mapper.entities[section.to_sym].keys.each { |key|
           clazz.class_eval %Q{
-            alias_method :'#{key}', :∀_#{section}
+            alias_method :#{key}, :∀_#{section}
           } unless clazz.instance_methods.include?(key)
         }
       }
-      
+      clazz.class_eval %Q{
+        def ∀_tags
+          TAGS.keys
+        end
+      }
     end
   end
 end

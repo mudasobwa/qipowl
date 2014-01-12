@@ -6,6 +6,14 @@ When(/^bowler is created$/) do
   @bowler = Qipowl::Ruler.new_bowler 'html'
 end
 
+When(/^the input string is "(.*?)"$/) do |input|
+  @input = input
+end
+
+When(/^the execute method is called on bowler$/) do
+  @result = @bowler.execute @input
+end
+
 Then(/^bowler has all the method aliases$/) do
   puts @bowler.class.instance_methods(false)
   puts '='*60
@@ -15,3 +23,8 @@ Then(/^bowler has all the method aliases$/) do
     puts '-'*60
   }
 end
+
+Then(/^the output is "(.*?)"$/) do |result|
+  expect(@result).to eq(result)
+end
+
