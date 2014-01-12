@@ -7,6 +7,10 @@ When(/^the input string is "(.*?)"$/) do |input|
   @input = input
 end
 
+When(/^the input string is$/) do |input|
+  @input = input
+end
+
 When(/^the execute method is called on bowler$/) do
   @result = @bowler.execute @input
 end

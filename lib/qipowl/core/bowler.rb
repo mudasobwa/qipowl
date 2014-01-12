@@ -154,8 +154,12 @@ module Qipowl::Bowlers
     def block str
       result = str.dup
       self.class::BLOCK_TAGS.each { |tag, value|
-        result.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) {
-          "\n\n#{$1}('#{$2}', '#{$3.carriage}')\n\n"
+        result.gsub!(/(#{tag})\s*(\S*\s*|$)(.*?)(#{tag}|\Z)/m) {
+          %Q{
+
+#{$1}('#{$2.strip}', '#{$3.carriage}')
+
+}
         }
       }
       result
@@ -185,7 +189,8 @@ module Qipowl::Bowlers
     
     def split str
       (block str.bowl).split(/\R{2,}/).map { |para|
-        grip custom para unless para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/
+        para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/ ?
+          para : (grip custom para)
       }
     end
     

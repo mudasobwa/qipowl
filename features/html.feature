@@ -34,3 +34,28 @@ Feature: All the possibilities of HTML parser
         | input     | output                    |
         | "A ⏎ B"   | "<p>A <br/> B</p>"        |
         | "A —— B"  | "<p>A</p> <hr/> <p>B</p>" |
+
+  Scenario: Block tag Λ
+    Given we use "html" bowler
+    When the input string is "Λ ruby @mapping[:block] = ≡bold≡ Λ"
+    And the execute method is called on bowler
+    Then the result should equal to
+    """
+    
+    <pre class='ruby'>@mapping[:block] = ≡bold≡ </pre>
+    """
+
+  Scenario: Block tag ✍
+    Given we use "html" bowler
+    When the input string is
+    """
+    ✍
+      ruby @mapping[:block] = ≡bold≡
+    ✍
+    """
+    And the execute method is called on bowler
+    Then the result should equal to
+    """
+
+
+    """

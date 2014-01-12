@@ -30,6 +30,20 @@ module Qipowl
         [standalone(∃_alone_tag(__callee__), {:class => ∃_alone(__callee__)[:class]}), args]
       end
 
+    # `:block` default handler
+    # @param [Array] args the words, gained since last call to {#harvest}
+    # @param [String] param the text to be places on the same string as
+    # opening tag
+    # @return [Nil] nil
+    def ∀_block param, args
+      harvest __callee__, 
+              tagify(
+                      ∃_block_tag(__callee__), 
+                      {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
+                      args.hsub(String::HTML_ENTITIES)
+                    )
+    end
+
 ##############################################################################
 ###              Grip :: Specific handlers                                 ###
 ##############################################################################
@@ -54,6 +68,17 @@ module Qipowl
         harvest __callee__, standalone(∃_alone_tag(__callee__))
       end
 
+##############################################################################
+###             Block :: Specific handlers                                 ###
+##############################################################################
+      # `:block` handler for comment (required because comments are
+      # formatted in HTML in some specific way.)
+      # @param [String] param the text to be places on the same string as opening tag
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Nil] nil
+      def ✍ *args
+        []
+      end
 
 
 
@@ -119,22 +144,6 @@ end
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
       harvest __callee__, tagify(@mapping.linewide(__callee__), {}, args)
-    end
-    
-    # `:flush` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with prepended `flush` tag
-    def ⏎ *args
-      [standalone(@mapping.flush(__callee__)), args]
-    end
-    
-    # `:flush` handler for horizontal rule; it differs from default
-    # handler since orphans around must be handled as well.
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def —— *args
-      harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-      harvest __callee__, standalone(@mapping.flush(__callee__))
     end
     
     # `:block` default handler
