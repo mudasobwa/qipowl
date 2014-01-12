@@ -20,14 +20,14 @@ module Qipowl
       def ∀_grip *args
         text = [*args].join(SEPARATOR)
         mine, rest = text.split("#{__callee__}∎", 2)
-        [tagify(∃_grip_tag(__callee__), {}, mine), rest]
+        [tagify(∃_grip_tag(__callee__), {:class => ∃_grip(__callee__)[:class]}, mine), rest]
       end
 
       # `:alone` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with prepended `alone` tag
       def ∀_alone *args
-        [standalone(∃_alone_tag(__callee__)), args]
+        [standalone(∃_alone_tag(__callee__), {:class => ∃_alone(__callee__)[:class]}), args]
       end
 
 ##############################################################################
@@ -39,7 +39,7 @@ module Qipowl
       def † *args
         term, *title = args.flatten
         mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
-        [tagify(∃_grip_tag(__callee__), {:title => mine}, term), rest]
+        [tagify(∃_grip_tag(__callee__), {:title => mine, :class => ∃_grip(__callee__)[:class]}, term), rest]
       end
 
 ##############################################################################
@@ -75,10 +75,8 @@ module Qipowl
       # @param [Hash] params to be put into opening tag as attributes. 
       # @return [String] opening tag for the input given.
       def opening tag, params={}
-        tag, *clazz = tag.to_s.split('†')
-        clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
-        attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
-        "<#{tag}#{clazz}#{attrs}>"
+        attrs = params.inject("") { |m, el| m.prepend " #{el.first}='#{el.last}'" unless el.last.nil? ; m }
+        "<#{tag}#{attrs}>"
       end
       
       # Constructs closing html tag for the input given.
@@ -86,7 +84,7 @@ module Qipowl
       # @param [String] tag to produce closing tag string from.
       # @return [String] opening tag for the input given.
       def closing tag
-        "</#{tag.to_s.split('†').first}>"
+        "</#{tag}>"
       end
   
       # (see opening)
