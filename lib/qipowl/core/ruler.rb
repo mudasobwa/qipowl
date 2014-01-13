@@ -86,7 +86,7 @@ module Qipowl
             nil
           end
           def ∃_#{section}_tag entity
-                ∃_#{section}(entity)[:tag]
+                ∃_#{section}(entity)[:tag] if ∃_#{section}(entity)
           end
         }
         mapper.entities[section.to_sym].keys.each { |key|

@@ -396,53 +396,6 @@ end
       result
     end
 
-    # @see Qipowl::Bowler#method_missing
-    #
-    # Lazy extends class with methods for nested `:linewide`s and 
-    # handles calls for words starting with elements from `:inplace` section.
-    # The latter is necessary since the common usage of markup is:
-    # 
-    #     This text is ≡bold≡.
-    #     
-    # Not
-    # 
-    #     #             ⇓ note the space here
-    #     This text is ≡ bold.
-    # 
-    # Hence we cannot simply declare the DSL for it, we need to handle 
-    # calls to all the _methods_, starting with those symbols.
-    # 
-    # @param [Symbol] method as specified by caller (`method_missing`.)
-    # @param [Array] args as specified by caller (`method_missing`.)
-    # @param [Proc] block as specified by caller (`method_missing`.)
-    # 
-    # @return [Array] the array of words
-    def special_handler method, *args, &block
-      # Sublevel markers, e.g. “ •” is level 2 line-item
-      if level(method) > 0
-        return send(method, args) if @mapping.dup_spice(nested_base(method), method)
-      else
-        # Inplace tags, like “≡” for ≡bold decoration≡ 
-        # FIXME Not efficient!
-        @mapping[:inplace].each { |tag, htmltag|
-          tag = tag.to_s.bowl
-          if method.to_s.start_with? tag
-              return [method, args].join(SEPARATOR).gsub(/#{tag}(.*?)(#{tag}|\Z)/) { |m|
-              send(tag, eval($1)).bowl
-            }.split(SEPARATOR)
-          end
-        }
-      end
-      [method, args].flatten
-    end
-
-    # Determines nested method’s base (e.g. “•” for [second level] “  •”)
-    # @param [Symbol] nested the name of the nested method
-    # @return [Symbol] the base (original) method name
-    def nested_base nested
-      nested ? nested.to_s[level(nested), nested.length].to_sym : nil
-    end
-  end
 end
 
 if __FILE__ == $0

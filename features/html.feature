@@ -137,5 +137,18 @@ Feature: All the possibilities of HTML parser
     And the execute method is called on bowler
     Then the result should equal to "<address><strong>Twitter</strong> <br/> <span class='phone'>☎ +1(987)5554321</span> <br/> <span class='email'>✉ info@twitter.com</span></address>"
 
+  Scenario: Entity addition
+    Given we use "html" bowler
+    When the input string is "List: × li1 line item × li2"
+    And rule "×" is added to mapping as "li" in "regular" section with "ol" enclosure
+    And the execute method is called on bowler
+    Then the result should equal to "<p>List:</p> <ol><li>li1 line item </li> <li>li2</li></ol>"
+
+  Scenario: Entity removal
+    Given we use "html" bowler
+    When the input string is "List: ◦ li1 ◦ li2"
+    And rule "◦" is removed from mapping
+    And the execute method is called on bowler
+    Then the result should equal to "<p>List: ◦ li1 ◦ li2</p>"
 
 

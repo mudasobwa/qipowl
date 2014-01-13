@@ -68,6 +68,58 @@ module Qipowl::Bowlers
         if self.private_methods.include?(:special_handler)
       [method, args].flatten
     end
+        
+    # Adds new +entity+ in the section specified.
+    # E. g., call to
+    #
+    #     add_spice :linewide, :°, :deg, :degrees
+    #
+    # in HTML implementation adds a support for specifying something like:
+    #
+    #     ° 15
+    #     ° 30
+    #     ° 45
+    #
+    # which is to be converted to the following:
+    #
+    #     <degrees>
+    #       <deg>15</deg>
+    #       <deg>30</deg>
+    #       <deg>45</deg>
+    #     </degrees>
+    #
+    # @param [Symbol] section the section (it must be one of {Mapping.SPICES}) to add new key to
+    # @param [Symbol] key the name for the key
+    # @param [Symbol] value the value
+    # @param [Symbol] enclosure_value optional value to be added for the key into enclosures section
+    def add_entity section, key, value, enclosure_value = null
+      if (tags = self.class.const_get("#{section.upcase}_TAGS"))
+        key = key.bowl.to_sym
+        tags[key] = value.to_sym
+        self.class.const_get("ENCLOSURES_TAGS")[key] = enclosure_value.to_sym if enclosure_value
+        self.class.class_eval %Q{
+          alias_method :#{key}, :∀_#{section}
+        } # unless self.class.instance_methods(true).include?(key.bowl)
+      else
+        logger.warn "Trying to add key “#{key}” in an invalid section “#{section}”. Ignoring…"
+      end
+    end
+
+    # Removes key from both {Mapping.SPICES} and {Mapping.SALT}. See {#add_spice}
+    #
+    # @param [Symbol] key the key to be removed
+    def remove_entity key
+      %w(block alone magnet grip regular).each { |section|
+        next unless send :"∃_#{section}_tag", key.to_sym
+        
+        self.class.const_get("#{section.upcase}_TAGS").delete key
+        self.class.const_get("ENCLOSURES_TAGS").delete key
+        self.class.class_eval %Q{
+          remove_method :#{key.bowl}
+        }
+      }
+    end
+
 
   protected
     %w(block alone magnet grip regular).each { |section|
