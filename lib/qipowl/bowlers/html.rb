@@ -44,6 +44,15 @@ module Qipowl
                     )
     end
 
+    # `:magnet` default handler
+    # @param [Array] args the words, gained since last call to {#harvest}
+    # @return [Array] the array of words with trimmed `magnet` tag
+    def ∀_magnet *args
+      param, *rest = args.flatten
+      param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
+      [tagify(∃_magnet_tag(__callee__), {:class => ∃_magnet(__callee__)[:class]}, param), rest]
+    end
+
 ##############################################################################
 ###              Grip :: Specific handlers                                 ###
 ##############################################################################
@@ -56,6 +65,23 @@ module Qipowl
         [tagify(∃_grip_tag(__callee__), {:title => mine, :class => ∃_grip(__callee__)[:class]}, term), rest]
       end
 
+      # Handler for anchors.
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Array] the array of words with trimmed `a` tag
+      def ⚓ *args
+        href, *title = args.flatten
+        mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
+        href = href.unbowl
+        [
+          case get_href_content(href)
+          when :img 
+            standalone :img, { :src => href, :alt => [*mine].join(SEPARATOR), :class => 'inplace' }
+          else 
+            tagify ∃_grip_tag(__callee__), {:href => href}, mine
+          end, rest
+        ]
+      end
+  
 ##############################################################################
 ###             Alone :: Specific handlers                                 ###
 ##############################################################################
@@ -78,6 +104,60 @@ module Qipowl
       # @return [Nil] nil
       def ✍ *args
         []
+      end
+
+##############################################################################
+###            Magnet :: Specific handlers                                 ###
+##############################################################################
+      # `:magnet` handler for reference to Livejournal user.
+      # @param [String] param the text to be places on the same string as opening tag
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Nil] nil
+      def ✎ *args
+        param, *rest = args.flatten
+        param = param.unbowl
+        ljref = "<span style='white-space: nowrap;'><a href='http://#{param}.livejournal.com/profile?mode=full'><img src='http://l-stat.livejournal.com/img/userinfo.gif' alt='[info]' style='border: 0pt none ; vertical-align: bottom; padding-right: 1px;' height='17' width='17'></a><a href='http://#{param}.livejournal.com/?style=mine'><b>#{param}</b></a></span>"
+        [ljref, rest]
+      end
+      
+      def ☇ *args
+        param, *rest = args.flatten
+        [tagify(∃_magnet_tag(__callee__), {:name => param.unbowl}, String::ZERO_WIDTH_SPACE), rest]
+      end
+    
+##############################################################################
+###           Regular :: Specific handlers                                 ###
+##############################################################################
+      # Handler for Youtube video
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Nil] nil
+      def ✇ *args
+        id, *rest = args.flatten
+        harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
+        harvest __callee__, %Q(
+<iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id.unbowl}' 
+        frameborder='0' allowfullscreen></iframe>
+        )
+      end
+      
+      # Handler for standalone pictures and
+      # @todo Make it to understand quotes when there is a plain HTML on the other side
+      # 
+      # @param 
+      # @return [Nil] nil
+      def ⚘ *args
+        href, *title = args.flatten
+  #      harvest __callee__, %Q(
+        %Q(
+<figure>
+  <img src='#{href.unbowl}'/>
+  <figcaption>
+    <p>
+      #{title.join(SEPARATOR)}
+    </p>
+  </figcaption>
+</figure>
+)
       end
 
 
@@ -129,6 +209,40 @@ module Qipowl
         text = [*args].join(SEPARATOR)
         text.vacant? ? '' : "#{opening tag, params}#{text}#{closing tag}"
       end
+
+
+      # Determines content of remote link by href.
+      # TODO Make image patterns configurable.
+      # @param [String] href link to remote resource
+      # @return [Symbol] content type (`:img` or `:text` currently)
+      def get_href_content href
+        href = href.to_s.unbowl.strip
+        if href.end_with?(* %w{png jpg jpeg gif PNG JPG JPEG GIF})
+          :img
+        elsif /\/\/i\.chzbgr/ =~ href
+          :img
+        else
+          :text
+        end
+          
+      #  uri = URI(href.to_s.unbowl)
+      #  Net::HTTP.start(uri.host, uri.port) do |http|
+      #    http.open_timeout = 1
+      #    http.read_timeout = 1
+      #
+      #    request = Net::HTTP::Head.new uri
+      #    response = http.request request
+      #    case response.to_hash["content-type"].first
+      #    when /image/ then return :img
+      #    when /text/ then return :text
+      #    end
+      #  end
+      #  :unknown
+      #rescue
+      #  logger.warn "Unable to determine link [#{href.to_s.unbowl}] type: no internet connection. Reverting to default."
+      #  :unknown
+      end
+
     end
   end
 end
@@ -144,54 +258,6 @@ end
     # @param [Array] args the words, gained since last call to {#harvest}
     def • *args
       harvest __callee__, tagify(@mapping.linewide(__callee__), {}, args)
-    end
-    
-    # `:block` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @param [String] param the text to be places on the same string as
-    # opening tag
-    # @return [Nil] nil
-    def Λ param, *args
-      harvest __callee__, 
-              tagify(
-                      @mapping.block(__callee__), 
-                      {:class => (param.strip.empty? ? 'auto' : param.strip)}, 
-                      args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
-                    )
-    end
-
-    # `:block` handler for comment (required because comments are
-    # formatted in HTML in some specific way.)
-    # @param [String] param the text to be places on the same string as opening tag
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def ✍ *args
-      []
-    end
-
-    # `:magnet` handler for reference to Livejournal user.
-    # @param [String] param the text to be places on the same string as opening tag
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def ✎ *args
-      param, *rest = args.flatten
-      param = param.unbowl
-      ljref = "<span style='white-space: nowrap;'><a href='http://#{param}.livejournal.com/profile?mode=full'><img src='http://l-stat.livejournal.com/img/userinfo.gif' alt='[info]' style='border: 0pt none ; vertical-align: bottom; padding-right: 1px;' height='17' width='17'></a><a href='http://#{param}.livejournal.com/?style=mine'><b>#{param}</b></a></span>"
-      [ljref, rest]
-    end
-
-    # `:magnet` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with trimmed `magnet` tag
-    def ☎ *args
-      param, *rest = args.flatten
-      param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
-      [tagify(@mapping.magnet(__callee__), {}, param), rest]
-    end
-    
-    def ☇ *args
-      param, *rest = args.flatten
-      [tagify(@mapping.magnet(__callee__), {:name => param.unbowl}, String::ZERO_WIDTH_SPACE), rest]
     end
     
     # `:linewide` handler for data lists (required since data list items
@@ -221,60 +287,6 @@ end
     end
     alias_method :⊂, :∈
     
-    # Handler for anchors.
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with trimmed `a` tag
-    def ⚓ *args
-      href, *title = args.flatten
-      href = href.unbowl
-      case get_href_content(href)
-      when :img 
-        standalone :img, { :src => href, :alt => title.join(SEPARATOR) }
-      else 
-        tagify @mapping.inplace(__callee__), {:href => href}, title
-      end
-    end
-
-    # Handler for Youtube video
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def ✇ *args
-      id, *rest = args.flatten
-      harvest nil, orphan(rest.join(SEPARATOR)) unless rest.vacant?
-      harvest __callee__, %Q(
-            <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id.unbowl}' 
-                    frameborder='0' allowfullscreen></iframe>
-          )
-    end
-    
-    # Handler for standalone pictures and
-    # @todo Make it to understand quotes when there is a plain HTML on the other side
-    # 
-    # @param 
-    # @return [Nil] nil
-    def ⚘ *args
-      href, *title = args.flatten
-#      harvest __callee__, %Q(
-      %Q(
-                              <figure>
-                              <img src='#{href.unbowl}'/>
-                              <figcaption>
-                              <p>
-                              #{title.join(SEPARATOR)}
-                              </p>
-                              </figcaption>
-                              </figure>
-                            )
-    end
-    
-    # Handler for abbrs.
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with trimmed `abbr` tag
-    def † *args
-      term, *title = args.flatten
-      tagify @mapping.inplace(__callee__), {:title => title.join(SEPARATOR)}, term
-    end
-
     def parse_and_roll str
       @callee = nil
       super str
@@ -505,38 +517,6 @@ end
         }
       end
       [method, args].flatten
-    end
-
-    # Determines content of remote link by href.
-    # TODO Make image patterns configurable.
-    # @param [String] href link to remote resource
-    # @return [Symbol] content type (`:img` or `:text` currently)
-    def get_href_content href
-      href = href.to_s.unbowl.strip
-      if href.end_with?(* %w{png jpg jpeg gif PNG JPG JPEG GIF})
-        :img
-      elsif /\/\/i\.chzbgr/ =~ href
-        :img
-      else
-        :text
-      end
-        
-    #  uri = URI(href.to_s.unbowl)
-    #  Net::HTTP.start(uri.host, uri.port) do |http|
-    #    http.open_timeout = 1
-    #    http.read_timeout = 1
-    #
-    #    request = Net::HTTP::Head.new uri
-    #    response = http.request request
-    #    case response.to_hash["content-type"].first
-    #    when /image/ then return :img
-    #    when /text/ then return :text
-    #    end
-    #  end
-    #  :unknown
-    #rescue
-    #  logger.warn "Unable to determine link [#{href.to_s.unbowl}] type: no internet connection. Reverting to default."
-    #  :unknown
     end
 
     # Determines nested method’s base (e.g. “•” for [second level] “  •”)

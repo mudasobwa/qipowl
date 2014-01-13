@@ -188,9 +188,9 @@ module Qipowl::Bowlers
     end
     
     def split str
-      (block str.bowl).split(/\R{2,}/).map { |para|
+      (block str).split(/\R{2,}/).map { |para|
         para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/ ?
-          para : (grip custom para)
+          para.bowl : (grip (custom para).bowl)
       }
     end
     

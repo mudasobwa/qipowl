@@ -59,3 +59,43 @@ Feature: All the possibilities of HTML parser
 
 
     """
+
+  Scenario Outline: Video tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should match "<iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/gokeLEC8dZc'"
+
+    Examples:
+        | input                                        |
+        | "http://www.youtube.com/watch?v=gokeLEC8dZc" |
+        | "http://youtu.be/gokeLEC8dZc"                |
+        | "YouTube http://youtu.be/gokeLEC8dZc inline test." |
+
+  Scenario Outline: Magnet tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input                  | output                             |
+        | "☎ +1(987)5554321"    | "<p><span class='phone'>☎ +1(987)5554321</span></p>" |
+        | "✉ info_twitter.com"   | "<p><span class='email'>✉ info_twitter.com</span></p>" |
+        | "✎ mudasobwa"          | "<p><span style='white-space: nowrap;'><a href='http://mudasobwa.livejournal.com/profile?mode=full'><img src='http://l-stat.livejournal.com/img/userinfo.gif' alt='[info]' style='border: 0pt none ; vertical-align: bottom; padding-right: 1px;' height='17' width='17'></a><a href='http://mudasobwa.livejournal.com/?style=mine'><b>mudasobwa</b></a></span></p>" |
+        | "☇ id001"               | "<p><a name='id001'>​</a></p>" |
+
+  Scenario Outline: Custom tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input                               | output                             |
+        | "‒ Wikipedia, http://wikipedia.org" | "<p><br/> <small><a href='http://wikipedia.org'>Wikipedia</a></small></p>" |
+        | "Wikipedia¹http://wikipedia.org"    | "<p><a href='http://wikipedia.org'>Wikipedia</a></p>" |
+        | "Wikipedia†Best knowledge base†"    | "<p><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
+        | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p><img class='inplace' alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<p><figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Standalone picture␍    </p>␍  </figcaption>␍</figure></p>" |
+
