@@ -97,5 +97,22 @@ Feature: All the possibilities of HTML parser
         | "Wikipedia¹http://wikipedia.org"    | "<p><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†"    | "<p><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
         | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p><img class='inplace' alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
-        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "<p><figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Standalone picture␍    </p>␍  </figcaption>␍</figure></p>" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "␍<figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Standalone picture␍    </p>␍  </figcaption>␍</figure>␍" |
 
+  Scenario Outline: Markdown atavisms ⇒ links
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input               | output                             |
+        | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p>Here <img class='inplace' alt='Image' src='http://mudasobwa.ru/images/am.jpg'/> goes</p>" |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "␍<figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Figure␍    </p>␍  </figcaption>␍</figure>␍" |
+        | "Here [Link](http://wikipedia.org/) goes" | "<p>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
+        | "Here *italic* goes" | "<p>Here <em>italic</em> goes</p>" |
+        | "Here inplace*it*alic goes" | "<p>Here inplace<em>it</em>alic goes</p>" |
+        | "Here non-italic 5*3 math goes" | "<p>Here non-italic 5*3 math goes</p>" |
+        | "Here **bold** goes" | "<p>Here <strong>bold</strong> goes</p>" |
+        | "Here ~~del~~ goes" | "<p>Here <del>del</del> goes</p>" |
+        | "Here `code` goes" | "<p>Here <code>code</code> goes</p>" |

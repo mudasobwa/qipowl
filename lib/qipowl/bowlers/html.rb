@@ -147,8 +147,7 @@ module Qipowl
       # @return [Nil] nil
       def ⚘ *args
         href, *title = args.flatten
-  #      harvest __callee__, %Q(
-        %Q(
+        harvest __callee__, %Q(
 <figure>
   <img src='#{href.unbowl}'/>
   <figcaption>

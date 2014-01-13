@@ -167,11 +167,11 @@ module Qipowl::Bowlers
 
     # Prepares customs in the input for the execution
     def custom str
-      result = str.dup
+      result = str.unbowl.dup
       self.class::CUSTOM_TAGS.each { |tag, value|
         result.gsub!(/#{tag}/, value)
       }
-      result
+      result.bowl
     end
 
     # Prepares grips in the input for the execution
@@ -179,8 +179,9 @@ module Qipowl::Bowlers
     def grip str
       result = str.dup
       self.class::GRIP_TAGS.each { |tag, value|
-        result.gsub!(/(#{tag})(.*?)(?:#{tag}|\Z)/m) {
-          tag, args = [$1, $2]
+        result.gsub!(/(?:#{tag})(.*?)(?:#{tag})/m) {
+          next if (args = $1).vacant?
+          tag = value[:marker] if Hash === value && value[:marker]
           "⌦ #{tag} #{args}#{tag}∎⌫"
         }
       }
@@ -188,9 +189,9 @@ module Qipowl::Bowlers
     end
     
     def split str
-      (block str).split(/\R{2,}/).map { |para|
+      (block str.bowl).split(/\R{2,}/).map { |para|
         para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/ ?
-          para.bowl : (grip (custom para).bowl)
+          para : (grip custom para)
       }
     end
     
