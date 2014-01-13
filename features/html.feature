@@ -130,6 +130,7 @@ Feature: All the possibilities of HTML parser
         | "List: • li1  • nested 1  • nested 2 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <ul class='fancy'><li>nested 1 </li> <li>nested 2  </li></ul> <li>li2</li></ul>" |
         | "Data: ▶ dt — dd ▶ dt — dd" | "<p>Data:</p> <dl>␍<dt>dt</dt>␍<dd>dd </dd>␍ ␍<dt>dt</dt>␍<dd>dd</dd>␍</dl>" |
         | "§1 Header" | "<h1>Header</h1>" |
+        | "〉 Blockquote" | "<blockquote><p class='blockquote'>Blockquote</p></blockquote>" |
         
   Scenario: Address tag
     Given we use "html" bowler
@@ -151,4 +152,44 @@ Feature: All the possibilities of HTML parser
     And the execute method is called on bowler
     Then the result should equal to "<p>List: ◦ li1 ◦ li2</p>"
 
+  Scenario: Standalone images
+    Given we use "html" bowler
+    When the input string is
+      """
+      ✍
+      Preamble: given
+      ✍
+      
+      〉 http://mudasobwa.ru/i/self.jpg With caption
+        ‒ Wiki, http://wikipedia.ru
+      
+      Nice?
+      """
+    And the execute method is called on bowler
+    Then the result should equal to
+    """
+    
+    
+    <blockquote><p class='blockquote'>http://mudasobwa.ru/i/self.jpg With caption
+     <br/> <small><a href='http://wikipedia.ru'>Wiki</a></small> </p></blockquote>
+    <p>Nice?</p>
+    """
+
+  Scenario: Comments
+    Given we use "html" bowler
+    When the input string is
+      """
+      ---
+      This is a comment text
+      ---
+      
+      Nice?
+      """
+    And the execute method is called on bowler
+    Then the result should equal to
+    """
+    
+    
+    <p>Nice?</p>
+    """
 

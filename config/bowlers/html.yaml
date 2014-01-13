@@ -61,7 +61,7 @@
         :class  : :dl_horizontal
     :℁            : :address
     :〉          :
-      :tag      : :div
+      :tag      : :p
       :parent   : :blockquote
       :class    : :blockquote
     :§1         : :h1

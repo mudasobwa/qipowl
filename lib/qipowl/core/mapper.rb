@@ -31,12 +31,13 @@ module Qipowl::Mappers
       raise ArgumentError.new "Invalid map for merge in Mapper" \
         unless input.respond_to? :to_hash        
 
-      input.delete(:includes).each { |inc|
-        merge! inc
-      } rescue NoMethodError
+      incs = input.delete(:includes)
 
       @entities_dirty = true
       @hash.rmerge!(input.to_hash)
+      incs.each { |inc|
+        merge! inc
+      } rescue NoMethodError
     end
   private
   # FIXME Make file search more flexible!!!
@@ -68,6 +69,7 @@ module Qipowl::Mappers
             # Append explicit synonyms
             v[:synonyms].each { |syn|
               (@entities[key][syn.bowl] = v.dup).delete(:synonyms)
+              @entities[key][syn.bowl][:marker] = k.bowl
             } if v[:synonyms]
           end
         }

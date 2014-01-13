@@ -89,9 +89,10 @@ module Qipowl
                 ∃_#{section}(entity)[:tag] if ∃_#{section}(entity)
           end
         }
-        mapper.entities[section.to_sym].keys.each { |key|
+        mapper.entities[section.to_sym].each { |key, value|
+          tag = Hash === value && value[:marker] ? value[:marker] : "∀_#{section}"
           clazz.class_eval %Q{
-            alias_method :#{key}, :∀_#{section}
+            alias_method :#{key}, :#{tag}
           } unless clazz.instance_methods.include?(key)
         }
       }
