@@ -127,5 +127,15 @@ Feature: All the possibilities of HTML parser
     Examples:
         | input               | output                             |
         | "List: • li1 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <li>li2</li></ul>" |
+        | "List: • li1  • nested 1  • nested 2 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <ul class='fancy'><li>nested 1 </li> <li>nested 2  </li></ul> <li>li2</li></ul>" |
         | "Data: ▶ dt — dd ▶ dt — dd" | "<p>Data:</p> <dl>␍<dt>dt</dt>␍<dd>dd </dd>␍ ␍<dt>dt</dt>␍<dd>dd</dd>␍</dl>" |
         | "§1 Header" | "<h1>Header</h1>" |
+        
+  Scenario: Address tag
+    Given we use "html" bowler
+    When the input string is "℁  ≡Twitter≡ ⏎  ☎ +1(987)5554321 ⏎  ✉ info@twitter.com"
+    And the execute method is called on bowler
+    Then the result should equal to "<address><strong>Twitter</strong> <br/> <span class='phone'>☎ +1(987)5554321</span> <br/> <span class='email'>✉ info@twitter.com</span></address>"
+
+
+

@@ -38,10 +38,10 @@ module Qipowl
       def ∀_block param, args
         harvest __callee__, 
                 tagify(
-                        ∃_block_tag(__callee__), 
-                        {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
-                        args.hsub(String::HTML_ENTITIES)
-                      )
+                  ∃_block_tag(__callee__), 
+                  {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
+                  args.hsub(String::HTML_ENTITIES)
+                )
       end
   
       # `:magnet` default handler
@@ -56,7 +56,12 @@ module Qipowl
       # `:regular` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       def ∀_regular *args
-        harvest __callee__, tagify(∃_regular_tag(__callee__), {:class => ∃_regular(__callee__)[:class]}, args)
+        harvest __callee__,
+                tagify(
+                  ∃_regular_tag(canonize(__callee__)),
+                  {:class => ∃_regular(canonize(__callee__))[:class]},
+                  args
+                )
       end
     
 ##############################################################################
@@ -188,12 +193,12 @@ module Qipowl
       # 
       #     li = "• li1 \u{00A0}• nested 1 \u{00A0}• nested 2 • li2"
       #     
-      # @param [Symbol|String] oper the DSL symbol to get the level information for.
+      # @param [Symbol|String] callee the DSL symbol to get the level information for.
       # @return [Integer] the level requested. 
       #
-      def level oper
-        (oper = oper.to_s).gsub(/#{String::NBSP}/, '').empty? ?
-          -1 : (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
+      def level callee
+        (callee = callee.to_s).gsub(/#{String::NBSP}/, '').empty? ?
+          -1 : (0..callee.length-1).each { |i| break i if callee[i] != String::NBSP }
       end
       
       def canonize callee
@@ -226,6 +231,23 @@ module Qipowl
       end
 
     private
+      # Hence we cannot simply declare the DSL for it, we need to handle 
+      # calls to all the _methods_, starting with those symbols.
+      # 
+      # @param [Symbol] method as specified by caller (`method_missing`.)
+      # @param [Array] args as specified by caller (`method_missing`.)
+      # @param [Proc] block as specified by caller (`method_missing`.)
+      # 
+      # @return [Array] the array of words
+      def special_handler method, *args, &block
+        # Sublevel markers, e.g. “ •” is level 2 line-item
+        return [method, args].flatten \
+          unless level(method) > 0 && self.class::REGULAR_TAGS.keys.include?(canonize(method))
+        
+        self.class.class_eval "alias_method :#{method}, :#{canonize(method)}"
+        send method, args, block
+      end
+
       # Produces html paragraph tag (`<p>`) with class `owl`.
       # @see Qipowl::Bowler#orphan
       # @param str the words, to be put in paragraph tag.
