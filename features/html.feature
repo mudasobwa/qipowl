@@ -97,7 +97,7 @@ Feature: All the possibilities of HTML parser
         | "Wikipedia¹http://wikipedia.org"    | "<p><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†"    | "<p><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
         | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p><img class='inplace' alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
-        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | "␍<figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Standalone picture␍    </p>␍  </figcaption>␍</figure>␍" |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | " ␍ <figure> ␍   <img src='http://mudasobwa.ru/images/am.jpg'/> ␍   <figcaption> ␍     <p> ␍       Standalone picture ␍     </p> ␍   </figcaption> ␍ </figure> ␍ " |
 
   Scenario Outline: Markdown atavisms ⇒ links
     Given we use "html" bowler
@@ -108,7 +108,7 @@ Feature: All the possibilities of HTML parser
     Examples:
         | input               | output                             |
         | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p>Here <img class='inplace' alt='Image' src='http://mudasobwa.ru/images/am.jpg'/> goes</p>" |
-        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | "␍<figure>␍  <img src='http://mudasobwa.ru/images/am.jpg'/>␍  <figcaption>␍    <p>␍      Figure␍    </p>␍  </figcaption>␍</figure>␍" |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | " ␍ <figure> ␍   <img src='http://mudasobwa.ru/images/am.jpg'/> ␍   <figcaption> ␍     <p> ␍       Figure ␍     </p> ␍   </figcaption> ␍ </figure> ␍ " |
         | "Here [Link](http://wikipedia.org/) goes" | "<p>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
         | "Here *italic* goes" | "<p>Here <em>italic</em> goes</p>" |
         | "Here inplace*it*alic goes" | "<p>Here inplace<em>it</em>alic goes</p>" |
@@ -128,7 +128,7 @@ Feature: All the possibilities of HTML parser
         | input               | output                             |
         | "List: • li1 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <li>li2</li></ul>" |
         | "List: • li1  • nested 1  • nested 2 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <ul class='fancy'><li>nested 1 </li> <li>nested 2  </li></ul> <li>li2</li></ul>" |
-        | "Data: ▶ dt — dd ▶ dt — dd" | "<p>Data:</p> <dl>␍<dt>dt</dt>␍<dd>dd </dd>␍ ␍<dt>dt</dt>␍<dd>dd</dd>␍</dl>" |
+        | "Data: ▶ dt — dd ▶ dt — dd" | "<p>Data:</p> <dl> ␍ <dt>dt</dt> ␍ <dd>dd </dd> ␍   ␍ <dt>dt</dt> ␍ <dd>dd</dd> ␍ </dl>" |
         | "§1 Header" | "<h1>Header</h1>" |
         | "〉 Blockquote" | "<blockquote><p class='blockquote'>Blockquote</p></blockquote>" |
         
@@ -171,7 +171,7 @@ Feature: All the possibilities of HTML parser
     
     
     <blockquote><p class='blockquote'>http://mudasobwa.ru/i/self.jpg With caption
-     <br/> <small><a href='http://wikipedia.ru'>Wiki</a></small> </p></blockquote>
+    <br/> <small><a href='http://wikipedia.ru'>Wiki</a></small> </p></blockquote>
     <p>Nice?</p>
     """
 
@@ -192,4 +192,38 @@ Feature: All the possibilities of HTML parser
     
     <p>Nice?</p>
     """
+
+  Scenario: Blockquotes
+    Given we use "html" bowler
+    When the input string is
+    """
+    §2 Blockquotes
+    
+    〉 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere
+    erat a ante.
+       〉 Nested blockquote first line
+     〉 Nested blockquote second line
+    〉 Lorem ipsum para text 2.
+    
+    Some para text.
+    
+    〉 Intro 1.
+     • list item ≡with bold≡ 1
+     • list item ≈emphasized≈ 
+      • nested list item 1
+      • nested list item 2 
+    
+    〉 Blockquote standalone.
+    
+    〉 Intro 2.
+     • list item 2.1 
+     • list item 2.2
+    〉 Continuing intro 2.
+    
+    Blockquote standalone.
+    """
+    And the execute method is called on bowler
+    Then the result should match "<blockquote><blockquote><blockquote><p class='blockquote'>Nested blockquote first"
+    And the result should match "</li> <ul class='fancy'><li>nested list item 1"
+    And the result should match "<p>Blockquote standalone.</p>"
 
