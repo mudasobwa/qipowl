@@ -2,7 +2,7 @@
 
 require_relative '../core/bowler'
 
-module Qipowl
+module Qipowl::Bowlers
   
   # Markup processor for Html output.
   # 
