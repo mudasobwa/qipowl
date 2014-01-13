@@ -103,7 +103,7 @@ module Qipowl::Bowlers
       str.gsub(/⌦./, '').gsub(/.⌫/, '')
     end
 
-  private
+  protected
     # The handler of the last “orphaned” text block in the input string.
     #
     # E.g.:
@@ -149,7 +149,7 @@ module Qipowl::Bowlers
       nil
     end
   
-  
+  private
     # Prepares blocks in the input for the execution
     def block str
       result = str.dup

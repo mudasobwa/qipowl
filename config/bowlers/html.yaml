@@ -114,3 +114,15 @@
   'http://www\.youtube\.com/(?:watch\?v=|v/)([A-Za-z0-9_]+)' : '✇ \1'
 # Standalone images and quotes
   '^(https?://\S+)(\s*.*)$' : '⚘ \1 \2'
+  
+:enclosures :
+  :•       :
+    :tag   : :ul
+    :class : :fancy
+  :◦ :     :ol
+  :▶ :     :dl
+  :▷         :
+    :tag   : :dl
+    :class : :dl_horizontal
+  :〉       : :blockquote
+

@@ -30,29 +30,35 @@ module Qipowl
         [standalone(∃_alone_tag(__callee__), {:class => ∃_alone(__callee__)[:class]}), args]
       end
 
-    # `:block` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @param [String] param the text to be places on the same string as
-    # opening tag
-    # @return [Nil] nil
-    def ∀_block param, args
-      harvest __callee__, 
-              tagify(
-                      ∃_block_tag(__callee__), 
-                      {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
-                      args.hsub(String::HTML_ENTITIES)
-                    )
-    end
-
-    # `:magnet` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Array] the array of words with trimmed `magnet` tag
-    def ∀_magnet *args
-      param, *rest = args.flatten
-      param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
-      [tagify(∃_magnet_tag(__callee__), {:class => ∃_magnet(__callee__)[:class]}, param), rest]
-    end
-
+      # `:block` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @param [String] param the text to be places on the same string as
+      # opening tag
+      # @return [Nil] nil
+      def ∀_block param, args
+        harvest __callee__, 
+                tagify(
+                        ∃_block_tag(__callee__), 
+                        {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
+                        args.hsub(String::HTML_ENTITIES)
+                      )
+      end
+  
+      # `:magnet` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Array] the array of words with trimmed `magnet` tag
+      def ∀_magnet *args
+        param, *rest = args.flatten
+        param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
+        [tagify(∃_magnet_tag(__callee__), {:class => ∃_magnet(__callee__)[:class]}, param), rest]
+      end
+  
+      # `:regular` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      def ∀_regular *args
+        harvest __callee__, tagify(∃_regular_tag(__callee__), {:class => ∃_regular(__callee__)[:class]}, args)
+      end
+    
 ##############################################################################
 ###              Grip :: Specific handlers                                 ###
 ##############################################################################
@@ -137,7 +143,7 @@ module Qipowl
         harvest __callee__, %Q(
 <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/#{id.unbowl}' 
         frameborder='0' allowfullscreen></iframe>
-        )
+)
       end
       
       # Handler for standalone pictures and
@@ -159,7 +165,65 @@ module Qipowl
 )
       end
 
+      # `:regular` handler for data lists (required since data list items
+      # consist of two tags: `dt` and `dd`.)
+      # @param [Array] args the words, gained since last call to {#harvest}
+      # @return [Nil] nil
+      def ▶ *args
+        dt, dd = args.join(SEPARATOR).split(/\s+(?:—)\s+/)
+        harvest __callee__, %Q(
+#{tagify :dt, {}, dt}
+#{tagify :dd, {}, dd}
+)
+      end
+      # Alias for {#▶}, according to YAML rules specifies additional 
+      # class for the data list `<dl>` tag behind (`dl-horizontal`.)
+      alias_method :▷, :▶
 
+    protected
+      # Computes the level of the `:linewide` element by counting
+      # preceeding non-breakable spaces. For instance, nested lists
+      # are produced by appending `"\u{00A0}"` to the line item
+      # DSL tag: 
+      # 
+      #     li = "• li1 \u{00A0}• nested 1 \u{00A0}• nested 2 • li2"
+      #     
+      # @param [Symbol|String] oper the DSL symbol to get the level information for.
+      # @return [Integer] the level requested. 
+      #
+      def level oper
+        (oper = oper.to_s).gsub(/#{String::NBSP}/, '').empty? ?
+          -1 : (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
+      end
+      
+      def canonize callee
+        callee.to_s.gsub(/^#{String::NBSP}*/, '').to_sym if callee
+      end
+
+      # @see Qipowl::Bowler#harvest
+      # 
+      # Additionally it checks if there was a `:linewide` item, requiring
+      # surrounding html element (like `<ul>` aroung several `<li>`s.)
+      # 
+      # @param [Symbol] callee of method
+      # @param [String] str to be harvested
+      def harvest callee, str
+        if callee.nil? || callee != @callee
+          level(callee).downto(level(@callee) + 1) { |i|
+            str += i.␚ify
+          } unless ∃_enclosures(canonize(callee)).nil?
+  
+          if prev = ∃_enclosures(canonize(@callee))
+            level(@callee).downto(level(callee) + 1) { |i|
+              @yielded.last.sub!(/\A/, opening(prev[:tag], {:class => prev[:class]}))
+              @yielded.each { |s| s.gsub!(/#{i.␚ify}/) { closing(prev[:tag]) } }
+            }
+          end
+          
+          @callee = callee
+        end
+        super callee, str
+      end
 
     private
       # Produces html paragraph tag (`<p>`) with class `owl`.
@@ -253,26 +317,6 @@ end
     # Amount of unnamed instances of the class (needed for new class name generation)
     @@inst_count = 0
     
-    # `:linewide` default handler
-    # @param [Array] args the words, gained since last call to {#harvest}
-    def • *args
-      harvest __callee__, tagify(@mapping.linewide(__callee__), {}, args)
-    end
-    
-    # `:linewide` handler for data lists (required since data list items
-    # consist of two tags: `dt` and `dd`.)
-    # @param [Array] args the words, gained since last call to {#harvest}
-    # @return [Nil] nil
-    def ▶ *args
-      dt, dd = args.join(SEPARATOR).split(/\s+(?:#{@mapping.params(:dd).join('|')})\s+/)
-      harvest __callee__, %Q(
-                             #{tagify :dt, {}, dt}
-                             #{tagify :dd, {}, dd}
-                            )
-    end
-    # Alias for {#▶}, according to YAML rules specifies additional 
-    # class for the data list `<dl>` tag behind (`dl-horizontal`.)
-    alias_method :▷, :▶
     
     # `:handshake` default handler
     # @param [String] from packed as string operand “before”
@@ -286,155 +330,7 @@ end
     end
     alias_method :⊂, :∈
     
-    def parse_and_roll str
-      @callee = nil
-      super str
-    end
 
-    def unparse_and_roll str
-      html_doc = HtmlDoc.new @mapping
-      parser = Nokogiri::HTML::SAX::Parser.new(html_doc)
-      parser.parse(str)
-      puts '='*40
-      puts html_doc.tg
-      puts '='*40
-      html_doc.tg
-    end
-
-    # Constructor merges rules from the file given, extends class definition
-    # with methods not defined explicitly, but specified in rules. E.g. whether
-    # the rules file contains `:≈ : :em` definition for emphasis markup under
-    # the `:inplace` section, the class will be extended with:
-    # 
-    #     alias_method :≈, :≡
-    #     
-    # where the `:≡` is the default processing method for `:inplace` tags.
-    # 
-    # Also there is `:custom` section processing (currently simply by
-    # substituting items from rules within their values.)
-    # 
-    # @param [String] file to read rules to merge from
-    def initialize file = nil
-      super
-      merge_rules file if file
-    end
-#    private_class_method :new
-    
-    # @todo Check if this will not lead to memory leaks
-    # @todo Problem: we are currently shitting the general namespace
-    #
-    # @param name [String] name of the bowler to save for future use;
-    #   if omitted, will be generated automatically
-    def self.parse str, name = nil
-      clazz = nil
-      name_ok = !name.nil? && \
-                begin
-                  clazz = Qipowl::Bowlers.const_get(name)
-                  clazz.is_a? Class
-                  clazz < self
-                rescue NameError
-                  false
-                end
-      
-      unless name_ok
-        name = "#{self.name.split('::').last}_#{@@inst_count += 1}"
-        clazz = Qipowl::Bowlers.const_set(name, Class.new(self))
-      end
-
-      clazz.new.parse_and_roll str
-    end
-    
-  private
-    # Constructs opening html tag for the input given.
-    # 
-    # To construct `abbr` tag with `title` _Title_ and class _default_:
-    # 
-    #     opening :abbr, { :title=>'Title', :class=>'default' }
-    # 
-    # @param [String] tag to produce opening tag string from.
-    # @param [Hash] params to be put into opening tag as attributes. 
-    # @return [String] opening tag for the input given.
-    def opening tag, params={}
-      tag, *clazz = tag.to_s.split('†')
-      clazz = clazz.vacant? ? nil : " class='#{clazz.join(' ').gsub(/_/, '-')}'"
-      attrs = params.inject("") { |m, k| m.prepend " #{k.first}='#{k.last}'" }
-      "\n<#{tag}#{clazz}#{attrs}>"
-    end
-    
-    # Constructs closing html tag for the input given.
-    # 
-    # @param [String] tag to produce closing tag string from.
-    # @return [String] opening tag for the input given.
-    def closing tag
-      "</#{tag.to_s.split('†').first}>\n"
-    end
-
-    # (see opening)
-    # Acts most like an {#opening} method, but closes an element inplace
-    # (used for `hr`, `br`, `img`).
-    def standalone tag, params={}
-      opening(tag, params).sub('>', '/>')
-    end
-
-    # Constructs valid tag for the input given, concatenating
-    # opening and closing tags around the text passed in `args`.
-    # 
-    # @param [String] tag to produce html tag string from.
-    # @param [Hash] params to be put into opening tag as attributes. 
-    # @param [Array] args the words, to be tagged around. 
-    # @return [String] opening tag for the input given.
-    def tagify tag, params, *args
-      text = [*args].join(SEPARATOR)
-      text.vacant? ? '' : "#{opening tag, params}#{text}#{closing tag}"
-    end
-
-    # Produces html paragraph tag (`<p>`) with class `owl`.
-    # @see Qipowl::Bowler#orphan
-    # @param str the words, to be put in paragraph tag.
-    # @return [String] tagged words.
-    def orphan str
-      tagify(:p, {:class => 'owl'}, str.to_s.strip)
-    end
-
-    # Computes the level of the `:linewide` element by counting
-    # preceeding non-breakable spaces. For instance, nested lists
-    # are produced by appending `"\u{00A0}"` to the line item
-    # DSL tag: 
-    # 
-    #     li = "• li1 \u{00A0}• nested 1 \u{00A0}• nested 2 • li2"
-    #     
-    # @param [Symbol|String] oper the DSL symbol to get the level information for.
-    # @return [Integer] the level requested. 
-    #
-    def level oper
-      (oper = oper.to_s).gsub(/#{String::NBSP}/, '').empty? ?
-        -1 : (0..oper.length-1).each { |i| break i if oper[i] != String::NBSP }
-    end
-
-    # @see Qipowl::Bowler#harvest
-    # 
-    # Additionally it checks if there was a `:linewide` item, requiring
-    # surrounding html element (like `<ul>` aroung several `<li>`s.)
-    # 
-    # @param [Symbol] callee of method
-    # @param [String] str to be harvested
-    def harvest callee, str
-      if callee.nil? || callee != @callee
-        level(callee).downto(level(@callee) + 1) { |i|
-          str += i.␚ify
-        } if @mapping.enclosures(callee)
-
-        if prev_enclosure = @mapping.enclosures(@callee)
-          level(@callee).downto(level(callee) + 1) { |i|
-            @yielded.last.sub!(/\A/, opening(prev_enclosure))
-            @yielded.each { |s| s.gsub!(/#{i.␚ify}/) { closing(prev_enclosure) } }
-          }
-        end
-        
-        @callee = callee
-      end
-      super callee, str
-    end
     
     # @see {Qipowl::Bowler#defreeze}
     # 

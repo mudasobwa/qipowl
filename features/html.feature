@@ -116,3 +116,16 @@ Feature: All the possibilities of HTML parser
         | "Here **bold** goes" | "<p>Here <strong>bold</strong> goes</p>" |
         | "Here ~~del~~ goes" | "<p>Here <del>del</del> goes</p>" |
         | "Here `code` goes" | "<p>Here <code>code</code> goes</p>" |
+
+
+  Scenario Outline: Regular tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input               | output                             |
+        | "List: • li1 • li2" | "<p>List:</p> <ul class='fancy'><li>li1 </li> <li>li2</li></ul>" |
+        | "Data: ▶ dt — dd ▶ dt — dd" | "<p>Data:</p> <dl>␍<dt>dt</dt>␍<dd>dd </dd>␍ ␍<dt>dt</dt>␍<dd>dd</dd>␍</dl>" |
+        | "§1 Header" | "<h1>Header</h1>" |
