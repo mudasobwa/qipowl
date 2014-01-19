@@ -10,14 +10,12 @@ use Rack::Session::Pool, :expire_after => 2592000
 
 before do
   session[:typo] ||= Qipowl::Ruler.new_bowler "html"
-  puts '-'*60
-  puts session[:typo].class::ENTITIES
-  puts '-'*60
+  session[:mapping] ||= session[:typo].class::ENTITIES.rmerge({:custom => session[:typo].class::CUSTOM_TAGS}).to_json
 end
 
 get '/html/mapping' do
   content_type :json
-  session[:typo].class::ENTITIES.to_json
+  session[:mapping]
 end
 
 delete '/html/mapping/:key' do |key|
