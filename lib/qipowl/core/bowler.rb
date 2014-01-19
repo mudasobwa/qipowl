@@ -206,7 +206,7 @@ module Qipowl::Bowlers
     def block str
       result = str.dup
       self.class::BLOCK_TAGS.each { |tag, value|
-        result.gsub!(/(#{tag})\s*(\S*\s*|$)(.*?)(#{tag}|\Z)/m) {
+        result.gsub!(/(#{tag})\s*(\S*\s?|$)(.*?)(#{tag}|\Z)/m) {
           %Q{
 
 #{$1}('#{$2.strip}', '#{$3.carriage}')

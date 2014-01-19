@@ -33,18 +33,16 @@ module Qipowl
     instance_eval(&block)
   end
 
-  def self.tg__html
-    Html.new
-  end
-  
-  def self.tg_md__html
-    result = tg__html
-    result.merge_rules "#{File.dirname(__FILE__)}/tagmaps/markdown2html.yaml"
-    result
-  end
 end
 
 Qipowl::config do
   params :bowlers_dir
   bowlers_dir File.expand_path(File.join(__dir__, '..', 'config', 'bowlers'))
+end
+
+class Qipowl::Html
+  attr_reader :bowler
+  def self.parse s
+    (@bowler ||= Qipowl::Ruler.new_bowler "html").execute s
+  end
 end
