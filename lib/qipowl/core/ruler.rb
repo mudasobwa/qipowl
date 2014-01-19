@@ -57,9 +57,12 @@ module Qipowl
         
       @@yamls[yaml] = clazz.new
     end
+        
+    # FIXME Make contants PER-EIGENCLASS
     def teach_class clazz, mapper
       clazz.const_set("CUSTOM_TAGS", mapper.to_hash[:custom])
       clazz.const_set("ENCLOSURES_TAGS", mapper.to_hash[:enclosures])
+      clazz.const_set("ENTITIES", mapper.to_hash)
       clazz.const_set("TAGS", {})
       clazz.class_eval %Q{
         def ∃_enclosures entity
@@ -75,7 +78,7 @@ module Qipowl
       %w(block alone magnet grip regular).each { |section|
         clazz.const_set("#{section.upcase}_TAGS", mapper.entities[section.to_sym])
         clazz.class_eval %Q{
-          #{clazz}::TAGS.rmerge! #{clazz}::#{section.upcase}_TAGS
+          self::TAGS.rmerge! self::#{section.upcase}_TAGS
           def ∃_#{section} entity
             self.class::#{section.upcase}_TAGS.each { |k, v|
               next unless k == entity
