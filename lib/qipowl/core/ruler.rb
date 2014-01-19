@@ -62,7 +62,7 @@ module Qipowl
     def teach_class clazz, mapper
       clazz.const_set("CUSTOM_TAGS", mapper.to_hash[:custom])
       clazz.const_set("ENCLOSURES_TAGS", mapper.to_hash[:enclosures])
-      clazz.const_set("ENTITIES", mapper.to_hash)
+      clazz.const_set("ENTITIES", mapper.entities)
       clazz.const_set("TAGS", {})
       clazz.class_eval %Q{
         def ∃_enclosures entity
