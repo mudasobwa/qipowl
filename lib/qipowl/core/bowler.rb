@@ -133,7 +133,7 @@ module Qipowl::Bowlers
     end
 
     def roast str
-      (split str).reverse.map { |dish|
+      (split str).map { |dish|
         @yielded = []
         rest = begin
           eval(dish.strip.carriage)
@@ -148,7 +148,7 @@ module Qipowl::Bowlers
         end
         harvest(nil, orphan([*rest].join(SEPARATOR))) # FIXME Check if this is correct in all the cases
         @yielded.pop(@yielded.size).reverse.join(SEPARATOR)
-      }.reverse.join($/).uncarriage.un␚ify.unspacefy.unbowl
+      }.join($/).uncarriage.un␚ify.unspacefy.unbowl
     end
   
     def serveup str
