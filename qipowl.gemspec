@@ -36,5 +36,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'psych'
   s.add_dependency 'nokogiri'
   s.add_dependency 'htmlbeautifier'
+  s.add_dependency 'aquarium'
+  s.add_dependency 'crochets'
 end
 

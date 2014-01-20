@@ -3,6 +3,11 @@
 require_relative '../utils/hash_recursive_merge'
 
 module Qipowl
+  class ::Object
+    def is_one_of? *classes
+      !classes.each { |c| break false if c === self }
+    end
+  end
   class ::Array
     # Checks whether an array contains non-nil elements
     # @return +true+ if an array does not contain non-nils and +false+ otherwise
@@ -82,7 +87,7 @@ module Qipowl
       out
     end
     def spacefy!
-      self.gsub!(/ /, SYMBOL_FOR_SPACE)
+      self.gsub!(' ', SYMBOL_FOR_SPACE)
     end
     def spacefy
       (out = self.dup).spacefy!
@@ -109,11 +114,11 @@ module Qipowl
       self.gsub!(/\R/, " #{CARRIAGE_RETURN} ")
     end
     def uncarriage
-      self.gsub(/[[:blank:]]?#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+      self.gsub(/ #{CARRIAGE_RETURN} /, %Q(
 ))
     end
     def uncarriage!
-      self.gsub!(/[[:blank:]]?#{CARRIAGE_RETURN}[[:blank:]]?/, %Q(
+      self.gsub!(/ #{CARRIAGE_RETURN} /, %Q(
 ))
     end
 
@@ -131,6 +136,9 @@ module Qipowl
   end
   
   class ::Symbol
+    def dup
+      self.to_s.dup.to_sym
+    end
     def bowl
       self.to_s.bowl.to_sym
     end
@@ -156,5 +164,5 @@ module Qipowl
       "␚#{self}␚"
     end
   end
-    
+  
 end

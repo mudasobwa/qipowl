@@ -1,20 +1,16 @@
 # encoding: utf-8
 
-require 'yaml'
-require 'uri'
-
 require_relative 'monkeypatches'
 require_relative '../utils/logging'
-require_relative '../core/mapping'
 
 # @author Alexei Matyushkin
-module Qipowl
+module Qipowl::Bowlers
 
   # Base class for all the parsers.
   #
   # Technically it may be instantiated, but that’s meaningless.
   # Main operation method for it and all the descendants is
-  # {#parse_and_roll}. It sequentially executes following
+  # {#parse}. It sequentially executes following
   # private methods:
   #
   # - {#defreeze}
@@ -37,45 +33,14 @@ module Qipowl
   class Bowler
     include TypoLogging
     
-    # The last interpreted input string and it′s result of evaluation
-    # respectively.
-    attr_reader :in, :out, :mapping
-
+    attr_reader :in, :out
+    
     # Internal constant for joining/splitting the strings during processing.
     # Override on your own risk. I can′t imagine why you would need to do so.
     SEPARATOR = $, || ' '
 
-    # Main execution method.
-    #
-    # @param [String] str the string to be processed
-    # @return [String] the result of string evaluation
-    def parse_and_roll str
-      serveup roast defreeze @in = str
-    end
-
-    # @param [String] file name of file to read rules from, defaults to the class name of the caller class.
-    def initialize file = nil
-      rules = self.class.name.downcase.split('::').last.split('_').first
-      fname = "#{File.dirname(__FILE__)}/../../tagmaps/#{rules}.yaml"
-      file = fname if !file && File.exist?(fname)
-      
-      @mapping = Mapping.new(self.class, file ? file : nil)
-    end
-
-    # (see Mapping#merge!)
-    # Helper method to add custom DSL description to processing.
-    #
-    # In case one wants `☢` symbol to be treated as markup for warnings,
-    # the only thing needed is to add the respective line to YAML rules.
-    # Since “warning” behaves exactly as the paragraph, but has the “special
-    # class” in terms of HTML, all we need is to do:
-    #
-    #     tg = Qipowl::Html.new
-    #     tg.mapping.merge! { :linewide => { :☢ => :p†warning }}
-    def merge_rules other
-      @mapping.merge! other
-#    rescue
-#      logger.error "Inconsistent call to `merge_rules`. Param: #{other}."
+    def execute str
+      @out = (serveup roast defreeze @in = str)
     end
 
     # Everything is a DSL, remember?
@@ -90,6 +55,7 @@ module Qipowl
     #
     # @return the constant name as is
     def self.const_missing name
+      raise "There was CONST [#{name}] met. Stupid programming error."
       name
     end
 
@@ -102,8 +68,94 @@ module Qipowl
         if self.private_methods.include?(:special_handler)
       [method, args].flatten
     end
+        
+    # Adds new +entity+ in the section specified.
+    # E. g., call to
+    #
+    #     add_spice :linewide, :°, :deg, :degrees
+    #
+    # in HTML implementation adds a support for specifying something like:
+    #
+    #     ° 15
+    #     ° 30
+    #     ° 45
+    #
+    # which is to be converted to the following:
+    #
+    #     <degrees>
+    #       <deg>15</deg>
+    #       <deg>30</deg>
+    #       <deg>45</deg>
+    #     </degrees>
+    #
+    # @param [Symbol] section the section (it must be one of {Mapping.SPICES}) to add new key to
+    # @param [Symbol] key the name for the key
+    # @param [Symbol] value the value
+    # @param [Symbol] enclosure_value optional value to be added for the key into enclosures section
+    def add_entity section, key, value, enclosure_value = null
+      if (tags = self.class.const_get("#{section.upcase}_TAGS"))
+        key = key.bowl.to_sym
+        tags[key] = value.to_sym
+        self.class.const_get("ENCLOSURES_TAGS")[key] = enclosure_value.to_sym if enclosure_value
+        self.class.class_eval %Q{
+          alias_method :#{key}, :∀_#{section}
+        } # unless self.class.instance_methods(true).include?(key.bowl)
+      else
+        logger.warn "Trying to add key “#{key}” in an invalid section “#{section}”. Ignoring…"
+      end
+    end
 
-  private
+    # Removes key from both {Mapping.SPICES} and {Mapping.SALT}. See {#add_spice}
+    #
+    # @param [Symbol] key the key to be removed
+    def remove_entity key
+      %w(block alone magnet grip regular).each { |section|
+        next unless send :"∃_#{section}_tag", key.to_sym
+        
+        self.class.const_get("#{section.upcase}_TAGS").delete key
+        self.class.const_get("ENCLOSURES_TAGS").delete key
+        self.class.class_eval %Q{
+          remove_method :#{key.bowl}
+        }
+      }
+    end
+
+
+  protected
+    %w(block alone magnet grip regular).each { |section|
+      define_method "∀_#{section}".to_sym, ->(*args) {
+        raise "Default method for #{section} (“#{self.class.name.gsub(/_\d+\Z/, '')}#∀_#{section}”) MUST be defined"
+      }
+    }
+
+    def defreeze str
+      str
+    end
+
+    def roast str
+      (split str).map { |dish|
+        @yielded = []
+        rest = begin
+          eval(dish.strip.carriage)
+        rescue Exception => e
+          msg = e.message.dup
+          logger.error '='*78
+          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Dish follows:"
+          logger.error '-'*78
+          logger.error dish
+          logger.error '='*78
+          [*dish]
+        end
+        harvest(nil, orphan([*rest].join(SEPARATOR))) # FIXME Check if this is correct in all the cases
+        @yielded.pop(@yielded.size).reverse.join(SEPARATOR)
+      }.join($/).uncarriage.un␚ify.unspacefy.unbowl
+    end
+  
+    def serveup str
+      str.gsub(/⌦./, '').gsub(/.⌫/, '')
+    end
+
+  protected
     # The handler of the last “orphaned” text block in the input string.
     #
     # E.g.:
@@ -148,102 +200,52 @@ module Qipowl
       @yielded << str unless str.vacant?
       nil
     end
+  
+  private
+    # Prepares blocks in the input for the execution
+    def block str
+      result = str.dup
+      self.class::BLOCK_TAGS.each { |tag, value|
+        result.gsub!(/(#{tag})\s*(\S*\s?|$)(.*?)(#{tag}|\Z)/m) {
+          %Q{
 
-    # Preprocessor of input string. The best candidate to override in
-    # descendants in case of input should be slightly “normalized”.
-    # By default it {String#bowl}es the input, substituting
-    # ASCII symbols like letters, digits, dots, commas and parenthesis
-    # to the same symbols within fullwidth latin set (`U+FF01` — `U+FFFF`).
-    # Now it’s safe to have input string, containing,
-    # say, `I like eval` text inside.
-    #
-    # Html parser, for instances, utilizes this method to provide support
-    # for human-readable link representation:
-    #
-    #     — Wikipedia, http://wikipedia.org
-    #
-    # which is hardly DSL-able as is. {#defreeze} there parses the input
-    # and substitutes those links with “well-formed”:
-    #
-    #     ⚓http://wikipedia.org Wikipedia⚓
-    #
-    # @todo Make this configurable
-    #
-    # @param [String] str string to prepare for {#roast}
-    # @return [String] preprocessed string
-    def defreeze str
-      out = str.dup
-      @mapping[:synsugar].each { |re, subst|
-        out.gsub!(/#{re}/, subst)
-      } if @mapping[:synsugar]
+#{$1}('#{$2.strip}', '#{$3.carriage}')
 
-      out.bowl!
-
-      @mapping[:handshake].each { |k, v|
-        v = Hash[[[:tag, v]]] if Symbol === v
-        %i(from till).each { |key|
-          v[key] = :space unless v[key]
-          v[key] =  case v[key] # FIXME. That’s ugly. Invent the right way!!!
-                    when :space then '\S'
-                    when :dot   then "[^#{'.'.bowl}]"
-                    when :comma then "[^#{','.bowl}]"
-                    when :colon then "[^#{':'.bowl}]"
-                    when :eol   then '.'
-                    when :punctuation then "[^#{'.,;:!?'.bowl}]"
-                    else '.'
-                    end
+}
         }
-        out = out.split(/\R/).map { |line|
-          line.gsub(/(#{v[:from]}*\s*)#{k.bowl}(\s*#{v[:till]}*)/) {
-            from, till = $~[1,2]
-            " #{k.bowl} #{from.spacefy} #{till.spacefy} "
-          }
-        }.join("\n")
-      } if @mapping[:handshake]
-
-      out
+      }
+      result
     end
 
-    # …Drum-roll… Main handler.
-    #
-    # It splits the input into array of “paragraphs” (by empty lines,
-    # `/\R{2}/` in terms of Ruby regexps.) Then it applies syntactic sugar
-    # substitutes from rules file. After all it `eval`s input content.
-    #
-    # Yes, the backbone call in this method is call to `eval (input)`.
-    #
-    # @param [String] str the input string. NB! It might be dangerous to call this method
-    #   without preceeding call to {#defreeze} (mainly {String#bowl} on input inside {#defreeze}).
-    # @return [String] roasted input. It still requires to be {String#unbowl}ed.
-    def roast str
-      @yielded = []
-      courses = str.split(/\R{2,}/).reverse
-      courses.each { |dish|
-        rest = begin
-          eval(dish.strip.carriage)
-        rescue Exception => e
-          msg = e.message.dup
-          logger.error '='*78
-          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}], will return as is… Dish follows:"
-          logger.error '-'*78
-          logger.error dish
-          logger.error '='*78
-          [*dish]
-        end
-        harvest(nil, orphan([*rest].join(SEPARATOR)))
-      } unless courses.nil?
-      @yielded.reverse.join($/)
+    # Prepares customs in the input for the execution
+    def custom str
+      result = str.unbowl.dup
+      self.class::CUSTOM_TAGS.each { |tag, value|
+        result.gsub!(/#{tag}/, value)
+      }
+      result.bowl
     end
 
-    # Post-processing of roasted input. By default it simply {String#unbowl}s
-    # the result and returns it. It there were some addition handling made
-    # in {#defreeze} it’s the right place to revert it back.
-    #
-    # @param [String] str roasted output.
-    # @return [String] the result of processing.
-    def serveup str
-      @out = str.uncarriage.un␚ify.unspacefy.unbowl
+    # Prepares grips in the input for the execution
+    # FIX<E There is a problem: we append a trailing space, need to remove it later!!
+    def grip str
+      result = str.dup
+      self.class::GRIP_TAGS.each { |tag, value|
+        result.gsub!(/(?:#{tag})(.*?)(?:#{tag})/m) {
+          next if (args = $1).vacant?
+          tag = value[:marker] if Hash === value && value[:marker]
+          "⌦ #{tag} #{args}#{tag}∎⌫"
+        }
+      }
+      result
     end
-
+    
+    def split str
+      (block str.bowl).split(/\R{2,}/).map { |para|
+        para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/ ?
+          para : (grip custom para)
+      }
+    end
+    
   end
 end
