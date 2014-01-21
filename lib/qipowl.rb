@@ -4,7 +4,9 @@ require_relative "qipowl/version"
 require_relative "qipowl/core/mapper"
 require_relative "qipowl/core/ruler"
 require_relative "qipowl/core/bowler"
+
 require_relative "qipowl/bowlers/html"
+require_relative "qipowl/bowlers/typo_ru"
 #require_relative "qipowl/bowlers/cmd"
 #require_relative "qipowl/bowlers/yaml"
 

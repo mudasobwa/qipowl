@@ -23,6 +23,15 @@ Feature: All the possibilities of HTML parser
         | "here λ≡code bold≡λ goes"     | "<p>here <code><strong>code bold</strong></code> goes</p>" |
         | "Hello, ≈World≈!"              | "<p>Hello, <em>World</em>!</p>" |
 
+  Scenario Outline: Inplace tags nested
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should NOT equal to <output>
+
+    Examples:
+        | input                            | output                             |
+        | "here ≡nested ≡bold≡ tags≡ go" | "<p>here <strong>nested <strong>bold</strong> tags</strong> goes</p>" |
 
   Scenario Outline: Alone tags
     Given we use "html" bowler
@@ -42,7 +51,7 @@ Feature: All the possibilities of HTML parser
     Then the result should equal to
     """
     
-    <pre class='ruby'>@mapping[:block] = ≡bold≡ </pre>
+    <pre class='ruby'>@mapping[:block] = ≡bold≡</pre>
     """
 
   Scenario: Block tag ✍
@@ -188,7 +197,6 @@ Feature: All the possibilities of HTML parser
     And the execute method is called on bowler
     Then the result should equal to
     """
-    
     
     <p>Nice?</p>
     """

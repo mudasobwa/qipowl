@@ -76,6 +76,7 @@ module Qipowl
         end
       }
       %w(block alone magnet grip regular).each { |section|
+        next unless mapper.entities && mapper.entities[section.to_sym]
         clazz.const_set("#{section.upcase}_TAGS", mapper.entities[section.to_sym])
         clazz.class_eval %Q{
           self::TAGS.rmerge! self::#{section.upcase}_TAGS
@@ -96,7 +97,7 @@ module Qipowl
           tag = Hash === value && value[:marker] ? value[:marker] : "∀_#{section}"
           clazz.class_eval %Q{
             alias_method :#{key}, :#{tag}
-          } unless clazz.instance_methods.include?(key)
+          } unless clazz.instance_methods.include?(key.to_sym)
         }
       }
       clazz.class_eval %Q{

@@ -1,5 +1,8 @@
+# encoding: utf-8
+
 Given(/^we use "(.*?)" bowler$/) do |f|
 #  @f = "config/bowlers/#{f}.yaml"
+  f = "#{f}#{@suffix}" unless @suffix.nil? 
   @bowler = Qipowl::Ruler.new_bowler f
 end
 

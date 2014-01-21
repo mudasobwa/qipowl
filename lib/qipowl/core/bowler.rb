@@ -68,7 +68,7 @@ module Qipowl::Bowlers
         if self.private_methods.include?(:special_handler)
       [method, args].flatten
     end
-        
+
     # Adds new +entity+ in the section specified.
     # E. g., call to
     #
@@ -125,7 +125,7 @@ module Qipowl::Bowlers
     %w(block alone magnet grip regular).each { |section|
       define_method "∀_#{section}".to_sym, ->(*args) {
         raise "Default method for #{section} (“#{self.class.name.gsub(/_\d+\Z/, '')}#∀_#{section}”) MUST be defined"
-      }
+      } unless Bowler.instance_methods(true).include?("∀_#{section}".to_sym)
     }
 
     def defreeze str
@@ -136,11 +136,11 @@ module Qipowl::Bowlers
       (split str).map { |dish|
         @yielded = []
         rest = begin
-          eval(dish.strip.carriage)
+          eval(dish.bowl.carriage)
         rescue Exception => e
           msg = e.message.dup
           logger.error '='*78
-          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Dish follows:"
+          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Dish follows:\n\n"
           logger.error '-'*78
           logger.error dish
           logger.error '='*78
@@ -204,12 +204,13 @@ module Qipowl::Bowlers
   private
     # Prepares blocks in the input for the execution
     def block str
+      return str unless self.class.const_defined?(:BLOCK_TAGS)
       result = str.dup
       self.class::BLOCK_TAGS.each { |tag, value|
         result.gsub!(/(#{tag})\s*(\S*\s?|$)(.*?)(#{tag}|\Z)/m) {
           %Q{
 
-#{$1}('#{$2.strip}', '#{$3.carriage}')
+#{$1} #{$2.strip.bowl} #{$3.bowl.carriage}
 
 }
         }
@@ -219,17 +220,19 @@ module Qipowl::Bowlers
 
     # Prepares customs in the input for the execution
     def custom str
-      result = str.unbowl.dup
+      return str unless self.class.const_defined?(:CUSTOM_TAGS)
+      result = str.dup
       self.class::CUSTOM_TAGS.each { |tag, value|
         result.gsub!(/#{tag}/, value)
       }
-      result.bowl
+      result
     end
 
     # Prepares grips in the input for the execution
     # FIX<E There is a problem: we append a trailing space, need to remove it later!!
     def grip str
-      result = str.dup
+      return str unless self.class.const_defined?(:GRIP_TAGS)
+      result = str.bowl
       self.class::GRIP_TAGS.each { |tag, value|
         result.gsub!(/(?:#{tag})(.*?)(?:#{tag})/m) {
           next if (args = $1).vacant?
@@ -237,12 +240,13 @@ module Qipowl::Bowlers
           "⌦ #{tag} #{args}#{tag}∎⌫"
         }
       }
-      result
+      result.unbowl
     end
     
     def split str
-      (block str.bowl).split(/\R{2,}/).map { |para|
-        para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\(/ ?
+      (block str).split(/\R{2,}/).map { |para|
+        self.class.const_defined?(:BLOCK_TAGS) &&
+              (para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\s+/) ?
           para : (grip custom para)
       }
     end

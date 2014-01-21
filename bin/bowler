@@ -12,7 +12,7 @@ OptionParser.new do |opts|
 
   # Bowl result?
   opts.on("-a", "--action ACTION", [:bowl, :ruby, :cmd, :yaml, :html],
-          "Action to apply on input (bowl, ruby, cmd, yaml, html); default: html") do |action|
+          "Action to apply on input (bowl, html); default: html") do |action|
     options[:action] = action || :bowl
   end
 
@@ -31,14 +31,6 @@ file_or_string = File.read(file_or_string) if File.exist?(file_or_string)
 case options[:action]
 when :bowl
   puts file_or_string.bowl
-when :ruby
-  puts Qipowl::Mapping.new(nil, file_or_string).to_ruby
-when :html
-  puts Qipowl::Html.parse file_or_string
-when :cmd
-  puts Qipowl::Cmd.execute file_or_string
-when :yaml
-  puts Qipowl::Yaml.parse file_or_string
 else
   puts Qipowl::Html.parse file_or_string
 end  

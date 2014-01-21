@@ -4,9 +4,14 @@ require 'net/http'
 require 'htmlbeautifier'
 
 require_relative '../core/bowler'
-require_relative '../bowlers/htmldoc'
 
 module Qipowl
+  module Mappers
+    class HtmlBowlerMapper < BowlerMapper
+      
+    end
+  end
+
   # Module placeholder for dynamically created bowlers
   module Bowlers
     class Html < Bowler
@@ -18,8 +23,7 @@ module Qipowl
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with trimmed `grip` tag
       def ∀_grip *args
-        text = [*args].join(SEPARATOR)
-        mine, rest = text.split("#{__callee__}∎", 2)
+        mine, rest = [*args].join(SEPARATOR).split("#{__callee__}∎", 2)
         [tagify(∃_grip_tag(__callee__), {:class => ∃_grip(__callee__)[:class]}, mine), rest]
       end
 
@@ -35,12 +39,14 @@ module Qipowl
       # @param [String] param the text to be places on the same string as
       # opening tag
       # @return [Nil] nil
-      def ∀_block param, args
+      def ∀_block *args
+        param, *args = args.flatten
+        param = param.to_s
         harvest __callee__, 
                 tagify(
                   ∃_block_tag(__callee__), 
                   {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
-                  args.hsub(String::HTML_ENTITIES)
+                  args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
                 )
       end
   

@@ -37,7 +37,7 @@ module Qipowl::Mappers
       @hash.rmerge!(input.to_hash)
       incs.each { |inc|
         merge! inc
-      } rescue NoMethodError
+      } rescue NoMethodError # FIXME WTF rescueing here?
     end
   private
   # FIXME Make file search more flexible!!!
@@ -49,6 +49,8 @@ module Qipowl::Mappers
   end
   
   class BowlerMapper < Mapper
+    include TypoLogging
+    
     def initialize input = nil
       input = self.class.name.split('::').last.downcase.gsub(/bowlermapper\Z/, '') if input.nil?
       super input
@@ -57,7 +59,7 @@ module Qipowl::Mappers
     @entities_dirty = true
 
     def entities
-      return @entities unless @entities_dirty
+      return @entities unless @entities_dirty && @hash[:entities]
       @entities = {}
       @hash[:entities].each { |key, value| # :block. :alone etc
         @entities[key] ||= {}
@@ -77,10 +79,6 @@ module Qipowl::Mappers
       @entities_dirty = false
       @entities
     end
-  end
-  
-  class HtmlBowlerMapper < BowlerMapper
-    
   end
 end
   
