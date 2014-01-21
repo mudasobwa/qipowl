@@ -223,7 +223,7 @@ module Qipowl::Bowlers
       return str unless self.class.const_defined?(:CUSTOM_TAGS)
       result = str.dup
       self.class::CUSTOM_TAGS.each { |tag, value|
-        result.gsub!(/#{tag}/, value)
+        result.gsub!(/#{tag}/m, value)
       }
       result
     end
