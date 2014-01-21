@@ -1,0 +1,16 @@
+# encoding: utf-8
+
+:entities      :
+  :regular     :
+    '.'        : :dot
+    ','        : :comma
+    ':'        : :colon
+    ';'        : :semicolon
+    '¡'        : :exclm_start
+    '!'        : :exclm_end
+    '¿'        : :quest_start
+    '?'        : :quest_end
+
+:custom        :
+  '([.,:;?!])(?=\s|\Z)' : ' \1 '
+  '(?<=\s|\A)([¿¡])' : ' \1 '
