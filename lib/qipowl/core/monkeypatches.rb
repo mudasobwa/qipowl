@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require_relative '../utils/unicode_strings'
 require_relative '../utils/hash_recursive_merge'
 
 module Qipowl

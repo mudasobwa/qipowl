@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in typogrowl.gemspec
 gemspec
 
-gem 'htmlbeautifier', :git => 'https://github.com/threedaymonk/htmlbeautifier'
 gem 'aquarium', '~> 0.6', :git => 'git://github.com/deanwampler/Aquarium.git'
 gem "crochets", :git => 'git://github.com/mudasobwa/crochets.git'
 

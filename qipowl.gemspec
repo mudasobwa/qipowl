@@ -34,8 +34,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'yard-cucumber'
 
   s.add_dependency 'psych'
-  s.add_dependency 'nokogiri'
-  s.add_dependency 'htmlbeautifier'
+  s.add_dependency 'unicode'
+  s.add_dependency 'typogrowth'
   s.add_dependency 'aquarium'
   s.add_dependency 'crochets'
 end
