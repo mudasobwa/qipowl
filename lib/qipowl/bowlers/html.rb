@@ -69,6 +69,12 @@ module Qipowl
                 )
       end
     
+      # `:self` default handler
+      # @param [Array] args the words, gained since last call to {#harvest}
+      def ∀_self *args
+        [tagify(∃_self_tag(__callee__), {:class => ∃_self(__callee__)[:class]}, __callee__), args]
+      end
+    
 ##############################################################################
 ###              Grip :: Specific handlers                                 ###
 ##############################################################################

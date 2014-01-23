@@ -10,6 +10,8 @@
   - 'markdown2html'
 
 :entities       :
+  :self         :
+    :qipowl     : :strong
   :block        :
     :✍             :
       :synonyms :

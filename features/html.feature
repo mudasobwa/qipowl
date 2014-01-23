@@ -141,6 +141,16 @@ Feature: All the possibilities of HTML parser
         | "§1 Header" | "<h1>Header</h1>" |
         | "〉 Blockquote" | "<blockquote><p class='blockquote'>Blockquote</p></blockquote>" |
         
+  Scenario Outline: Self tags
+    Given we use "html" bowler
+    When the input string is <input>
+    And the execute method is called on bowler
+    Then the result should equal to <output>
+
+    Examples:
+        | input                        | output                                     |
+        | "here qipowl goes"           | "<p>here <strong>qipowl</strong> goes</p>" |
+
   Scenario: Address tag
     Given we use "html" bowler
     When the input string is "℁  ≡Twitter≡ ⏎  ☎ +1(987)5554321 ⏎  ✉ info@twitter.com"

@@ -1,7 +1,9 @@
 # encoding: utf-8
 
-require_relative 'monkeypatches'
+require_relative "../constants"
 require_relative '../utils/logging'
+
+require_relative 'monkeypatches'
 
 # @author Alexei Matyushkin
 module Qipowl::Bowlers
@@ -109,10 +111,11 @@ module Qipowl::Bowlers
     #
     # @param [Symbol] key the key to be removed
     def remove_entity key
-      %w(block alone magnet grip regular).each { |section|
+      Qipowl::ENTITIES.each { |section|
+        next unless (curr_sect = self.class.const_get("#{section.upcase}_TAGS") rescue nil)
         next unless send :"∃_#{section}_tag", key.to_sym
         
-        self.class.const_get("#{section.upcase}_TAGS").delete key
+        curr_sect.delete key
         self.class.const_get("ENCLOSURES_TAGS").delete key
         self.class.class_eval %Q{
           remove_method :#{key.bowl}
@@ -122,7 +125,7 @@ module Qipowl::Bowlers
 
 
   protected
-    %w(block alone magnet grip regular).each { |section|
+    Qipowl::ENTITIES.each { |section|
       define_method "∀_#{section}".to_sym, ->(*args) {
         raise "Default method for #{section} (“#{self.class.name.gsub(/_\d+\Z/, '')}#∀_#{section}”) MUST be defined"
       } unless Bowler.instance_methods(true).include?("∀_#{section}".to_sym)

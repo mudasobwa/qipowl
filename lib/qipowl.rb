@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 require_relative "qipowl/version"
+require_relative "qipowl/constants"
+
 require_relative "qipowl/core/mapper"
 require_relative "qipowl/core/ruler"
 require_relative "qipowl/core/bowler"

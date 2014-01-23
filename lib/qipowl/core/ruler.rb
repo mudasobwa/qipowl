@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require_relative "../constants"
 require_relative '../utils/logging'
 
 # @author Alexei Matyushkin
@@ -75,7 +76,7 @@ module Qipowl
           nil
         end
       }
-      %w(block alone magnet grip regular).each { |section|
+      Qipowl::ENTITIES.each { |section|
         next unless mapper.entities && mapper.entities[section.to_sym]
         clazz.const_set("#{section.upcase}_TAGS", mapper.entities[section.to_sym])
         clazz.class_eval %Q{
