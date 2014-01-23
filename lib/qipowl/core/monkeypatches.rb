@@ -115,11 +115,11 @@ module Qipowl
       self.gsub!(/\R/, " #{CARRIAGE_RETURN} ")
     end
     def uncarriage
-      self.gsub(/ #{CARRIAGE_RETURN} /, %Q(
+      self.gsub(/\s?#{CARRIAGE_RETURN}\s?/, %Q(
 ))
     end
     def uncarriage!
-      self.gsub!(/ #{CARRIAGE_RETURN} /, %Q(
+      self.gsub!(/\s?#{CARRIAGE_RETURN}\s?/, %Q(
 ))
     end
 

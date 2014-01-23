@@ -74,18 +74,20 @@
       :tag      : :p
       :class    : :lead
     :☆             :
-      :tag      : :p
-      :class    : :text_muted
-    :★             : :em
+      :tag      : :span
+      :class    : :'text-warning'
+    :★             :
+      :tag      : :span
+      :class    : :'label label-info'
     :☛             :
       :tag      : :p
-      :class    : :text_success
+      :class    : :'text-success'
     :☞             :
       :tag      : :p
-      :class    : :text_info
+      :class    : :'text-info'
     :☣             :
       :tag      : :p
-      :class    : :text_warning
+      :class    : :'text-warning'
     :☢             :
       :tag      : :p
       :class    : :text_danger

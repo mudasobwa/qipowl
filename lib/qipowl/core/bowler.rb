@@ -46,7 +46,7 @@ module Qipowl::Bowlers
     # Everything is a DSL, remember?
     #
     # @return true
-    def respond_to?(method)
+    def respond_to? method, incl_priv = false
       true
     end
 
