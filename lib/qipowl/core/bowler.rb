@@ -143,7 +143,10 @@ module Qipowl::Bowlers
         rescue Exception => e
           msg = e.message.dup
           logger.error '='*78
-          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Dish follows:\n\n"
+          logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Backtrace:\n"
+          logger.error e.backtrace.join("\n")
+          logger.error '-'*78
+          logger.error "Dish follows:\n"
           logger.error '-'*78
           logger.error dish
           logger.error '='*78
