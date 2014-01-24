@@ -70,8 +70,9 @@ module Qipowl::Mappers
             @entities[key][k.bowl].delete(:synonyms) 
             # Append explicit synonyms
             v[:synonyms].each { |syn|
-              (@entities[key][syn.bowl] = v.dup).delete(:synonyms)
-              @entities[key][syn.bowl][:marker] = k.bowl
+              syn = syn.bowl.to_sym
+              (@entities[key][syn] = v.dup).delete(:synonyms)
+              @entities[key][syn][:marker] = k.bowl
             } if v[:synonyms]
           end
         }

@@ -144,7 +144,7 @@ module Qipowl::Bowlers
           msg = e.message.dup
           logger.error '='*78
           logger.error "Could not roast dish [#{msg.force_encoding(Encoding::UTF_8)}].\nWill return as is… Backtrace:\n"
-          logger.error e.backtrace.join("\n")
+          logger.error e.backtrace.take(Qipowl::BTRACE_COUNT).join("\n")
           logger.error '-'*78
           logger.error "Dish follows:\n"
           logger.error '-'*78

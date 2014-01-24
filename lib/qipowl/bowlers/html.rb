@@ -73,9 +73,31 @@ module Qipowl
       # `:self` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       def ∀_self *args
-        [tagify(∃_self_tag(__callee__), {:class => ∃_self(__callee__)[:class]}, __callee__), args]
+        tag, data = [∃_self_tag(__callee__), ∃_self(__callee__)]
+        text = case data[:format]
+               when NilClass then __callee__
+               when String then __callee__.to_s.gsub(/(#{__callee__})/, data[:format])
+#               when Regexp then __callee__.to_s.gsub(__callee__.to_s, data[:format])
+               when Symbol then send(data[:format], __callee__)
+               else raise "Bad format specified for #{tag}"
+               end
+        [tag ?
+          tagify(
+              ∃_self_tag(__callee__),
+              {:class => data[:class]},
+              text
+          ) : text, args]
       end
     
+##############################################################################
+###              Self :: Specific handlers                                 ###
+##############################################################################
+      # Handler for tags.
+      # @param [String] arg the word to be processed
+      # @return [Array] the array of words with procesed tag
+      def tagger_format tag
+        "<a href='/tags/#{tag}'>#{tag}</a>"
+      end
 ##############################################################################
 ###              Grip :: Specific handlers                                 ###
 ##############################################################################

@@ -11,7 +11,16 @@
 
 :entities       :
   :self         :
-    :qipowl     : :strong
+    :qipowl     :
+      :tag      : :strong
+      :format   : "<a href='http://\\1.github.com'>\\1</a>"
+    :tag        :
+      :format   : :tagger_format
+    :tag2       :
+      :tag      : :b
+      :format   : :tagger_format
+      :synonyms :
+        - :tag3
   :block        :
     :✍             :
       :synonyms :
