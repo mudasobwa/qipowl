@@ -72,13 +72,14 @@ module Qipowl
     
       # `:self` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
-      def ∀_self *args
+      def ∀_self *args, &cb
         data = ∃_self(__callee__)
+        cally = block_given? ? yield : __callee__
         text = case data[:format]
-               when NilClass then __callee__
-               when String then __callee__.to_s.gsub(/(#{__callee__})/, data[:format])
-#               when Regexp then __callee__.to_s.gsub(__callee__.to_s, data[:format])
-               when Symbol then send(data[:format], __callee__)
+               when NilClass then cally
+               when String then cally.to_s.gsub(/(#{cally})/, data[:format])
+#               when Regexp then cally.to_s.gsub(cally.to_s, data[:format])
+               when Symbol then send(data[:format], cally)
                else raise "Bad format specified for #{data[:tag]}"
                end
         [data[:tag] ? tagify(data[:tag], {:class => data[:class]}, text) : text, args]
@@ -242,7 +243,8 @@ module Qipowl
       end
 
       def normalize cally
-        cally.to_s.downcase.to_sym if cally.to_s.gsub(/p{L}/, '').empty?
+        scally = cally.to_s.unbowl
+        scally.gsub(/\p{L}/, '').empty? ? scally.downcase.bowl.to_sym : cally
       end
           
       # Produces html paragraph tag (`<p>`) with no class.
@@ -293,8 +295,7 @@ module Qipowl
           self.class.class_eval "alias_method :#{method}, :#{m}"
           send method, args, block
         elsif self.class.instance_methods.include?(m = (normalize method))
-          self.class.class_eval "alias_method :#{method}, :#{m}"
-          send method, args, block
+          send(m, args) { yield if block_given? ; method.to_s } 
         else
           [method, args].flatten
         end

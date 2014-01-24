@@ -150,6 +150,7 @@ Feature: All the possibilities of HTML parser
     Examples:
         | input                | output                                         |
         | "here qipowl goes"   | "<p>here <strong><a href='http://qipowl.github.com'>qipowl</a></strong> goes</p>"     |
+        | "here Qipowl goes"   | "<p>here <strong><a href='http://Qipowl.github.com'>Qipowl</a></strong> goes</p>"     |
         | "here tag goes"      | "<p>here <a href='/tags/tag'>tag</a> goes</p>" |
         | "here tag2 goes"     | "<p>here <b><a href='/tags/tag2'>tag2</a></b> goes</p>" |
         | "here tag3 goes"     | "<p>here <b><a href='/tags/tag3'>tag3</a></b> goes</p>" |
