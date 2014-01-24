@@ -73,20 +73,15 @@ module Qipowl
       # `:self` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       def ∀_self *args
-        tag, data = [∃_self_tag(__callee__), ∃_self(__callee__)]
+        data = ∃_self(__callee__)
         text = case data[:format]
                when NilClass then __callee__
                when String then __callee__.to_s.gsub(/(#{__callee__})/, data[:format])
 #               when Regexp then __callee__.to_s.gsub(__callee__.to_s, data[:format])
                when Symbol then send(data[:format], __callee__)
-               else raise "Bad format specified for #{tag}"
+               else raise "Bad format specified for #{data[:tag]}"
                end
-        [tag ?
-          tagify(
-              ∃_self_tag(__callee__),
-              {:class => data[:class]},
-              text
-          ) : text, args]
+        [data[:tag] ? tagify(data[:tag], {:class => data[:class]}, text) : text, args]
       end
     
 ##############################################################################
@@ -234,18 +229,22 @@ module Qipowl
       # 
       #     li = "• li1 \u{00A0}• nested 1 \u{00A0}• nested 2 • li2"
       #     
-      # @param [Symbol|String] callee the DSL symbol to get the level information for.
+      # @param [Symbol|String] cally the DSL symbol to get the level information for.
       # @return [Integer] the level requested. 
       #
-      def level callee
-        (callee = callee.to_s).gsub(/#{String::NBSP}/, '').empty? ?
-          -1 : (0..callee.length-1).each { |i| break i if callee[i] != String::NBSP }
+      def level cally
+        (cally = cally.to_s).gsub(/#{String::NBSP}/, '').empty? ?
+          -1 : (0..cally.length-1).each { |i| break i if cally[i] != String::NBSP }
       end
       
-      def canonize callee
-        callee.to_s.gsub(/^#{String::NBSP}*/, '').to_sym if callee
+      def canonize cally
+        cally.to_s.gsub(/^#{String::NBSP}*/, '').to_sym if cally
       end
 
+      def normalize cally
+        cally.to_s.downcase.to_sym if cally.to_s.gsub(/p{L}/, '').empty?
+      end
+          
       # Produces html paragraph tag (`<p>`) with no class.
       # @see Qipowl::Bowler#orphan
       # @param str the words, to be put in paragraph tag.
@@ -259,24 +258,24 @@ module Qipowl
       # Additionally it checks if there was a `:linewide` item, requiring
       # surrounding html element (like `<ul>` aroung several `<li>`s.)
       # 
-      # @param [Symbol] callee of method
+      # @param [Symbol] cally of method
       # @param [String] str to be harvested
-      def harvest callee, str
-        if callee.nil? || callee != @callee
-          level(callee).downto(level(@callee) + 1) { |i|
+      def harvest cally, str
+        if cally.nil? || cally != @cally
+          level(cally).downto(level(@cally) + 1) { |i|
             str += i.␚ify
-          } unless ∃_enclosures(canonize(callee)).nil?
+          } unless ∃_enclosures(canonize cally).nil?
   
-          if prev = ∃_enclosures(canonize(@callee))
-            level(@callee).downto(level(callee) + 1) { |i|
+          if prev = ∃_enclosures(canonize(@cally))
+            level(@cally).downto(level(cally) + 1) { |i|
               @yielded.last.sub!(/\A/, opening(prev[:tag], {:class => prev[:class]}))
               @yielded.each { |s| s.gsub!(/#{i.␚ify}/) { closing(prev[:tag]) } }
             }
           end
           
-          @callee = callee
+          @cally = cally
         end
-        super callee, str
+        super cally, str
       end
 
     private
@@ -290,11 +289,15 @@ module Qipowl
       # @return [Array] the array of words
       def special_handler method, *args, &block
         # Sublevel markers, e.g. “ •” is level 2 line-item
-        return [method, args].flatten \
-          unless level(method) > 0 && self.class::REGULAR_TAGS.keys.include?(canonize(method))
-        
-        self.class.class_eval "alias_method :#{method}, :#{canonize(method)}"
-        send method, args, block
+        if level(method) > 0 && self.class::REGULAR_TAGS.keys.include?(m = (canonize method))
+          self.class.class_eval "alias_method :#{method}, :#{m}"
+          send method, args, block
+        elsif self.class.instance_methods.include?(m = (normalize method))
+          self.class.class_eval "alias_method :#{method}, :#{m}"
+          send method, args, block
+        else
+          [method, args].flatten
+        end
       end
 
       # Constructs opening html tag for the input given.

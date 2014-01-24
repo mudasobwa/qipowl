@@ -198,11 +198,11 @@ module Qipowl::Bowlers
     # After we have this part of input processed, it should be considered
     # “done.” So block processors call {#harvest} to store processed parts.
     #
-    # @param [Symbol] callee of this method. Qipowl hardly relies on method namings and sometimes we may need to know if the call was made by, say, lineitem DSL (`•`), not datalist (`▷`).
+    # @param [Symbol] cally of this method. Qipowl hardly relies on method namings and sometimes we may need to know if the call was made by, say, lineitem DSL (`•`), not datalist (`▷`).
     # @param [String] str string to yield
     #
     # @return nil
-    def harvest callee, str
+    def harvest cally, str
       @yielded << str unless str.vacant?
       nil
     end
