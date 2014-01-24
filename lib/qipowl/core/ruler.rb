@@ -20,8 +20,6 @@ module Qipowl
     extend self
 
     @@bowlers = {} # FIXME REDIS!!!!
-    @@yamls = {}
-
     
     def get_bowler id: nil, type: nil
       @@bowlers[id] || new_bowler(type, true)
@@ -50,13 +48,11 @@ module Qipowl
       
   private
     def get_yaml yaml
-      return @@yamls[yaml] if @@yamls[yaml]
-      
       clazz = Qipowl::Mappers.const_get("#{yaml.capitalize}BowlerMapper")
       raise NameError.new("Invalid mapper type: #{clazz}") \
         unless clazz.is_a?(Class) && clazz < Qipowl::Mappers::BowlerMapper
         
-      @@yamls[yaml] = clazz.new
+      clazz.new
     end
         
     # FIXME Make contants PER-EIGENCLASS

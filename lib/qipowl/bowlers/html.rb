@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'net/http'
+require 'typogrowth'
 
 require_relative '../core/bowler'
 
@@ -197,6 +198,13 @@ module Qipowl
       alias_method :▷, :▶
 
     protected
+      # @see {Qipowl::Bowlers::Bowler#defreeze}
+      # 
+      # @param [String] str to be defreezed
+      def defreeze str
+        (super str)
+      end
+
       # Computes the level of the `:linewide` element by counting
       # preceeding non-breakable spaces. For instance, nested lists
       # are produced by appending `"\u{00A0}"` to the line item
@@ -214,6 +222,14 @@ module Qipowl
       
       def canonize callee
         callee.to_s.gsub(/^#{String::NBSP}*/, '').to_sym if callee
+      end
+
+      # Produces html paragraph tag (`<p>`) with no class.
+      # @see Qipowl::Bowler#orphan
+      # @param str the words, to be put in paragraph tag.
+      # @return [String] tagged words.
+      def orphan str
+        "#{tagify(:p, {}, str.to_s.strip)}"
       end
 
       # @see Qipowl::Bowler#harvest
@@ -259,13 +275,6 @@ module Qipowl
         send method, args, block
       end
 
-      # Produces html paragraph tag (`<p>`) with class `owl`.
-      # @see Qipowl::Bowler#orphan
-      # @param str the words, to be put in paragraph tag.
-      # @return [String] tagged words.
-      def orphan str
-        "#{tagify(:p, {}, str.to_s.strip)}"
-      end
       # Constructs opening html tag for the input given.
       # 
       # To construct `abbr` tag with `title` _Title_ and class _default_:
@@ -365,23 +374,6 @@ end
     
 
     
-    # @see {Qipowl::Bowler#defreeze}
-    # 
-    # Additionally it checks if tag is a `:block` tag and 
-    # substitutes all the carriage returns (`$/`) with special symbol
-    # {String::CARRIAGE_RETURN} to prevent format damage.
-    # 
-    # @param [String] str to be defreezed
-    def defreeze str
-      str = super str
-      @mapping[:block].each { |tag, htmltag|
-        str.gsub!(/(#{tag})(.*?)$(.*?)(#{tag}|\Z)/m) { |m|
-          "#{$1}('#{$2}', '#{$3}')\n\n"
-        }
-      }
-      str
-    end
-
     # @see {Qipowl::Bowler#serveup}
     #
     # Additionally it beatifies the output HTML
