@@ -27,14 +27,14 @@ module Qipowl::Mappers
       @hash
     end
     def merge! input
-      input = load_yaml(input) if input.is_one_of?(String, IO)
-      raise ArgumentError.new "Invalid map for merge in Mapper" \
-        unless input.respond_to? :to_hash        
+      map = load_yaml(input) if input.is_one_of?(String, IO)
+      raise ArgumentError.new "Invalid map (#{input} @ #{Qipowl.bowlers}) for merge in Mapper.\nCurrent dir: [#{Dir.pwd}].\n" \
+        unless map.respond_to? :to_hash        
 
-      incs = input.delete(:includes)
+      incs = map.delete(:includes)
 
       @entities_dirty = true
-      @hash.rmerge!(input.to_hash)
+      @hash.rmerge!(map.to_hash)
       incs.each { |inc|
         merge! inc
       } rescue NoMethodError # FIXME WTF rescueing here?
