@@ -34,7 +34,6 @@ end
 
 When(/^we request param "(.*?)"$/) do |param|
   @param_value = Qipowl["#{param}".to_sym]
-  puts "QQQ: #{@param_value}"
 end
 
 When(/^we add additional bowler directory "(.*?)"$/) do |dir|
