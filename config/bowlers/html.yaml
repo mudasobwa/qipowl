@@ -38,8 +38,6 @@
     :✉             :
       :tag      : :span
       :class    : :email
-      :synonyms :
-        - :mail
     :✎             : :lj
     :☇              : :a
   :grip         :
@@ -69,7 +67,7 @@
       :tag      : :dt
       :parent   :
         :tag    : :dl
-        :class  : :dl_horizontal
+        :class  : :'dl-horizontal'
     :℁            : :address
     :〉          :
       :tag      : :p
@@ -101,7 +99,7 @@
       :class    : :'text-warning'
     :☢             :
       :tag      : :p
-      :class    : :text_danger
+      :class    : :'text-danger'
     :✇             : :video
     :⚘             : :figure
     :✿_p_address :
@@ -136,6 +134,6 @@
   :▶ :     :dl
   :▷         :
     :tag   : :dl
-    :class : :dl_horizontal
+    :class : :'dl-horizontal'
   :〉       : :blockquote
 
