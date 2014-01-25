@@ -119,6 +119,7 @@ module Qipowl::Bowlers
 
         curr_sect.delete key
         self.class.const_get("ENCLOSURES_TAGS").delete key
+        self.class.const_get("ENTITIES")[section.to_sym].delete key
 
         self.class.class_eval %Q{
           remove_method :#{key.bowl}
