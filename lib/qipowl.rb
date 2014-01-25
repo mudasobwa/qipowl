@@ -18,30 +18,40 @@ Encoding.default_internal = Encoding::UTF_8
 module Qipowl
   extend self
 
-  # Basic single-method DSL with .parameter method
-  # being used to define a set of available settings.
-  # This method takes one or more symbols, with each one being
-  # a name of the configuration option.
-  def params *names
-    names.each do |name|
-      attr_accessor name
-      define_method name do |*values|
-        value = values.first
-        value ? self.send("#{name}=", value) : instance_variable_get("@#{name}")
-      end
-    end
-  end
-
   # A wrapper for the configuration block
-  def config &block
+  def configure &block
     instance_eval(&block)
   end
 
+  def [](key)
+    config[key.to_sym]
+  end
+
+private
+
+  def set(key, value)
+    config[key.to_sym] = value
+  end
+
+  def add(key, value)
+    config[key.to_sym] = [*config[key.to_sym]] << value
+  end
+
+  def config
+    @config ||= Hash.new
+  end
+
+  def method_missing(sym, *args)
+    if sym.to_s =~ /(.+)=$/
+      config[$1.to_sym] = args.first
+    else
+      config[sym.to_sym]
+    end
+  end
 end
 
-Qipowl::config do
-  params :bowlers_dir
-  bowlers_dir File.expand_path(File.join(__dir__, '..', 'config', 'bowlers'))
+Qipowl::configure do
+  set :bowlers, File.expand_path(File.join(__dir__, '..', 'config', 'bowlers'))
 end
 
 class Qipowl::Html

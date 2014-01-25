@@ -25,7 +25,7 @@ module Qipowl
       @@bowlers[id] || new_bowler(type, true)
     end
   
-    def new_bowler type, persistent = false
+    def new_bowler type, persistent: false, additional_maps: []
       yaml, clazz = \
         case type
         when Class
@@ -41,66 +41,71 @@ module Qipowl
       name = "#{clazz.name.split('::').last}_#{id}"
       clazz = Qipowl::Bowlers.const_set(name, Class.new(clazz))
 
-      teach_class clazz, get_yaml(yaml)
+      teach_class clazz, get_yaml(yaml, additional_maps: additional_maps)
 
       persistent ? [@@bowlers[id] = clazz.new, id] : clazz.new
     end
       
   private
-    def get_yaml yaml
+    def get_yaml yaml, additional_maps: []
       clazz = Qipowl::Mappers.const_get("#{yaml.capitalize}BowlerMapper")
       raise NameError.new("Invalid mapper type: #{clazz}") \
         unless clazz.is_a?(Class) && clazz < Qipowl::Mappers::BowlerMapper
         
-      clazz.new
+      result = clazz.new
+      [*additional_maps].each { |map|
+        result.merge! map
+      }
+      result
     end
-        
-    # FIXME Make contants PER-EIGENCLASS
-    def teach_class clazz, mapper
-      clazz.const_set("CUSTOM_TAGS", mapper.to_hash[:custom])
-      clazz.const_set("ENCLOSURES_TAGS", mapper.to_hash[:enclosures])
-      clazz.const_set("ENTITIES", mapper.entities)
-      clazz.const_set("TAGS", {})
-      clazz.class_eval %Q{
-        def ∃_enclosures entity
-          self.class::ENCLOSURES_TAGS.each { |k, v|
+
+    def teach_class_prepare clazz
+      clazz.const_set('CUSTOM_TAGS', {}) unless clazz.const_defined? 'CUSTOM_TAGS'
+      clazz.const_set('ENCLOSURES_TAGS', {}) unless clazz.const_defined? 'ENCLOSURES_TAGS'
+      Qipowl::ENTITIES.each { |section|
+        clazz.const_set("#{section.upcase}_TAGS", {}) \
+          unless clazz.const_defined? "#{section.upcase}_TAGS"
+      }
+      clazz.const_set('ENTITIES', {}) unless clazz.const_defined? 'ENTITIES'
+      clazz.const_set('TAGS', {}) unless clazz.const_defined? 'TAGS'
+    end
+
+    def ∃_template section
+      %Q{
+        def ∃_#{section} entity
+          self.class::#{section.upcase}_TAGS.each { |k, v|
             next unless k == entity
             v = {:tag => v} unless Hash === v
             v[:origin] = self.class::TAGS[v[:tag]]
+            v[:section] = k
             return v
           }
           nil
         end
       }
+    end
+
+    def teach_class clazz, mapper
+      teach_class_prepare clazz
+
+      clazz::CUSTOM_TAGS.rmerge! mapper.to_hash[:custom] if mapper.to_hash[:custom]
+      clazz::ENCLOSURES_TAGS.rmerge! mapper.to_hash[:enclosures] if mapper.to_hash[:enclosures]
+      clazz::ENTITIES.rmerge! mapper.entities if mapper.entities
+
+      clazz.class_eval ∃_template 'enclosures'
+
       Qipowl::ENTITIES.each { |section|
         next unless mapper.entities && mapper.entities[section.to_sym]
-        clazz.const_set("#{section.upcase}_TAGS", mapper.entities[section.to_sym])
-        clazz.class_eval %Q{
-          self::TAGS.rmerge! self::#{section.upcase}_TAGS
-          def ∃_#{section} entity
-            self.class::#{section.upcase}_TAGS.each { |k, v|
-              next unless k == entity
-              v = {:tag => v} unless Hash === v
-              v[:section] = k
-              return v
-            }
-            nil
-          end
-          def ∃_#{section}_tag entity
-                ∃_#{section}(entity)[:tag] if ∃_#{section}(entity)
-          end
-        }
+        clazz.const_get("#{section.upcase}_TAGS").rmerge! mapper.entities[section.to_sym]
+        clazz.const_get('TAGS').rmerge! clazz.const_get("#{section.upcase}_TAGS")
+        clazz.class_eval ∃_template section
+
         mapper.entities[section.to_sym].each { |key, value|
           tag = Hash === value && value[:marker] ? value[:marker] : "∀_#{section}"
           clazz.class_eval %Q{
             alias_method :#{key}, :#{tag}
           } unless clazz.instance_methods.include?(key.to_sym)
         }
-      }
-      clazz.class_eval %Q{
-        def ∀_tags
-          self.class::TAGS.keys
-        end
       }
     end
   end

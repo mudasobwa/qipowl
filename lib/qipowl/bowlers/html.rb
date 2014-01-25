@@ -23,15 +23,17 @@ module Qipowl
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with trimmed `grip` tag
       def ∀_grip *args
+        data = ∃_grip(__callee__)
         mine, rest = [*args].join(SEPARATOR).split("#{__callee__}∎", 2)
-        [tagify(∃_grip_tag(__callee__), {:class => ∃_grip(__callee__)[:class]}, mine), rest]
+        [tagify(data[:tag], {:class => data[:class]}, mine), rest]
       end
 
       # `:alone` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with prepended `alone` tag
       def ∀_alone *args
-        [standalone(∃_alone_tag(__callee__), {:class => ∃_alone(__callee__)[:class]}), args]
+        data = ∃_alone(__callee__)
+        [standalone(data[:tag], {:class => data[:class]}), args]
       end
 
       # `:block` default handler
@@ -40,12 +42,13 @@ module Qipowl
       # opening tag
       # @return [Nil] nil
       def ∀_block *args
+        data = ∃_block(__callee__)
         param, *args = args.flatten
         param = param.to_s
         harvest __callee__, 
                 tagify(
-                  ∃_block_tag(__callee__), 
-                  {:class => (param.strip.empty? ? ∃_block(__callee__)[:class] : param.strip)}, 
+                  data[:tag],
+                  {:class => (param.strip.empty? ? data[:class] : param.strip)}, 
                   args.join(SEPARATOR).hsub(String::HTML_ENTITIES)
                 )
       end
@@ -54,20 +57,17 @@ module Qipowl
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with trimmed `magnet` tag
       def ∀_magnet *args
+        data = ∃_magnet(__callee__)
         param, *rest = args.flatten
         param = param.unbowl.to_s.prepend("#{__callee__}#{String::NBSP}")
-        [tagify(∃_magnet_tag(__callee__), {:class => ∃_magnet(__callee__)[:class]}, param), rest]
+        [tagify(data[:tag], {:class => data[:class]}, param), rest]
       end
   
       # `:regular` default handler
       # @param [Array] args the words, gained since last call to {#harvest}
       def ∀_regular *args
-        harvest __callee__,
-                tagify(
-                  ∃_regular_tag(canonize(__callee__)),
-                  {:class => ∃_regular(canonize(__callee__))[:class]},
-                  args
-                )
+        data = ∃_regular(canonize __callee__)
+        harvest __callee__, tagify(data[:tag], {:class => data[:class]}, args)
       end
     
       # `:self` default handler
@@ -79,7 +79,7 @@ module Qipowl
                when NilClass then cally
                when String then cally.to_s.gsub(/(#{cally})/, data[:format])
 #               when Regexp then cally.to_s.gsub(cally.to_s, data[:format])
-               when Symbol then send(data[:format], cally)
+               when Symbol then send(data[:format], cally) rescue cally # FIXME Do I need rescue here?!
                else raise "Bad format specified for #{data[:tag]}"
                end
         [data[:tag] ? tagify(data[:tag], {:class => data[:class]}, text) : text, args]
@@ -101,15 +101,17 @@ module Qipowl
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with trimmed `abbr` tag
       def † *args
+        data = ∃_grip(__callee__)
         term, *title = args.flatten
         mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
-        [tagify(∃_grip_tag(__callee__), {:title => mine, :class => ∃_grip(__callee__)[:class]}, term), rest]
+        [tagify(data[:tag], {:title => mine, :class => data[:class]}, term), rest]
       end
 
       # Handler for anchors.
       # @param [Array] args the words, gained since last call to {#harvest}
       # @return [Array] the array of words with trimmed `a` tag
       def ⚓ *args
+        data = ∃_grip(__callee__)
         href, *title = args.flatten
         mine, rest = [*title].join(SEPARATOR).split("#{__callee__}∎", 2)
         href = href.unbowl
@@ -118,7 +120,7 @@ module Qipowl
           when :img 
             standalone :img, { :src => href, :alt => [*mine].join(SEPARATOR), :class => 'inplace' }
           else 
-            tagify ∃_grip_tag(__callee__), {:href => href}, mine
+            tagify data[:tag], {:href => href}, mine
           end, rest
         ]
       end
@@ -132,7 +134,7 @@ module Qipowl
       # @return [Nil] nil
       def —— *args
         harvest nil, orphan(args.join(SEPARATOR)) unless args.vacant?
-        harvest __callee__, standalone(∃_alone_tag(__callee__))
+        harvest __callee__, standalone(∃_alone(__callee__)[:tag])
       end
 
 ##############################################################################
@@ -163,7 +165,7 @@ module Qipowl
       
       def ☇ *args
         param, *rest = args.flatten
-        [tagify(∃_magnet_tag(__callee__), {:name => param.unbowl}, String::ZERO_WIDTH_SPACE), rest]
+        [tagify(∃_magnet(__callee__)[:tag], {:name => param.unbowl}, String::ZERO_WIDTH_SPACE), rest]
       end
     
 ##############################################################################

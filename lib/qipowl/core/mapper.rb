@@ -40,11 +40,15 @@ module Qipowl::Mappers
       } rescue NoMethodError # FIXME WTF rescueing here?
     end
   private
-  # FIXME Make file search more flexible!!!
+    def load_yaml_file name
+      [*Qipowl.bowlers].each { |b|
+        (return YAML.load_file("#{b}/#{name}.yaml")) rescue next
+      }
+      nil
+    end
+
     def load_yaml input
-      IO === input ?
-        YAML.load_stream(input) :
-        YAML.load_file("#{Qipowl.bowlers_dir}/#{input.downcase}.yaml")
+      IO === input ? YAML.load_stream(input) : load_yaml_file("#{input.downcase}")
     end
   end
   
@@ -81,11 +85,4 @@ module Qipowl::Mappers
       @entities
     end
   end
-end
-  
-if __FILE__ == $0
-  require '../../qipowl'
-  y = Qipowl::Mappers::BowlerMapper.new 'html'
-  require 'awesome_print'
-  ap y[:mail]
 end
