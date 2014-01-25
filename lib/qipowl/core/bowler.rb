@@ -109,21 +109,22 @@ module Qipowl::Bowlers
 
     # Removes key from both {Mapping.SPICES} and {Mapping.SALT}. See {#add_spice}
     #
-    # @param [Symbol] key the key to be removed
-    def remove_entity key
+    # @param [Symbol] entity the key to be removed
+    def remove_entity entity
+      key = entity.to_sym
       Qipowl::ENTITIES.each { |section|
         next unless (curr_sect = self.class.const_get("#{section.upcase}_TAGS") rescue nil)
-        
+        curr_tag = send(:"∃_#{section}", key)
+        next unless curr_tag
+
         curr_sect.delete key
         self.class.const_get("ENCLOSURES_TAGS").delete key
-        curr_tag = send(:"∃_#{section}", key.to_sym)
 
         self.class.class_eval %Q{
           remove_method :#{key.bowl}
-        } if curr_tag && curr_tag[:tag] && instance_methods.include?(key.bowl)
+        }
       }
     end
-
 
   protected
     Qipowl::ENTITIES.each { |section|
