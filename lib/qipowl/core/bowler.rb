@@ -113,8 +113,6 @@ module Qipowl::Bowlers
     def remove_entity key
       Qipowl::ENTITIES.each { |section|
         next unless (curr_sect = self.class.const_get("#{section.upcase}_TAGS") rescue nil)
-        curr_tag = send(:"∃_#{section}", key.to_sym)
-        next unless curr_tag && curr_tag[:tag]
         
         curr_sect.delete key
         self.class.const_get("ENCLOSURES_TAGS").delete key
