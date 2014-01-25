@@ -116,9 +116,11 @@ module Qipowl::Bowlers
         
         curr_sect.delete key
         self.class.const_get("ENCLOSURES_TAGS").delete key
+        curr_tag = send(:"∃_#{section}", key.to_sym)
+
         self.class.class_eval %Q{
           remove_method :#{key.bowl}
-        }
+        } if curr_tag && curr_tag[:tag] && instance_methods.include?(key.bowl)
       }
     end
 
