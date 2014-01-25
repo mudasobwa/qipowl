@@ -99,6 +99,7 @@ module Qipowl::Bowlers
         key = key.bowl.to_sym
         tags[key] = value.to_sym
         self.class.const_get("ENCLOSURES_TAGS")[key] = enclosure_value.to_sym if enclosure_value
+        self.class.const_get("ENTITIES")[section.to_sym][key] = value.to_sym
         self.class.class_eval %Q{
           alias_method :#{key}, :∀_#{section}
         } # unless self.class.instance_methods(true).include?(key.bowl)
