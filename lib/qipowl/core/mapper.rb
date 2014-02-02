@@ -8,7 +8,7 @@ require_relative '../utils/logging'
 
 # @author Alexei Matyushkin
 module Qipowl::Mappers
-  
+
   # Operates +mapping+ for loaded +YAML+ rules files.
   #
   # - For top level sections, each section name
@@ -29,7 +29,7 @@ module Qipowl::Mappers
     def merge! input
       map = load_yaml(input) if input.is_one_of?(String, IO)
       raise ArgumentError.new "Invalid map (#{input} @ #{Qipowl.bowlers}) for merge in Mapper.\nCurrent dir: [#{Dir.pwd}].\n" \
-        unless map.respond_to? :to_hash        
+        unless map.respond_to? :to_hash
 
       incs = map.delete(:includes)
 
@@ -51,10 +51,10 @@ module Qipowl::Mappers
       IO === input ? YAML.load_stream(input) : load_yaml_file("#{input.downcase}")
     end
   end
-  
+
   class BowlerMapper < Mapper
     include TypoLogging
-    
+
     def initialize input = nil
       input = self.class.name.split('::').last.downcase.gsub(/bowlermapper\Z/, '') if input.nil?
       super input
@@ -71,7 +71,7 @@ module Qipowl::Mappers
           # Append keys
           @entities[key][k.bowl] = v.dup
           if Hash === v
-            @entities[key][k.bowl].delete(:synonyms) 
+            @entities[key][k.bowl].delete(:synonyms)
             # Append explicit synonyms
             v[:synonyms].each { |syn|
               syn = syn.bowl.to_sym

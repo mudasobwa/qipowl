@@ -35,8 +35,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'psych'
   s.add_dependency 'unicode'
-  s.add_dependency 'typogrowth', '~> 0.9.0', '>= 0.9.1'
-  s.add_dependency 'aquarium', '~> 0.6'
   s.add_dependency 'crochets'
 end
 

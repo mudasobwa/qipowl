@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'typogrowth'
+
 require_relative "../constants"
 require_relative '../utils/logging'
 
@@ -34,9 +36,9 @@ module Qipowl::Bowlers
   #
   class Bowler
     include TypoLogging
-    
+
     attr_reader :in, :out
-    
+
     # Internal constant for joining/splitting the strings during processing.
     # Override on your own risk. I can′t imagine why you would need to do so.
     SEPARATOR = $, || ' '
@@ -136,7 +138,7 @@ module Qipowl::Bowlers
     }
 
     def defreeze str
-      str
+      str.typo(sections: :quotes).defuse
     end
 
     def roast str
@@ -160,16 +162,16 @@ module Qipowl::Bowlers
         @yielded.pop(@yielded.size).reverse.join(SEPARATOR)
       }.join($/).uncarriage.un␚ify.unspacefy.unbowl
     end
-  
+
     def serveup str
-      str.gsub(/⌦./, '').gsub(/.⌫/, '')
+      str.gsub(/⌦./, '').gsub(/.⌫/, '').typo
     end
 
   protected
     # The handler of the last “orphaned” text block in the input string.
     #
     # E.g.:
-    #     
+    #
     #     Here goes a quite significant list:
     #
     #     • line item 1
@@ -210,7 +212,7 @@ module Qipowl::Bowlers
       @yielded << str unless str.vacant?
       nil
     end
-  
+
   private
     # Prepares blocks in the input for the execution
     def block str
@@ -220,7 +222,7 @@ module Qipowl::Bowlers
         result.gsub!(/(#{tag})\s*(\S*\s?|$)(.*?)(#{tag}|\Z)/m) {
           %Q{
 
-#{$1} #{$2.strip.bowl} #{$3.bowl.carriage}
+#{$1} #{Base64.encode64($2).chomp.bowl} #{Base64.encode64($3).chomp.bowl}
 
 }
         }
@@ -252,14 +254,12 @@ module Qipowl::Bowlers
       }
       result.unbowl
     end
-    
+
     def split str
       (block str).split(/\R{2,}/).map { |para|
-        self.class.const_defined?(:BLOCK_TAGS) &&
-              (para =~ /\A(#{self.class::BLOCK_TAGS.keys.join('|')})\s+/) ?
-          para : (grip custom para)
+        (grip custom para)
       }
     end
-    
+
   end
 end

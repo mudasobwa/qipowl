@@ -1,10 +1,10 @@
 # encoding: utf-8
 
 # КТО ЧТО_ДЕЛАЕТ КОМУ   ЧТО
-#  ☺       ⚙         ♿      ☕
+#  ☺       ⚙     ♿     ☕
 
 # КАКОЙ   КАК   КАКОЙ  КАКОЙ
-#  ☼        ☂        ☼       ☼
+#  ☼      ☂     ☼      ☼
 
 # ПОКА НЕ ОПРЕДЕЛЕНА ЧАСТЬ РЕЧИ (найти термин для)
 #                 ∈
@@ -19,7 +19,7 @@ require_relative '../core/bowler'
 module Qipowl
   module Mappers
     class IspruBowlerMapper < BowlerMapper
-      
+
     end
   end
 
@@ -30,7 +30,7 @@ module Qipowl
 
       LANG_FROM = 'es' # FIXME UGLY
       LANG_TO   = 'ru' # FIXME UGLY
-      
+
 ##############################################################################
 ###              Default handlers for all the types of markup              ###
 ##############################################################################
@@ -73,20 +73,20 @@ module Qipowl
       # @see {Qipowl::Bowler#serveup}
       #
       # Additionally it beatifies the output HTML
-      # 
+      #
       # @param [String] str to be roasted
       def serveup str
-        (super str).typo(LANG_TO).strip
+        (super str).typo(lang: LANG_TO).strip
       end
 
     private
-      # Hence we cannot simply declare the DSL for it, we need to handle 
+      # Hence we cannot simply declare the DSL for it, we need to handle
       # calls to all the _methods_, starting with those symbols.
-      # 
+      #
       # @param [Symbol] method as specified by caller (`method_missing`.)
       # @param [Array] args as specified by caller (`method_missing`.)
       # @param [Proc] block as specified by caller (`method_missing`.)
-      # 
+      #
       # @return [Array] the array of words
       def special_handler method, *args, &block
         ∀_word method, args, block

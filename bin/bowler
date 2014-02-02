@@ -11,7 +11,7 @@ OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} FILE|STRING"
 
   # Bowl result?
-  opts.on("-a", "--action ACTION", [:bowl, :ruby, :cmd, :yaml, :html],
+  opts.on("-a", "--action ACTION", [:bowl, :unbowl, :ruby, :cmd, :yaml, :html],
           "Action to apply on input (bowl, html); default: html") do |action|
     options[:action] = action || :bowl
   end
@@ -31,6 +31,8 @@ file_or_string = File.read(file_or_string) if File.exist?(file_or_string)
 case options[:action]
 when :bowl
   puts file_or_string.bowl
+when :unbowl
+  puts file_or_string.unbowl
 else
   puts Qipowl::Html.parse file_or_string
-end  
+end

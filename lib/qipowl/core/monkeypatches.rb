@@ -18,12 +18,12 @@ module Qipowl
   end
 
   # Bowling string means producing interpreter-safe text basing on ascii input.
-  # 
+  #
   class ::String
     NBSP = "\u{00A0}"
-    
+
     SYMBOL_FOR_SPACE = "\u{2420}" # ␠
-    
+
     WIDESPACE = "\u{FF00}"
     EN_SPACE = "\u{2002}"
     EM_SPACE = "\u{2003}"
@@ -38,8 +38,8 @@ module Qipowl
     NARROW_NO_BREAK_SPACE = "\u{202F}"
     MEDIUM_MATHEMATICAL_SPACE = "\u{205F}"
     ZERO_WIDTH_NO_BREAK_SPACE = "\u{FEFF}"
-    IDEOGRAPHIC_SPACE = "\u{3000}"    
-    
+    IDEOGRAPHIC_SPACE = "\u{3000}"
+
     CARRIAGE_RETURN = '␍'
     NULL = '␀'
     ASCII_SYMBOLS, ASCII_DIGITS, ASCII_LETTERS_SMALL, ASCII_LETTERS_CAP = [
@@ -58,14 +58,14 @@ module Qipowl
       }.flatten]
     }
     UTF_ALL = [UTF_SYMBOLS.values, UTF_DIGITS.values, UTF_LETTERS_SMALL.values, UTF_LETTERS_CAP.values]
-    
+
     UTF_ASCII = UTF_SYMBOLS.merge(UTF_DIGITS).merge(UTF_LETTERS_SMALL).merge(UTF_LETTERS_CAP)
     ASCII_UTF = UTF_ASCII.invert
-    
+
     def vacant?
       nil? || empty?
     end
-    
+
     def hsub! hash
       self.gsub!(/#{hash.keys.join('|')}/, hash)
     end
@@ -101,7 +101,7 @@ module Qipowl
       (out = self.dup).unspacefy!
       out
     end
-    
+
     def unuglify
       self.unbowl.unspacefy.uncarriage.strip
     end
@@ -126,16 +126,16 @@ module Qipowl
     def un␚ify
       self.gsub(/␚(.*?)␚/, '')
     end
-    
+
     def wstrip
       self.gsub(/#{NBSP}/, '')
     end
-    
+
     def to_filename
       self.gsub(/[#{Regexp.quote(ASCII_SYMBOLS.join)}]/, UTF_ASCII).gsub(/\s/, "#{NBSP}")[0..50]
     end
   end
-  
+
   class ::Symbol
     def dup
       self.to_s.dup.to_sym
@@ -159,11 +159,11 @@ module Qipowl
       self.to_s.wstrip.to_sym
     end
   end
-  
+
   class ::Fixnum
     def ␚ify
       "␚#{self}␚"
     end
   end
-  
+
 end
