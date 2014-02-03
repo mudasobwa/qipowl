@@ -38,20 +38,21 @@ module Qipowl
       end
 
       # `:block` default handler
+      # FIXME TODO make an ability to supply class
       # @param [Array] args the words, gained since last call to {#harvest}
       # @param [String] param the text to be places on the same string as
       # opening tag
       # @return [Nil] nil
-      def ∀_block *args
+      def ∀_block arg
         data = ∃_block(__callee__)
-        param, body = args.flatten.map { |arg|
-          Base64.decode64("#{arg.to_s.unbowl}\n").force_encoding('UTF-8')
-        }
-        param = param.to_s
+        param, body = Base64.decode64(
+          "#{arg.to_s.unbowl.uncarriage(false)}"
+        ).force_encoding('UTF-8').split(/\n/, 2)
+        param, body = '', param if body.nil?
         harvest __callee__,
                 tagify(
                   data[:tag],
-                  {:class => (param.strip.empty? ? data[:class] : param.strip)},
+                  {:class => param.strip.empty? ? data[:class] : param.strip },
                   body.hsub(String::HTML_ENTITIES)
                 )
       end
@@ -220,18 +221,27 @@ module Qipowl
       alias_method :▷, :▶
 
     protected
+      def shadows
+        @shadows ||= ([] \
+           << self.class::BLOCK_TAGS.keys.map  {|b| /#{b}.*?#{b}/m } \
+           << self.class::CUSTOM_TAGS.keys.map {|re| /#{re}/m} \
+           << self.class::MAGNET_TAGS.keys.map {|m| /#{m}\s+\S+/} \
+        ).flatten
+      end
+
       # @see {Qipowl::Bowlers::Bowler#defreeze}
       #
       # @param [String] str to be defreezed
       def defreeze str
-        shadows = [] \
-           << self.class::CUSTOM_TAGS.keys.map {|re| /#{re}/m} \
-           << self.class::MAGNET_TAGS.keys.map {|m| /#{m}\s+\S+/} \
-           << self.class::BLOCK_TAGS.keys.map  {|b| /#{b}.*?#{b}/m }
-        str.typo(sections: :quotes).defuse(
-          shadows: shadows.flatten
-        )
+        s = shadows
+        str.typo(sections: :quotes, shadows: s).defuse(shadows: s)
       end
+
+      def serveup str
+        s = /<pre.*?>.*?<\/pre>/m
+        str.gsub(/⌦./, '').gsub(/.⌫/, '').typo(shadows: s)
+      end
+
 
       # Computes the level of the `:linewide` element by counting
       # preceeding non-breakable spaces. For instance, nested lists

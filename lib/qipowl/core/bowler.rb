@@ -105,6 +105,7 @@ module Qipowl::Bowlers
         self.class.class_eval %Q{
           alias_method :#{key}, :∀_#{section}
         } # unless self.class.instance_methods(true).include?(key.bowl)
+        @shadows = nil
       else
         logger.warn "Trying to add key “#{key}” in an invalid section “#{section}”. Ignoring…"
       end
@@ -127,6 +128,7 @@ module Qipowl::Bowlers
         self.class.class_eval %Q{
           remove_method :#{key.bowl}
         }
+        @shadows = nil
       }
     end
 
@@ -219,10 +221,10 @@ module Qipowl::Bowlers
       return str unless self.class.const_defined?(:BLOCK_TAGS)
       result = str.dup
       self.class::BLOCK_TAGS.each { |tag, value|
-        result.gsub!(/(#{tag})\s*(\S*\s?|$)(.*?)(#{tag}|\Z)/m) {
+        result.gsub!(/(#{tag})(.*?)(?:#{tag}|\Z)/m) { |m|
           %Q{
 
-#{$1} #{Base64.encode64($2).chomp.bowl} #{Base64.encode64($3).chomp.bowl}
+#{$1} #{Base64.encode64($2).carriage(false).bowl}
 
 }
         }

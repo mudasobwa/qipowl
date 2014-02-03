@@ -46,7 +46,12 @@ Feature: All the possibilities of HTML parser
 
   Scenario: Block tag Λ
     Given we use "html" bowler
-    When the input string is "Λ ruby @mapping[:block] = ≡bold≡ Λ"
+    When the input string is
+    """
+    Λ ruby
+      @mapping[:block] = ≡bold≡
+    Λ
+    """
     And the execute method is called on bowler
     Then the result should equal to
     """
