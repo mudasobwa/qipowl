@@ -106,7 +106,7 @@ Feature: All the possibilities of HTML parser
         | "Wikipedia¹http://wikipedia.org"    | "<p><a href='http://wikipedia.org'>Wikipedia</a></p>" |
         | "Wikipedia†Best knowledge base†"    | "<p><abbr title='Best knowledge base'>Wikipedia</abbr></p>" |
         | "Inplace picture¹http://mudasobwa.ru/images/am.jpg goes here." | "<p><img class='inplace' alt='Inplace picture' src='http://mudasobwa.ru/images/am.jpg'/> goes here.</p>" |
-        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | " ␍ <figure> ␍  <img src='http://mudasobwa.ru/images/am.jpg'/> ␍  <figcaption> ␍  <p> ␍  Standalone picture ␍  </p> ␍  </figcaption> ␍ </figure> ␍ " |
+        | "http://mudasobwa.ru/images/am.jpg Standalone picture" | " ␍ <figure> ␍  <img src='http://mudasobwa.ru/images/am.jpg'/> ␍  <figcaption> ␍  <p>Standalone picture</p> ␍  </figcaption> ␍ </figure> ␍ " |
 
   Scenario Outline: Markdown atavisms ⇒ links
     Given we use "html" bowler
@@ -117,7 +117,7 @@ Feature: All the possibilities of HTML parser
     Examples:
         | input               | output                             |
         | "Here ![Image](http://mudasobwa.ru/images/am.jpg) goes" | "<p>Here <img class='inplace' alt='Image' src='http://mudasobwa.ru/images/am.jpg'/> goes</p>" |
-        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | " ␍ <figure> ␍  <img src='http://mudasobwa.ru/images/am.jpg'/> ␍  <figcaption> ␍  <p> ␍  Figure ␍  </p> ␍  </figcaption> ␍ </figure> ␍ " |
+        | "![Figure](http://mudasobwa.ru/images/am.jpg)" | " ␍ <figure> ␍  <img src='http://mudasobwa.ru/images/am.jpg'/> ␍  <figcaption> ␍  <p>Figure</p> ␍  </figcaption> ␍ </figure> ␍ " |
         | "Here [Link](http://wikipedia.org/) goes" | "<p>Here <a href='http://wikipedia.org/'>Link</a> goes</p>" |
         | "Here *italic* goes" | "<p>Here <em>italic</em> goes</p>" |
         | "Here inplace*it*alic goes" | "<p>Here inplace<em>it</em>alic goes</p>" |
@@ -259,3 +259,31 @@ Feature: All the possibilities of HTML parser
         | input                  | output                                    |
         | "here «quote» goes"    | "<p>here «quote» goes</p>"     |
         | "here « quote¹http://wikipedia.org » goes"    | "<p>here «<a href='http://wikipedia.org'>quote</a>» goes</p>"     |
+
+  Scenario: Video embedded
+    Given we use "html" bowler
+    When the input string is
+    """
+    http://qipowl.herokuapp.com/images/owl.png
+
+    ☞ Video embedded:
+
+    http://www.youtube.com/watch?v=KFKxlYNfT_o
+    """
+    And the execute method is called on bowler
+    Then the result should equal to
+    """
+
+    <figure>
+     <img src='http://qipowl.herokuapp.com/images/owl.png'/>
+     <figcaption>
+     <p></p>
+     </figcaption>
+    </figure>
+
+    <p class='text-info'>Video embedded:</p>
+
+    <iframe class='youtube' width='560' height='315' src='http://www.youtube.com/embed/KFKxlYNfT_o'
+            frameborder='0' allowfullscreen></iframe>
+
+    """

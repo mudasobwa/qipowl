@@ -193,13 +193,12 @@ module Qipowl
       # @return [Nil] nil
       def ⚘ *args
         href, *title = args.flatten
+        title = title.join(SEPARATOR).strip
         harvest __callee__, %Q(
 <figure>
   <img src='#{href.unbowl}'/>
   <figcaption>
-    <p>
-      #{title.join(SEPARATOR)}
-    </p>
+    <p>#{title}</p>
   </figcaption>
 </figure>
 )

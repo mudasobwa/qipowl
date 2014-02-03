@@ -124,7 +124,7 @@
 # http://www.youtube.com/watch?v=SAJ_TzLqy1U
   'http://www\.youtube\.com/(?:watch\?v=|v/)([A-Za-z0-9_]+)' : '✇ \1'
 # Standalone images and quotes
-  '^(https?://\S+)(\s*.*)$' : '⚘ \1 \2'
+  '^(https?://\S+)(\s*.*?)$' : '⚘ \1 \2'
 
 :enclosures :
   :•       :
