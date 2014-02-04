@@ -234,12 +234,14 @@ module Qipowl
       # @param [String] str to be defreezed
       def defreeze str
         s = shadows
-        str.typo(sections: :quotes, shadows: s).defuse(shadows: s)
+        str.typo(sections: [:sequence, :quotes], shadows: s).defuse(shadows: s)
       end
 
       def serveup str
         s = /<pre.*?>.*?<\/pre>/m
-        str.gsub(/⌦./, '').gsub(/.⌫/, '').typo(shadows: s)
+        str.gsub(/⌦./, '').gsub(/.⌫/, '').typo(
+          sections: [:punctuation, :orphans], shadows: s
+        )
       end
 
 
