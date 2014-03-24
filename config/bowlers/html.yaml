@@ -45,7 +45,10 @@
     :≈          : :em
     :↑             : :sup
     :↓             : :small
-    :λ          : :code
+    :λ          :
+      :tag      : :code
+      :synonyms :
+        - :✿_span_fixedfont
     :⚓             : :a
     :†          : :abbr
     :✁             : :del
@@ -91,6 +94,8 @@
     :☛             :
       :tag      : :p
       :class    : :'text-success'
+      :synonyms :
+        - :✿_div_center
     :☞             :
       :tag      : :p
       :class    : :'text-info'
