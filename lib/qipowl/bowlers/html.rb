@@ -238,7 +238,11 @@ module Qipowl
       end
 
       def serveup str
-        s = /<pre.*?>.*?<\/pre>/m
+        s = [
+          /<pre.*?>.*?<\/pre>/m,
+          /<code.*?>.*?<\/code>/m
+        ]
+
         str.gsub(/⌦./, '').gsub(/.⌫/, '').typo(
           sections: [:punctuation, :orphans], shadows: s
         )

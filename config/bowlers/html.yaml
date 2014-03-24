@@ -53,6 +53,9 @@
     :†          : :abbr
     :✁             : :del
     :✿_span_nobr : :nobr
+    :✓          :
+      :tag      : :span
+      :class    : :notypo
   :regular      :
     :•          :
       :tag      : :li
