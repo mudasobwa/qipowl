@@ -265,7 +265,7 @@ Feature: All the possibilities of HTML parser
         | "here «quote» goes"    | "<p>here «quote» goes</p>"     |
         | "here « quote¹http://wikipedia.org » goes"    | "<p>here «<a href='http://wikipedia.org'>quote</a>» goes</p>"     |
         | "This is λsystem.dllλ file."  | "<p>This is <code>system.dll</code> file.</p>" |
-        | "This is ✓8:35✓ time."       | "<p>This is ✓8:35✓ time.</p>" |
+        | "This is ✓8:35✓ time."       | "<p>This is <span class='notypo'>8:35</span> time.</p>" |
 
   Scenario: Video embedded
     Given we use "html" bowler
